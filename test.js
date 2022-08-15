@@ -4,16 +4,16 @@ const app = express();
 
 var mysql = require('mysql');
 var conn = mysql.createConnection({
-    host : 'database-1.c0vugvhjuhqj.ap-northeast-2.rds.amazonaws.com',
-    user : 'admin',
-    password : 'choi6014#',
-    database : 'espa'
+    host : 'kyunss-db.cjwyxnwnqovj.ap-northeast-2.rds.amazonaws.com',
+    user : 'kyunss_admin',
+    password : 'Choibjk6014#',
+    database : 'GongDB'
 });
 
 //conn.connect();
 
 const server = app.listen(3001, () => {
-    console.log('Start Server : 54.180.1.96:3001');
+    console.log('Start Server : 13.124.234.170:3001');
 
 });
 
