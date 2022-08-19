@@ -103,8 +103,8 @@ app.post('/api/users/add', function(req, res) {
     var p_code_1 = req.body.p_code_1;
     var level = req.body.level;
     var app_version = req.body.app_version;
-    var c_login_date = req.body.last_login_date.toString();
-    var p_login_date = req.body.last_login_date.toString();
+    var c_login_date = req.body.c_login_date.toString();
+    var p_login_date = req.body.p_login_date.toString();
 
     
 
