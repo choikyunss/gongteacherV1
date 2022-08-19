@@ -100,12 +100,16 @@ app.post('/api/users/add', function(req, res) {
     var nickname = req.body.nickname.toString();
     var email = req.body.email.toString();
     var join_date = req.body.join_date.toString();
-    var last_login_date = req.body.last_login_date.toString();
-    var user_version = req.body.user_version;
+    var p_code_1 = req.body.p_code_1;
     var level = req.body.level;
+    var app_version = req.body.app_version;
+    var c_login_date = req.body.last_login_date.toString();
+    var p_login_date = req.body.last_login_date.toString();
 
-    var sql = 'INSERT INTO users (nickname, email, join_date, last_login_date, user_version, level) VALUES (?, ?, ?, ?, ?, ?)';
-    conn.query(sql, [nickname, email, join_date, last_login_date, user_version, level], (err, rows, fields) => {
+    
+
+    var sql = 'INSERT INTO users (nickname, email, join_date, p_code_1, level, app_version, c_login_date, p_login_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+    conn.query(sql, [nickname, email, join_date, p_code_1, level, app_version, c_login_date, p_login_date], (err, rows, fields) => {
         if(err) {
             console.log(err);
             res.status(500).send('Internal Server Error');
