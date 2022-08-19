@@ -7,7 +7,7 @@ var conn = mysql.createConnection({
     host : 'kyunss-db.cjwyxnwnqovj.ap-northeast-2.rds.amazonaws.com',
     user : 'kyunss_admin',
     password : 'Choibjk6014#',
-    database : 'GongDB'
+    database : 'Gong_Teacher'
 });
 
 //conn.connect();
