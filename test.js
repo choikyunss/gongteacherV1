@@ -126,12 +126,12 @@ app.post('/api/users/add', function(req, res) {
     var nickname = req.body.nickname.toString();
     var email = req.body.email.toString();
     var join_date = req.body.join_date.toString();
-    var level = 1; // 신규 가입자의 학습레벨은 무조건 1
+    var level = req.body.level;
     var app_version = req.body.app_version;
     var c_login_date = req.body.c_login_date.toString();
     var p_login_date = req.body.p_login_date.toString();    
 
-    var sql = 'INSERT INTO users (nickname, email, join_date, app_version, c_login_date, p_login_date) VALUES (?, ?, ?, ?, ?, ?) FROM DUAL WHERE NOT EXISTS (SELECT * FROM users WHERE email = ?)';
+    var sql = 'INSERT INTO users (nickname, email, join_date, level, app_version, c_login_date, p_login_date) VALUES (?, ?, ?, ?, ?, ?, ?) FROM DUAL WHERE NOT EXISTS (SELECT * FROM users WHERE email = ?)';
     // 신규 가입자의 E-Mail이 중복될 경우, 중복가입처리 되지 않도록 함
     conn.query(sql, [nickname, email, join_date, level, app_version, c_login_date, p_login_date], (err, rows, fields) => {
         if(err) {
