@@ -149,14 +149,13 @@ app.post('/api/users/add', function(req, res) {
 app.put('/api/users/update/:type', function(req, res) {
     let {type} = req.params;
     var app_version = req.body.app_version;
-    var p_login_date;
     var c_login_date = req.body.c_login_date.toString();
 
     conn.query('SELECT c_login_date FROM users WHERE user_id = ?;', type, function(err, rows, fields) {
         if (err) {
             res.send(err);
         } else {
-            p_login_date = rows.c_login_date;
+            var p_login_date = rows.c_login_date;
             var sql = 'UPDATE users SET app_version=?, c_login_date=?, p_login_date=? WHERE user_id=?';
             var params = [app_version, c_login_date, p_login_date]
             conn.query(sql, params, function(err, rows, fields) {
