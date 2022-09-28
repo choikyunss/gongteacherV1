@@ -151,21 +151,21 @@ app.put('/api/users/update/:type', function(req, res) {
     var app_version = req.body.app_version;
     var c_login_date = req.body.c_login_date.toString();
 
-    conn.query('SELECT c_login_date FROM users WHERE user_id = ?;', type, function(err, rows, fields) {
-        if (err) {
-            res.send(err);
+    conn.query('SELECT c_login_date FROM users WHERE user_id = ?;', type, function(err1, rows1, fields) {
+        if (err1) {
+            res.send(err1);
         } else {
-            console.log(rows.c_login_date);
-            var p_login_date = rows.c_login_date;
+            console.log(rows1.c_login_date);
+            var p_login_date = rows1.c_login_date;
             var sql = 'UPDATE users SET app_version=?, c_login_date=?, p_login_date=? WHERE user_id=?';
             var params = [app_version, c_login_date, p_login_date, type]
-            conn.query(sql, params, function(err, rows, fields) {
-                if (err) {
-                    console.log(err);
+            conn.query(sql, params, function(err2, rows2, fields) {
+                if (err2) {
+                    console.log(err2);
                     res.status(500).send('Internal Server Error');
                 } else {
-                    console.log(rows);
-                    res.send(rows);
+                    console.log(rows2);
+                    res.send(rows2);
                 }
             });
         }
