@@ -157,7 +157,7 @@ app.put('/api/users/update/:type', function(req, res) {
         } else {
             var p_login_date = rows.c_login_date;
             var sql = 'UPDATE users SET app_version=?, c_login_date=?, p_login_date=? WHERE user_id=?';
-            var params = [app_version, c_login_date, p_login_date]
+            var params = [app_version, c_login_date, p_login_date, type]
             conn.query(sql, params, function(err, rows, fields) {
                 if (err) {
                     console.log(err);
