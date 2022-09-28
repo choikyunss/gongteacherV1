@@ -119,7 +119,7 @@ app.post('/api/users/add', function(req, res) {
 });
 */
 
-///////////// 사용자 신규가입 (DB : Users) ///////////////////////////
+///////////// (Table ID : s_users_id_info) 사용자 신규 추가 ///////////////////////////
 app.post('/api/users/add', function(req, res) {
     var req_body = req.body;
     console.log(req_body);
@@ -133,7 +133,6 @@ app.post('/api/users/add', function(req, res) {
     var p_login_date = req.body.p_login_date.toString();    
 
     var sql = 'INSERT INTO users (nickname, email, join_route, join_date, level, app_version, c_login_date, p_login_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-    // 신규 가입자의 E-Mail이 중복될 경우, 중복가입처리 되지 않도록 함
     conn.query(sql, [nickname, email, join_route, join_date, level, app_version, c_login_date, p_login_date], (err, rows, fields) => {
         if(err) {
             console.log(err);
@@ -146,15 +145,23 @@ app.post('/api/users/add', function(req, res) {
 });
 
 
-///////////// users DB에 값 수정하기 ///////////////////////////
+///////////// (Table ID : s_users_id_info) 사용자 정보 업데이트 (app_version, c_login_date, p_login_date) ///////////////////////////
 app.put('/api/users/update/:type', function(req, res) {
     let {type} = req.params;
-    var last_login_date = req.body.last_login_date.toString();
-    var user_version = req.body.user_version;
-    var level = req.body.level;
+    var app_version = req.body.app_version;
+    var p_login_date;
+    var c_login_date = req.body.last_login_date.toString();
+
+    conn.query('SELECT c_login_date FROM users WHERE user_id = ?;', type, function(err, rows, fields) {
+        if (err) {
+            res.send(err);
+        } else {
+            p_login_date = rows.c_login_date;
+        }
+    });
     
-    var sql = 'UPDATE users SET last_login_date=?, user_version=?, level=? WHERE id=?';
-    var params = [last_login_date, user_version, level, type]
+    var sql = 'UPDATE users SET app_version=?, c_login_date=?, p_login_date=? WHERE user_id=?';
+    var params = [app_version, c_login_date, p_login_date]
     conn.query(sql, params, function(err, rows, fields) {
         if (err) {
             console.log(err);
