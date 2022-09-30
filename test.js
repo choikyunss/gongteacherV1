@@ -172,8 +172,8 @@ app.put('/api/users/update/:type', function(req, res) {
     });
 });
 
-///////////// (Table ID : s_ox_users_order_ch-1) OX Chapter-1 순차 정보 생성 (q1 ~ q40) ///////////////////////////
-app.post('/api/s_ox_users_order_ch-1/add', function(req, res) {
+///////////// (Table ID : s_ox_users_order_ch01) OX Chapter-1 순차 정보 생성 (q1 ~ q40) ///////////////////////////
+app.post('/api/s_ox_users_order_ch01/add', function(req, res) {
     var req_body = req.body;
     console.log(req_body);
     var qst = new Array();
@@ -182,7 +182,7 @@ app.post('/api/s_ox_users_order_ch-1/add', function(req, res) {
         qst[i] = 1;
     }
 
-    var sql = 'INSERT INTO s_ox_users_order_ch-1 (q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, q19, q20, q21, q22, q23, q24, q25, q26, q27, q28, q29, q30, q31, q32, q33, q34, q35, q36, q37, q38, q39, q40) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    var sql = 'INSERT INTO s_ox_users_order_ch01 (q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, q19, q20, q21, q22, q23, q24, q25, q26, q27, q28, q29, q30, q31, q32, q33, q34, q35, q36, q37, q38, q39, q40) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
     conn.query(sql, [qst[0], qst[1], qst[2], qst[3], qst[4], qst[5], qst[6], qst[7], qst[8], qst[9], qst[10], qst[11], qst[12], qst[13], qst[14], qst[15], qst[16], qst[17], qst[18], qst[19], qst[20], qst[21], qst[22], qst[23], qst[24], qst[25], qst[26], qst[27], qst[28], qst[29], qst[30], qst[31], qst[32], qst[33], qst[34], qst[35], qst[36], qst[37], qst[38], qst[39] ], (err, rows, fields) => {
         if(err) {
             console.log(err);
