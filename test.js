@@ -192,7 +192,7 @@ app.post('/api/s_ox_users_order_ch-1/add', function(req, res) {
             res.send(rows);
         }
     });
-}
+});
 
 
 ///////////// id를 지정해서 users 테이블의 특정 row 데이터 불러오기 ///////////////////////////
