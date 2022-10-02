@@ -123,7 +123,6 @@ app.post('/api/users/add', function(req, res) {
 app.post('/api/users/add', function(req, res) {
     var req_body = req.body;
     console.log(req_body);
-    var nickname = req.body.nickname.toString();
     var email = req.body.email.toString();
     var join_route = req.body.join_route.toString();
     var join_date = req.body.join_date.toString();
