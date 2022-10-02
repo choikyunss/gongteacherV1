@@ -144,6 +144,19 @@ app.post('/api/users/add', function(req, res) {
     });
 });
 
+///////////// (Table ID : s_users_id_info) 사용자 정보 불러오기 (join_route, join_date, c_login_date, p_login_date) ///////////////////////////
+app.get('/api/users/read/:type', async(req, res) => {
+
+    let {type} = req.params;
+
+    conn.query('SELECT join_route, join_date, c_login_date, p_login_date FROM users WHERE user_id = ?;', type, function(err, rows, fields) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(rows);
+        }
+    });
+});
 
 ///////////// (Table ID : s_users_id_info) 사용자 정보 업데이트 (app_version, c_login_date, p_login_date) ///////////////////////////
 app.put('/api/users/update/:type', function(req, res) {
@@ -196,6 +209,7 @@ app.post('/api/s_ox_users_order_ch01/add', function(req, res) {
 
 
 ///////////// id를 지정해서 users 테이블의 특정 row 데이터 불러오기 ///////////////////////////
+/*
 app.get('/api/users/read/:type', async(req, res) => {
 
     let {type} = req.params;
@@ -208,7 +222,7 @@ app.get('/api/users/read/:type', async(req, res) => {
         }
     });
 });
-
+*/
 
 
 
