@@ -120,7 +120,7 @@ app.post('/api/users/add', function(req, res) {
 */
 
 ///////////// (Table ID : s_users_id_info) 사용자 신규 추가 ///////////////////////////
-app.post('/api/users/add', function(req, res) {
+app.post('/api/s_users_id_info/add', function(req, res) {
     var req_body = req.body;
     console.log(req_body);
     var login_id = req.body.login_id.toString();
@@ -145,11 +145,11 @@ app.post('/api/users/add', function(req, res) {
 });
 
 ///////////// (Table ID : s_users_id_info) 사용자 정보 불러오기 (join_route, join_date, c_login_date, p_login_date) ///////////////////////////
-app.get('/api/users/read/:type', async(req, res) => {
+app.get('/api/s_users_id_info/read/:type', async(req, res) => {
 
     let {type} = req.params;
 
-    conn.query('SELECT join_route, join_date, c_login_date, p_login_date FROM users WHERE login_id = ?;', type, function(err, rows, fields) {
+    conn.query('SELECT join_route, join_date, c_login_date, p_login_date FROM s_users_id_info WHERE login_id = ?;', type, function(err, rows, fields) {
         if (err) {
             res.send(err);
         } else {
@@ -159,18 +159,18 @@ app.get('/api/users/read/:type', async(req, res) => {
 });
 
 ///////////// (Table ID : s_users_id_info) 사용자 정보 업데이트 (app_version, c_login_date, p_login_date) ///////////////////////////
-app.put('/api/users/update/:type', function(req, res) {
+app.put('/api/s_users_id_info/update/:type', function(req, res) {
     let {type} = req.params;
     var app_version = req.body.app_version;
     var c_login_date = req.body.c_login_date.toString();
 
-    conn.query('SELECT c_login_date FROM users WHERE login_id = ?;', type, function(err1, rows1, fields) {
+    conn.query('SELECT c_login_date FROM s_users_id_info WHERE login_id = ?;', type, function(err1, rows1, fields) {
         if (err1) {
             res.send(err1);
         } else {
             console.log(rows1.c_login_date);
             var p_login_date = rows1[0].c_login_date;
-            var sql = 'UPDATE users SET app_version=?, c_login_date=?, p_login_date=? WHERE login_id=?';
+            var sql = 'UPDATE s_users_id_info SET app_version=?, c_login_date=?, p_login_date=? WHERE login_id=?';
             var params = [app_version, c_login_date, p_login_date, type]
             conn.query(sql, params, function(err2, rows2, fields) {
                 if (err2) {
@@ -181,6 +181,20 @@ app.put('/api/users/update/:type', function(req, res) {
                     res.send(rows2);
                 }
             });
+        }
+    });
+});
+
+///////////// (Table ID : s_system_id_info) 사용자 정보 불러오기 (final_ver, mandatory_update_ver) ///////////////////////////
+app.get('/api/s_system_id_info/read/:type', async(req, res) => {
+
+    let {type} = req.params;
+
+    conn.query('SELECT final_ver, mandatory_update_ver FROM s_system_id_info WHERE login_id = ?;', type, function(err, rows, fields) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(rows);
         }
     });
 });
