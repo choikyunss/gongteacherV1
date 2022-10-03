@@ -224,6 +224,7 @@ app.post('/api/s_ox_users_order_ch01/add', function(req, res) {
 
 ///////////// id를 지정해서 users 테이블의 특정 row 데이터 불러오기 ///////////////////////////
 app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
+    let {type} = req.params;
     var q1 = req.body.q1;
     
     var sql = 'UPDATE s_ox_users_order_ch01 SET q1=? WHERE user_id=?';
@@ -240,6 +241,17 @@ app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
 });
 
 /*
+var sql = 'UPDATE s_users_id_info SET app_version=?, c_login_date=?, p_login_date=? WHERE login_id=?';
+            var params = [app_version, c_login_date, p_login_date, type]
+            conn.query(sql, params, function(err2, rows2, fields) {
+                if (err2) {
+                    console.log(err2);
+                    res.status(500).send('Internal Server Error');
+                } else {
+                    console.log(rows2);
+                    res.send(rows2);
+                }
+
 var config = {user: "root", password: "root"}; // your config
 var sql1 = "SET @i = 0";
 var sql2 = " SELECT POSITION FROM ( " +
