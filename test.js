@@ -190,7 +190,7 @@ app.get('/api/s_system_id_info/read/:type', async(req, res) => {
 
     let {type} = req.params;
 
-    conn.query('SELECT final_ver, mandatory_update_ver FROM s_system_id_info WHERE login_id = ?;', type, function(err, rows, fields) {
+    conn.query('SELECT final_ver, mandatory_update_ver FROM s_system_id_info WHERE system_id = ?;', type, function(err, rows, fields) {
         if (err) {
             res.send(err);
         } else {
