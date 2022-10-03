@@ -123,6 +123,7 @@ app.post('/api/users/add', function(req, res) {
 app.post('/api/users/add', function(req, res) {
     var req_body = req.body;
     console.log(req_body);
+    var login_id = req.body.login_id.toString();
     var email = req.body.email.toString();
     var join_route = req.body.join_route.toString();
     var join_date = req.body.join_date.toString();
@@ -131,8 +132,8 @@ app.post('/api/users/add', function(req, res) {
     var c_login_date = req.body.c_login_date.toString();
     var p_login_date = req.body.c_login_date.toString();
     
-    var sql = 'INSERT INTO users (email, join_route, join_date, level, app_version, c_login_date, p_login_date) VALUES (?, ?, ?, ?, ?, ?, ?)';
-    conn.query(sql, [email, join_route, join_date, level, app_version, c_login_date, p_login_date], (err, rows, fields) => {
+    var sql = 'INSERT INTO users (login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+    conn.query(sql, [login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date], (err, rows, fields) => {
         if(err) {
             console.log(err);
             res.status(500).send('Internal Server Error');
@@ -148,7 +149,7 @@ app.get('/api/users/read/:type', async(req, res) => {
 
     let {type} = req.params;
 
-    conn.query('SELECT join_route, join_date, c_login_date, p_login_date FROM users WHERE user_id = ?;', type, function(err, rows, fields) {
+    conn.query('SELECT join_route, join_date, c_login_date, p_login_date FROM users WHERE login_id = ?;', type, function(err, rows, fields) {
         if (err) {
             res.send(err);
         } else {
@@ -163,13 +164,13 @@ app.put('/api/users/update/:type', function(req, res) {
     var app_version = req.body.app_version;
     var c_login_date = req.body.c_login_date.toString();
 
-    conn.query('SELECT c_login_date FROM users WHERE user_id = ?;', type, function(err1, rows1, fields) {
+    conn.query('SELECT c_login_date FROM users WHERE login_id = ?;', type, function(err1, rows1, fields) {
         if (err1) {
             res.send(err1);
         } else {
             console.log(rows1.c_login_date);
             var p_login_date = rows1[0].c_login_date;
-            var sql = 'UPDATE users SET app_version=?, c_login_date=?, p_login_date=? WHERE user_id=?';
+            var sql = 'UPDATE users SET app_version=?, c_login_date=?, p_login_date=? WHERE login_id=?';
             var params = [app_version, c_login_date, p_login_date, type]
             conn.query(sql, params, function(err2, rows2, fields) {
                 if (err2) {
