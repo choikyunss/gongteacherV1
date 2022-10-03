@@ -132,7 +132,7 @@ app.post('/api/s_users_id_info/add', function(req, res) {
     var c_login_date = req.body.c_login_date.toString();
     var p_login_date = req.body.c_login_date.toString();
     
-    var sql = 'INSERT INTO users (login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+    var sql = 'INSERT INTO s_users_id_info (login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
     conn.query(sql, [login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date], (err, rows, fields) => {
         if(err) {
             console.log(err);
