@@ -120,6 +120,7 @@ app.post('/api/users/add', function(req, res) {
 */
 
 ///////////// (Table ID : s_users_id_info) 사용자 신규 추가 ///////////////////////////
+/// TODO : 동일 이메일 가입 시도 시, 체크하여 중복가입 막기 -> 적용 해야함.//
 app.post('/api/s_users_id_info/add', function(req, res) {
     var req_body = req.body;
     console.log(req_body);
@@ -149,7 +150,7 @@ app.get('/api/s_users_id_info/read/:type', async(req, res) => {
 
     let {type} = req.params;
 
-    conn.query('SELECT join_route, join_date, c_login_date, p_login_date FROM s_users_id_info WHERE login_id = ?;', type, function(err, rows, fields) {
+    conn.query('SELECT user_id, join_route, join_date, c_login_date, p_login_date FROM s_users_id_info WHERE login_id = ?;', type, function(err, rows, fields) {
         if (err) {
             res.send(err);
         } else {
@@ -221,6 +222,53 @@ app.post('/api/s_ox_users_order_ch01/add', function(req, res) {
     });
 });
 
+///////////// id를 지정해서 users 테이블의 특정 row 데이터 불러오기 ///////////////////////////
+app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
+    var column_num = req.body.column_num.toString();
+    var column_var = req.body.column_var.toString();
+    
+    var sql = 'UPDATE s_ox_users_order_ch01 ??=?, WHERE user_id=?';
+            var params = [column_num, column_var, type]
+            conn.query(sql, params, function(err2, rows2, fields) {
+                if (err2) {
+                    console.log(err2);
+                    res.status(500).send('Internal Server Error');
+                } else {
+                    console.log(rows2);
+                    res.send(rows2);
+                }
+            });
+}
+
+/*
+var config = {user: "root", password: "root"}; // your config
+var sql1 = "SET @i = 0";
+var sql2 = " SELECT POSITION FROM ( " +
+    "SELECT name, @i:=@i+1 AS POSITION " +
+    "FROM database.table ti WHERE name='Johny' ORDER BY points ASC) t " +
+    "WHERE name='Johny'";
+
+var result = [];
+var connection = mysql.createConnection(config);
+
+var query1 = connection.query(sql1);
+query1.on("error", function (err) {
+    // handle error
+});
+query1.on("end", function () {
+    var query2 = connection.query(sql2);
+    query2.on("error", function (err) {
+        // handle error
+    });
+    query2.on("result", function (row) {
+        result.push(row);
+    });
+    query2.on("end", function () {
+        connection.end(); // close connection
+        console.log(result); // display result
+    });
+});
+*/
 
 ///////////// id를 지정해서 users 테이블의 특정 row 데이터 불러오기 ///////////////////////////
 /*
