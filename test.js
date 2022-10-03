@@ -228,17 +228,17 @@ app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
     var column_var = req.body.column_var.toString();
     
     var sql = 'UPDATE s_ox_users_order_ch01 ??=?, WHERE user_id=?';
-            var params = [column_num, column_var, type]
-            conn.query(sql, params, function(err2, rows2, fields) {
-                if (err2) {
-                    console.log(err2);
-                    res.status(500).send('Internal Server Error');
-                } else {
-                    console.log(rows2);
-                    res.send(rows2);
-                }
-            });
-}
+    var params = [column_num, column_var, type]
+    conn.query(sql, params, function(err2, rows2, fields) {
+        if (err2) {
+            console.log(err2);
+            res.status(500).send('Internal Server Error');
+        } else {
+            console.log(rows2);
+            res.send(rows2);
+        }
+    });
+});
 
 /*
 var config = {user: "root", password: "root"}; // your config
