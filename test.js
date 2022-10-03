@@ -223,7 +223,7 @@ app.post('/api/s_ox_users_order_ch01/add', function(req, res) {
 });
 
 ///////////// id를 지정해서 users 테이블의 특정 row 데이터 불러오기 ///////////////////////////
-app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
+app.put('/api/s_ox_users_order_ch01/update/:type', type, function(req, res) {
     var q1 = req.body.q1;
     
     var sql = 'UPDATE s_ox_users_order_ch01 q1=? WHERE user_id=?';
