@@ -227,18 +227,8 @@ app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
     let {type} = req.params;
     var col_num = req.body.col_num;
     
-    conn.query('SELECT ?? FROM s_ox_users_order_ch01 WHERE user_id = ?;', col_num, type, function(err1, rows1, fields) {
-        if(err) {
-            console.log(err1);
-            res.status(500).send('Internal Server Error');
-        } else {
-            res.send(rows1);
-        }
-
-    });
-/*
-    var sql = 'UPDATE s_ox_users_order_ch01 SET ??=? WHERE user_id=?';
-    var params = [col_num, col_val, type]
+    var sql = 'UPDATE s_ox_users_order_ch01 SET ??=+1 WHERE user_id=?';
+    var params = [col_num, type]
     conn.query(sql, params, function(err, rows, fields) {
         if (err) {
             console.log(err);
@@ -248,7 +238,6 @@ app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
             res.send(rows);
         }
     });
-    */
 });
 
 /*
