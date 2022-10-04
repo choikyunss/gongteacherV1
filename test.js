@@ -226,7 +226,6 @@ app.post('/api/s_ox_users_order_ch01/add', function(req, res) {
 app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
     let {type} = req.params;
     var col_num = req.body.col_num;
-    var col_val = req.body.col_val;
     
     conn.query('SELECT ?? FROM s_ox_users_order_ch01 WHERE user_id = ?;', col_num, type, function(err1, rows1, fields) {
         if(err) {
