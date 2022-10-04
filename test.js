@@ -228,7 +228,7 @@ app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
     var col_num = req.body.col_num;
     
     var sql = 'UPDATE s_ox_users_order_ch01 SET ??=??+1 WHERE user_id=?';
-    var params = [col_num, type]
+    var params = [col_num, col_num, type]
     conn.query(sql, params, function(err, rows, fields) {
         if (err) {
             console.log(err);
