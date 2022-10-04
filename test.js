@@ -226,10 +226,9 @@ app.post('/api/s_ox_users_order_ch01/add', function(req, res) {
 app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
     let {type} = req.params;
     var col_num = req.body.col_num;
-    var col_val = req.body.col_val;
     
-    var sql = 'UPDATE s_ox_users_order_ch01 SET ??=? WHERE user_id=?';
-    var params = [col_num, col_val, type]
+    var sql = 'UPDATE s_ox_users_order_ch01 SET ??=+1 WHERE user_id=?';
+    var params = [col_num, type]
     conn.query(sql, params, function(err, rows, fields) {
         if (err) {
             console.log(err);
