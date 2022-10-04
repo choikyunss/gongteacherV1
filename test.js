@@ -222,14 +222,24 @@ app.post('/api/s_ox_users_order_ch01/add', function(req, res) {
     });
 });
 
-///////////// id를 지정해서 users 테이블의 특정 row 데이터 불러오기 ///////////////////////////
+///////////// (Table ID : s_ox_users_order_ch01) OX Chapter-1 순차 정보 업데이트 (q1 ~ q40) ///////////////////////////
 app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
     let {type} = req.params;
     var col_num = req.body.col_num;
-    var col_var = req.body.col_var;
+    var col_val = req.body.col_val;
     
+    conn.query('SELECT ?? FROM s_ox_users_order_ch01 WHERE user_id = ?;', col_num, type, function(err1, rows1, fields) {
+        if(err) {
+            console.log(err1);
+            res.status(500).send('Internal Server Error');
+        } else {
+            res.send(rows1);
+        }
+
+    });
+/*
     var sql = 'UPDATE s_ox_users_order_ch01 SET ??=? WHERE user_id=?';
-    var params = [col_num, col_var, type]
+    var params = [col_num, col_val, type]
     conn.query(sql, params, function(err, rows, fields) {
         if (err) {
             console.log(err);
@@ -239,45 +249,26 @@ app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
             res.send(rows);
         }
     });
+    */
 });
 
 /*
-var sql = 'UPDATE s_users_id_info SET app_version=?, c_login_date=?, p_login_date=? WHERE login_id=?';
-            var params = [app_version, c_login_date, p_login_date, type]
-            conn.query(sql, params, function(err2, rows2, fields) {
-                if (err2) {
-                    console.log(err2);
-                    res.status(500).send('Internal Server Error');
-                } else {
-                    console.log(rows2);
-                    res.send(rows2);
-                }
-
-var config = {user: "root", password: "root"}; // your config
-var sql1 = "SET @i = 0";
-var sql2 = " SELECT POSITION FROM ( " +
-    "SELECT name, @i:=@i+1 AS POSITION " +
-    "FROM database.table ti WHERE name='Johny' ORDER BY points ASC) t " +
-    "WHERE name='Johny'";
-
-var result = [];
-var connection = mysql.createConnection(config);
-
-var query1 = connection.query(sql1);
-query1.on("error", function (err) {
-    // handle error
-});
-query1.on("end", function () {
-    var query2 = connection.query(sql2);
-    query2.on("error", function (err) {
-        // handle error
-    });
-    query2.on("result", function (row) {
-        result.push(row);
-    });
-    query2.on("end", function () {
-        connection.end(); // close connection
-        console.log(result); // display result
+///////////// (Table ID : s_ox_users_order_ch01) OX Chapter-1 순차 정보 업데이트 (q1 ~ q40) ///////////////////////////
+app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
+    let {type} = req.params;
+    var col_num = req.body.col_num;
+    var col_val = req.body.col_val;
+    
+    var sql = 'UPDATE s_ox_users_order_ch01 SET ??=? WHERE user_id=?';
+    var params = [col_num, col_val, type]
+    conn.query(sql, params, function(err, rows, fields) {
+        if (err) {
+            console.log(err);
+            res.status(500).send('Internal Server Error');
+        } else {
+            console.log(rows);
+            res.send(rows);
+        }
     });
 });
 */
