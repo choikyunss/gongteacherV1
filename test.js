@@ -240,6 +240,21 @@ app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
     });
 });
 
+///////////// (Table ID : s_ox_users_order_ch01) OX Chapter-1 순차 정보 불러오기 ///////////////////////////
+app.get('/api/s_ox_users_order_ch01/read/:type', async(req, res) => {
+
+    let {type} = req.params;
+
+    conn.query('SELECT * FROM s_ox_users_order_ch01 WHERE user_id = ?;', type, function(err, rows, fields) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(rows);
+        }
+    });
+});
+
+
 /*
 ///////////// (Table ID : s_ox_users_order_ch01) OX Chapter-1 순차 정보 업데이트 (q1 ~ q40) ///////////////////////////
 app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
