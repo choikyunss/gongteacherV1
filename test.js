@@ -225,10 +225,12 @@ app.post('/api/s_ox_users_order_ch01/add', function(req, res) {
 ///////////// (Table ID : s_ox_users_order_ch01) OX Chapter-1 순차 정보 업데이트 (q1 ~ q40) ///////////////////////////
 app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
     let {type} = req.params;
+    var ch_num = req.body.ch_num;
     var col_num = req.body.col_num;
     
-    var sql = 'UPDATE s_ox_users_order_ch01 SET ??=??%5+1 WHERE user_id=?';
-    var params = [col_num, col_num, type]
+    //var sql = 'UPDATE s_ox_users_order_ch01 SET ??=??%5+1 WHERE user_id=?';//
+    var sql = 'UPDATE ?? SET ??=??%5+1 WHERE user_id=?';
+    var params = [ch_num, col_num, col_num, type]
     conn.query(sql, params, function(err, rows, fields) {
         if (err) {
             console.log(err);
