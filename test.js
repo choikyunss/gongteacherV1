@@ -106,399 +106,16 @@ app.get('/api/s_system_id_info/read/:type', async(req, res) => {
     });
 });
 
-
-
-///////////// (Table ID : s_ox_users_order_ch01) OX Chapter-1~12 순차 정보 업데이트 (q1 ~ q40) ///////////////////////////
-///////////// OX Chapter-1 /////////////
-app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
-    let {type} = req.params;
-    var col_num = req.body.col_num;
-    
-    var sql = 'UPDATE s_ox_users_order_ch01 SET ??=??%5+1 WHERE user_id=?';
-    var params = [col_num, col_num, type]
-    conn.query(sql, params, function(err, rows, fields) {
-        if (err) {
-            console.log(err);
-            res.status(500).send('Internal Server Error');
-        } else {
-            console.log(rows);
-            res.send(rows);
-        }
-    });
-});
-
-///////////// OX Chapter-2 /////////////
-app.put('/api/s_ox_users_order_ch02/update/:type', function(req, res) {
-    let {type} = req.params;
-    var col_num = req.body.col_num;
-    
-    var sql = 'UPDATE s_ox_users_order_ch02 SET ??=??%5+1 WHERE user_id=?';
-    var params = [col_num, col_num, type]
-    conn.query(sql, params, function(err, rows, fields) {
-        if (err) {
-            console.log(err);
-            res.status(500).send('Internal Server Error');
-        } else {
-            console.log(rows);
-            res.send(rows);
-        }
-    });
-});
-
-///////////// OX Chapter-3 /////////////
-app.put('/api/s_ox_users_order_ch03/update/:type', function(req, res) {
-    let {type} = req.params;
-    var col_num = req.body.col_num;
-    
-    var sql = 'UPDATE s_ox_users_order_ch03 SET ??=??%5+1 WHERE user_id=?';
-    var params = [col_num, col_num, type]
-    conn.query(sql, params, function(err, rows, fields) {
-        if (err) {
-            console.log(err);
-            res.status(500).send('Internal Server Error');
-        } else {
-            console.log(rows);
-            res.send(rows);
-        }
-    });
-});
-
-///////////// OX Chapter-4 /////////////
-app.put('/api/s_ox_users_order_ch04/update/:type', function(req, res) {
-    let {type} = req.params;
-    var col_num = req.body.col_num;
-    
-    var sql = 'UPDATE s_ox_users_order_ch04 SET ??=??%5+1 WHERE user_id=?';
-    var params = [col_num, col_num, type]
-    conn.query(sql, params, function(err, rows, fields) {
-        if (err) {
-            console.log(err);
-            res.status(500).send('Internal Server Error');
-        } else {
-            console.log(rows);
-            res.send(rows);
-        }
-    });
-});
-
-///////////// OX Chapter-5 /////////////
-app.put('/api/s_ox_users_order_ch05/update/:type', function(req, res) {
-    let {type} = req.params;
-    var col_num = req.body.col_num;
-    
-    var sql = 'UPDATE s_ox_users_order_ch05 SET ??=??%5+1 WHERE user_id=?';
-    var params = [col_num, col_num, type]
-    conn.query(sql, params, function(err, rows, fields) {
-        if (err) {
-            console.log(err);
-            res.status(500).send('Internal Server Error');
-        } else {
-            console.log(rows);
-            res.send(rows);
-        }
-    });
-});
-
-///////////// OX Chapter-6 /////////////
-app.put('/api/s_ox_users_order_ch06/update/:type', function(req, res) {
-    let {type} = req.params;
-    var col_num = req.body.col_num;
-    
-    var sql = 'UPDATE s_ox_users_order_ch06 SET ??=??%5+1 WHERE user_id=?';
-    var params = [col_num, col_num, type]
-    conn.query(sql, params, function(err, rows, fields) {
-        if (err) {
-            console.log(err);
-            res.status(500).send('Internal Server Error');
-        } else {
-            console.log(rows);
-            res.send(rows);
-        }
-    });
-});
-
-///////////// OX Chapter-7 /////////////
-app.put('/api/s_ox_users_order_ch07/update/:type', function(req, res) {
-    let {type} = req.params;
-    var col_num = req.body.col_num;
-    
-    var sql = 'UPDATE s_ox_users_order_ch07 SET ??=??%5+1 WHERE user_id=?';
-    var params = [col_num, col_num, type]
-    conn.query(sql, params, function(err, rows, fields) {
-        if (err) {
-            console.log(err);
-            res.status(500).send('Internal Server Error');
-        } else {
-            console.log(rows);
-            res.send(rows);
-        }
-    });
-});
-
-///////////// OX Chapter-8 /////////////
-app.put('/api/s_ox_users_order_ch08/update/:type', function(req, res) {
-    let {type} = req.params;
-    var col_num = req.body.col_num;
-    
-    var sql = 'UPDATE s_ox_users_order_ch08 SET ??=??%5+1 WHERE user_id=?';
-    var params = [col_num, col_num, type]
-    conn.query(sql, params, function(err, rows, fields) {
-        if (err) {
-            console.log(err);
-            res.status(500).send('Internal Server Error');
-        } else {
-            console.log(rows);
-            res.send(rows);
-        }
-    });
-});
-
-///////////// OX Chapter-9 /////////////
-app.put('/api/s_ox_users_order_ch09/update/:type', function(req, res) {
-    let {type} = req.params;
-    var col_num = req.body.col_num;
-    
-    var sql = 'UPDATE s_ox_users_order_ch09 SET ??=??%5+1 WHERE user_id=?';
-    var params = [col_num, col_num, type]
-    conn.query(sql, params, function(err, rows, fields) {
-        if (err) {
-            console.log(err);
-            res.status(500).send('Internal Server Error');
-        } else {
-            console.log(rows);
-            res.send(rows);
-        }
-    });
-});
-
-///////////// OX Chapter-10 /////////////
-app.put('/api/s_ox_users_order_ch10/update/:type', function(req, res) {
-    let {type} = req.params;
-    var col_num = req.body.col_num;
-    
-    var sql = 'UPDATE s_ox_users_order_ch10 SET ??=??%5+1 WHERE user_id=?';
-    var params = [col_num, col_num, type]
-    conn.query(sql, params, function(err, rows, fields) {
-        if (err) {
-            console.log(err);
-            res.status(500).send('Internal Server Error');
-        } else {
-            console.log(rows);
-            res.send(rows);
-        }
-    });
-});
-
-///////////// OX Chapter-11 /////////////
-app.put('/api/s_ox_users_order_ch11/update/:type', function(req, res) {
-    let {type} = req.params;
-    var col_num = req.body.col_num;
-    
-    var sql = 'UPDATE s_ox_users_order_ch11 SET ??=??%5+1 WHERE user_id=?';
-    var params = [col_num, col_num, type]
-    conn.query(sql, params, function(err, rows, fields) {
-        if (err) {
-            console.log(err);
-            res.status(500).send('Internal Server Error');
-        } else {
-            console.log(rows);
-            res.send(rows);
-        }
-    });
-});
-
-///////////// OX Chapter-12 /////////////
-app.put('/api/s_ox_users_order_ch12/update/:type', function(req, res) {
-    let {type} = req.params;
-    var col_num = req.body.col_num;
-    
-    var sql = 'UPDATE s_ox_users_order_ch12 SET ??=??%5+1 WHERE user_id=?';
-    var params = [col_num, col_num, type]
-    conn.query(sql, params, function(err, rows, fields) {
-        if (err) {
-            console.log(err);
-            res.status(500).send('Internal Server Error');
-        } else {
-            console.log(rows);
-            res.send(rows);
-        }
-    });
-});
-
-///////////// (Table ID : s_ox_users_order_ch01) OX Chapter-1~12 순차 정보 불러오기 ///////////////////////////
-///////////// OX Chapter-1 /////////////
-app.get('/api/s_ox_users_order_ch01/read/:type', async(req, res) => {
-
-    let {type} = req.params;
-
-    conn.query('SELECT * FROM s_ox_users_order_ch01 WHERE user_id = ?;', type, function(err, rows, fields) {
-        if (err) {
-            res.send(err);
-        } else {
-            res.send(rows);
-        }
-    });
-});
-
-///////////// OX Chapter-2 /////////////
-app.get('/api/s_ox_users_order_ch02/read/:type', async(req, res) => {
-
-    let {type} = req.params;
-
-    conn.query('SELECT * FROM s_ox_users_order_ch02 WHERE user_id = ?;', type, function(err, rows, fields) {
-        if (err) {
-            res.send(err);
-        } else {
-            res.send(rows);
-        }
-    });
-});
-
-///////////// OX Chapter-3 /////////////
-app.get('/api/s_ox_users_order_ch03/read/:type', async(req, res) => {
-
-    let {type} = req.params;
-
-    conn.query('SELECT * FROM s_ox_users_order_ch03 WHERE user_id = ?;', type, function(err, rows, fields) {
-        if (err) {
-            res.send(err);
-        } else {
-            res.send(rows);
-        }
-    });
-});
-
-///////////// OX Chapter-4 /////////////
-app.get('/api/s_ox_users_order_ch04/read/:type', async(req, res) => {
-
-    let {type} = req.params;
-
-    conn.query('SELECT * FROM s_ox_users_order_ch04 WHERE user_id = ?;', type, function(err, rows, fields) {
-        if (err) {
-            res.send(err);
-        } else {
-            res.send(rows);
-        }
-    });
-});
-
-///////////// OX Chapter-5 /////////////
-app.get('/api/s_ox_users_order_ch05/read/:type', async(req, res) => {
-
-    let {type} = req.params;
-
-    conn.query('SELECT * FROM s_ox_users_order_ch05 WHERE user_id = ?;', type, function(err, rows, fields) {
-        if (err) {
-            res.send(err);
-        } else {
-            res.send(rows);
-        }
-    });
-});
-
-///////////// OX Chapter-6 /////////////
-app.get('/api/s_ox_users_order_ch06/read/:type', async(req, res) => {
-
-    let {type} = req.params;
-
-    conn.query('SELECT * FROM s_ox_users_order_ch06 WHERE user_id = ?;', type, function(err, rows, fields) {
-        if (err) {
-            res.send(err);
-        } else {
-            res.send(rows);
-        }
-    });
-});
-
-///////////// OX Chapter-7 /////////////
-app.get('/api/s_ox_users_order_ch07/read/:type', async(req, res) => {
-
-    let {type} = req.params;
-
-    conn.query('SELECT * FROM s_ox_users_order_ch07 WHERE user_id = ?;', type, function(err, rows, fields) {
-        if (err) {
-            res.send(err);
-        } else {
-            res.send(rows);
-        }
-    });
-});
-
-///////////// OX Chapter-8 /////////////
-app.get('/api/s_ox_users_order_ch08/read/:type', async(req, res) => {
-
-    let {type} = req.params;
-
-    conn.query('SELECT * FROM s_ox_users_order_ch08 WHERE user_id = ?;', type, function(err, rows, fields) {
-        if (err) {
-            res.send(err);
-        } else {
-            res.send(rows);
-        }
-    });
-});
-
-///////////// OX Chapter-9 /////////////
-app.get('/api/s_ox_users_order_ch09/read/:type', async(req, res) => {
-
-    let {type} = req.params;
-
-    conn.query('SELECT * FROM s_ox_users_order_ch09 WHERE user_id = ?;', type, function(err, rows, fields) {
-        if (err) {
-            res.send(err);
-        } else {
-            res.send(rows);
-        }
-    });
-});
-
-///////////// OX Chapter-10 /////////////
-app.get('/api/s_ox_users_order_ch010/read/:type', async(req, res) => {
-
-    let {type} = req.params;
-
-    conn.query('SELECT * FROM s_ox_users_order_ch010 WHERE user_id = ?;', type, function(err, rows, fields) {
-        if (err) {
-            res.send(err);
-        } else {
-            res.send(rows);
-        }
-    });
-});
-
-///////////// OX Chapter-11 /////////////
-app.get('/api/s_ox_users_order_ch011/read/:type', async(req, res) => {
-
-    let {type} = req.params;
-
-    conn.query('SELECT * FROM s_ox_users_order_ch011 WHERE user_id = ?;', type, function(err, rows, fields) {
-        if (err) {
-            res.send(err);
-        } else {
-            res.send(rows);
-        }
-    });
-});
-
-///////////// OX Chapter-12 /////////////
-app.get('/api/s_ox_users_order_ch012/read/:type', async(req, res) => {
-
-    let {type} = req.params;
-
-    conn.query('SELECT * FROM s_ox_users_order_ch012 WHERE user_id = ?;', type, function(err, rows, fields) {
-        if (err) {
-            res.send(err);
-        } else {
-            res.send(rows);
-        }
-    });
-});
-
 ///////////// (Table ID : s_ox_users_(s1~s5)_ch01) OX Chapter-1~12 사용자 신규 추가 ///////////////////////////
 ///////////// OX Chapter-1 /////////////
 app.post('/api/s_ox_users_s1_ch01/add', function(req, res) {
     var req_body = req.body;
     console.log(req_body);
+    var qst = new Array();
+    var q_count = 40; // 문항 수 40문항으로 설정 //
+    for(var i = 0; i < q_count; i++){  // 문항별 정답 정보 초기화 (NULL값 입력) //
+        qst[i] = null;
+    }
 
     var sql = 'INSERT INTO s_ox_users_s1_ch01 ' +
     '(ox_ch01_q1, ox_ch01_q2, ox_ch01_q3, ox_ch01_q4, ox_ch01_q5, ox_ch01_q6, ox_ch01_q7, ox_ch01_q8, ox_ch01_q9, ox_ch01_q10, ' +
@@ -506,7 +123,7 @@ app.post('/api/s_ox_users_s1_ch01/add', function(req, res) {
     'ox_ch01_q21, ox_ch01_q22, ox_ch01_q23, ox_ch01_q24, ox_ch01_q25, ox_ch01_q26, ox_ch01_q27, ox_ch01_q28, ox_ch01_q29, ox_ch01_q30, ' +
     'ox_ch01_q31, ox_ch01_q32, ox_ch01_q33, ox_ch01_q34, ox_ch01_q35, ox_ch01_q36, ox_ch01_q37, ox_ch01_q38, ox_ch01_q39, ox_ch01_q40) ' +
     'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'; 
-    conn.query(sql, [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], (err, rows, fields) => {
+    conn.query(sql, qst, (err, rows, fields) => {
         if(err) {
             console.log(err);
             res.status(500).send('Internal Server Error');
@@ -517,31 +134,6 @@ app.post('/api/s_ox_users_s1_ch01/add', function(req, res) {
     });
 });
 
-/*
-app.post('/api/s_users_id_info/add', function(req, res) {
-    var req_body = req.body;
-    console.log(req_body);
-    var login_id = req.body.login_id.toString();
-    var email = req.body.email.toString();
-    var join_route = req.body.join_route.toString();
-    var join_date = req.body.join_date.toString();
-    var level = 1; // 신규 가입자의 학습레벨은 무조건 1단계 //
-    var app_version = req.body.app_version;
-    var c_login_date = req.body.c_login_date.toString();
-    var p_login_date = req.body.c_login_date.toString();
-    
-    var sql = 'INSERT INTO s_users_id_info (login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-    conn.query(sql, [login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date], (err, rows, fields) => {
-        if(err) {
-            console.log(err);
-            res.status(500).send('Internal Server Error');
-        } else {
-            console.log(rows);
-            res.send(rows);
-        }
-    });
-});
-*/
 
 /*
 ///////////// (Table ID : s_ox_users_order_ch01) OX Chapter-1 순차 정보 업데이트 (q1 ~ q40) ///////////////////////////
@@ -565,23 +157,9 @@ app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
 */
 
 
-//////////////////////////////////////////////////////////////////////
-// 특정시간 예약 이벤트 (node-schedule)
-//////////////////////////////////////////////////////////////////////
 
-
-const schedule = require('node-schedule');
-
-const j = schedule.scheduleJob('10 * * * * *', function() {
-    console.log("매 10초마다 실행");
-});
-
-
-//conn.end();
-
-input_order()
+///////////// (Table ID : s_ox_users_order_ch01~12) OX 순차 정보 생성 ///////////////////////////
 function input_order() {
-    ///////////// (Table ID : s_ox_users_order_ch01) OX 순차 정보 생성 (q1 ~ q40) ///////////////////////////
     ///////////// OX Chapter-1 /////////////
     app.post('/api/s_ox_users_order_ch01/add', function(req, res) {
         var req_body = req.body;
@@ -906,3 +484,414 @@ function input_order() {
         });
     });
 }
+input_order()
+
+///////////// (Table ID : s_ox_users_order_ch01~12) OX 순차 정보 불러오기 ///////////////////////////
+function read_order() {
+    ///////////// OX Chapter-1 /////////////
+    app.get('/api/s_ox_users_order_ch01/read/:type', async(req, res) => {
+
+        let {type} = req.params;
+
+        conn.query('SELECT * FROM s_ox_users_order_ch01 WHERE user_id = ?;', type, function(err, rows, fields) {
+            if (err) {
+                res.send(err);
+            } else {
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-2 /////////////
+    app.get('/api/s_ox_users_order_ch02/read/:type', async(req, res) => {
+
+        let {type} = req.params;
+
+        conn.query('SELECT * FROM s_ox_users_order_ch02 WHERE user_id = ?;', type, function(err, rows, fields) {
+            if (err) {
+                res.send(err);
+            } else {
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-3 /////////////
+    app.get('/api/s_ox_users_order_ch03/read/:type', async(req, res) => {
+
+        let {type} = req.params;
+
+        conn.query('SELECT * FROM s_ox_users_order_ch03 WHERE user_id = ?;', type, function(err, rows, fields) {
+            if (err) {
+                res.send(err);
+            } else {
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-4 /////////////
+    app.get('/api/s_ox_users_order_ch04/read/:type', async(req, res) => {
+
+        let {type} = req.params;
+
+        conn.query('SELECT * FROM s_ox_users_order_ch04 WHERE user_id = ?;', type, function(err, rows, fields) {
+            if (err) {
+                res.send(err);
+            } else {
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-5 /////////////
+    app.get('/api/s_ox_users_order_ch05/read/:type', async(req, res) => {
+
+        let {type} = req.params;
+
+        conn.query('SELECT * FROM s_ox_users_order_ch05 WHERE user_id = ?;', type, function(err, rows, fields) {
+            if (err) {
+                res.send(err);
+            } else {
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-6 /////////////
+    app.get('/api/s_ox_users_order_ch06/read/:type', async(req, res) => {
+
+        let {type} = req.params;
+
+        conn.query('SELECT * FROM s_ox_users_order_ch06 WHERE user_id = ?;', type, function(err, rows, fields) {
+            if (err) {
+                res.send(err);
+            } else {
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-7 /////////////
+    app.get('/api/s_ox_users_order_ch07/read/:type', async(req, res) => {
+
+        let {type} = req.params;
+
+        conn.query('SELECT * FROM s_ox_users_order_ch07 WHERE user_id = ?;', type, function(err, rows, fields) {
+            if (err) {
+                res.send(err);
+            } else {
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-8 /////////////
+    app.get('/api/s_ox_users_order_ch08/read/:type', async(req, res) => {
+
+        let {type} = req.params;
+
+        conn.query('SELECT * FROM s_ox_users_order_ch08 WHERE user_id = ?;', type, function(err, rows, fields) {
+            if (err) {
+                res.send(err);
+            } else {
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-9 /////////////
+    app.get('/api/s_ox_users_order_ch09/read/:type', async(req, res) => {
+
+        let {type} = req.params;
+
+        conn.query('SELECT * FROM s_ox_users_order_ch09 WHERE user_id = ?;', type, function(err, rows, fields) {
+            if (err) {
+                res.send(err);
+            } else {
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-10 /////////////
+    app.get('/api/s_ox_users_order_ch010/read/:type', async(req, res) => {
+
+        let {type} = req.params;
+
+        conn.query('SELECT * FROM s_ox_users_order_ch010 WHERE user_id = ?;', type, function(err, rows, fields) {
+            if (err) {
+                res.send(err);
+            } else {
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-11 /////////////
+    app.get('/api/s_ox_users_order_ch011/read/:type', async(req, res) => {
+
+        let {type} = req.params;
+
+        conn.query('SELECT * FROM s_ox_users_order_ch011 WHERE user_id = ?;', type, function(err, rows, fields) {
+            if (err) {
+                res.send(err);
+            } else {
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-12 /////////////
+    app.get('/api/s_ox_users_order_ch012/read/:type', async(req, res) => {
+
+        let {type} = req.params;
+
+        conn.query('SELECT * FROM s_ox_users_order_ch012 WHERE user_id = ?;', type, function(err, rows, fields) {
+            if (err) {
+                res.send(err);
+            } else {
+                res.send(rows);
+            }
+        });
+    });
+}
+read_order()
+
+///////////// (Table ID : s_ox_users_order_ch01) OX 순차 정보 업데이트 ///////////////////////////
+function update_order() {
+    ///////////// OX Chapter-1 /////////////
+    app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
+        let {type} = req.params;
+        var col_num = req.body.col_num;
+        
+        var sql = 'UPDATE s_ox_users_order_ch01 SET ??=??%5+1 WHERE user_id=?';
+        var params = [col_num, col_num, type]
+        conn.query(sql, params, function(err, rows, fields) {
+            if (err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-2 /////////////
+    app.put('/api/s_ox_users_order_ch02/update/:type', function(req, res) {
+        let {type} = req.params;
+        var col_num = req.body.col_num;
+        
+        var sql = 'UPDATE s_ox_users_order_ch02 SET ??=??%5+1 WHERE user_id=?';
+        var params = [col_num, col_num, type]
+        conn.query(sql, params, function(err, rows, fields) {
+            if (err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-3 /////////////
+    app.put('/api/s_ox_users_order_ch03/update/:type', function(req, res) {
+        let {type} = req.params;
+        var col_num = req.body.col_num;
+        
+        var sql = 'UPDATE s_ox_users_order_ch03 SET ??=??%5+1 WHERE user_id=?';
+        var params = [col_num, col_num, type]
+        conn.query(sql, params, function(err, rows, fields) {
+            if (err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-4 /////////////
+    app.put('/api/s_ox_users_order_ch04/update/:type', function(req, res) {
+        let {type} = req.params;
+        var col_num = req.body.col_num;
+        
+        var sql = 'UPDATE s_ox_users_order_ch04 SET ??=??%5+1 WHERE user_id=?';
+        var params = [col_num, col_num, type]
+        conn.query(sql, params, function(err, rows, fields) {
+            if (err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-5 /////////////
+    app.put('/api/s_ox_users_order_ch05/update/:type', function(req, res) {
+        let {type} = req.params;
+        var col_num = req.body.col_num;
+        
+        var sql = 'UPDATE s_ox_users_order_ch05 SET ??=??%5+1 WHERE user_id=?';
+        var params = [col_num, col_num, type]
+        conn.query(sql, params, function(err, rows, fields) {
+            if (err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-6 /////////////
+    app.put('/api/s_ox_users_order_ch06/update/:type', function(req, res) {
+        let {type} = req.params;
+        var col_num = req.body.col_num;
+        
+        var sql = 'UPDATE s_ox_users_order_ch06 SET ??=??%5+1 WHERE user_id=?';
+        var params = [col_num, col_num, type]
+        conn.query(sql, params, function(err, rows, fields) {
+            if (err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-7 /////////////
+    app.put('/api/s_ox_users_order_ch07/update/:type', function(req, res) {
+        let {type} = req.params;
+        var col_num = req.body.col_num;
+        
+        var sql = 'UPDATE s_ox_users_order_ch07 SET ??=??%5+1 WHERE user_id=?';
+        var params = [col_num, col_num, type]
+        conn.query(sql, params, function(err, rows, fields) {
+            if (err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-8 /////////////
+    app.put('/api/s_ox_users_order_ch08/update/:type', function(req, res) {
+        let {type} = req.params;
+        var col_num = req.body.col_num;
+        
+        var sql = 'UPDATE s_ox_users_order_ch08 SET ??=??%5+1 WHERE user_id=?';
+        var params = [col_num, col_num, type]
+        conn.query(sql, params, function(err, rows, fields) {
+            if (err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-9 /////////////
+    app.put('/api/s_ox_users_order_ch09/update/:type', function(req, res) {
+        let {type} = req.params;
+        var col_num = req.body.col_num;
+        
+        var sql = 'UPDATE s_ox_users_order_ch09 SET ??=??%5+1 WHERE user_id=?';
+        var params = [col_num, col_num, type]
+        conn.query(sql, params, function(err, rows, fields) {
+            if (err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-10 /////////////
+    app.put('/api/s_ox_users_order_ch10/update/:type', function(req, res) {
+        let {type} = req.params;
+        var col_num = req.body.col_num;
+        
+        var sql = 'UPDATE s_ox_users_order_ch10 SET ??=??%5+1 WHERE user_id=?';
+        var params = [col_num, col_num, type]
+        conn.query(sql, params, function(err, rows, fields) {
+            if (err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-11 /////////////
+    app.put('/api/s_ox_users_order_ch11/update/:type', function(req, res) {
+        let {type} = req.params;
+        var col_num = req.body.col_num;
+        
+        var sql = 'UPDATE s_ox_users_order_ch11 SET ??=??%5+1 WHERE user_id=?';
+        var params = [col_num, col_num, type]
+        conn.query(sql, params, function(err, rows, fields) {
+            if (err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-12 /////////////
+    app.put('/api/s_ox_users_order_ch12/update/:type', function(req, res) {
+        let {type} = req.params;
+        var col_num = req.body.col_num;
+        
+        var sql = 'UPDATE s_ox_users_order_ch12 SET ??=??%5+1 WHERE user_id=?';
+        var params = [col_num, col_num, type]
+        conn.query(sql, params, function(err, rows, fields) {
+            if (err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+}
+update_order()
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////
+// 특정시간 예약 이벤트 (node-schedule)
+//////////////////////////////////////////////////////////////////////
+
+
+const schedule = require('node-schedule');
+
+const j = schedule.scheduleJob('10 * * * * *', function() {
+    console.log("매 10초마다 실행");
+});
+
+
+//conn.end();
