@@ -521,9 +521,9 @@ app.post('/api/s_ox_users_s1_ch01/add', function(req, res) {
     console.log(req_body);
 
     var sql = 'INSERT INTO s_ox_users_s1_ch01 ' +
-    '(ox_ch01_q1, ox_ch01_q2, ox_ch01_q3, ox_ch01_q4, ox_ch01_q5, ox_ch01_q6, ox_ch01_q7, ox_ch01_q8, ox_ch01_q9, ox_ch01_q10' +
-    'ox_ch01_q11, ox_ch01_q12, ox_ch01_q13, ox_ch01_q14, ox_ch01_q15, ox_ch01_q16, ox_ch01_q17, ox_ch01_q18, ox_ch01_q19, ox_ch01_q20' +
-    'ox_ch01_q21, ox_ch01_q22, ox_ch01_q23, ox_ch01_q24, ox_ch01_q25, ox_ch01_q26, ox_ch01_q27, ox_ch01_q28, ox_ch01_q29, ox_ch01_q30' +
+    '(ox_ch01_q1, ox_ch01_q2, ox_ch01_q3, ox_ch01_q4, ox_ch01_q5, ox_ch01_q6, ox_ch01_q7, ox_ch01_q8, ox_ch01_q9, ox_ch01_q10, ' +
+    'ox_ch01_q11, ox_ch01_q12, ox_ch01_q13, ox_ch01_q14, ox_ch01_q15, ox_ch01_q16, ox_ch01_q17, ox_ch01_q18, ox_ch01_q19, ox_ch01_q20, ' +
+    'ox_ch01_q21, ox_ch01_q22, ox_ch01_q23, ox_ch01_q24, ox_ch01_q25, ox_ch01_q26, ox_ch01_q27, ox_ch01_q28, ox_ch01_q29, ox_ch01_q30, ' +
     'ox_ch01_q31, ox_ch01_q32, ox_ch01_q33, ox_ch01_q34, ox_ch01_q35, ox_ch01_q36, ox_ch01_q37, ox_ch01_q38, ox_ch01_q39, ox_ch01_q40) ' +
     'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'; 
     conn.query(sql, [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], (err, rows, fields) => {
