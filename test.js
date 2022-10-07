@@ -106,6 +106,7 @@ app.get('/api/s_system_id_info/read/:type', async(req, res) => {
     });
 });
 
+/*
 ///////////// (Table ID : s_ox_users_order_ch01) OX Chapter-1 순차 정보 생성 (q1 ~ q40) ///////////////////////////
 app.post('/api/s_ox_users_order_ch01/add', function(req, res) {
     var req_body = req.body;
@@ -118,6 +119,29 @@ app.post('/api/s_ox_users_order_ch01/add', function(req, res) {
 
     var sql = 'INSERT INTO s_ox_users_order_ch01 (ox_ch01_q1, ox_ch01_q2, ox_ch01_q3, ox_ch01_q4, ox_ch01_q5, ox_ch01_q6, ox_ch01_q7, ox_ch01_q8, ox_ch01_q9, ox_ch01_q10, ox_ch01_q11, ox_ch01_q12, ox_ch01_q13, ox_ch01_q14, ox_ch01_q15, ox_ch01_q16, ox_ch01_q17, ox_ch01_q18, ox_ch01_q19, ox_ch01_q20, ox_ch01_q21, ox_ch01_q22, ox_ch01_q23, ox_ch01_q24, ox_ch01_q25, ox_ch01_q26, ox_ch01_q27, ox_ch01_q28, ox_ch01_q29, ox_ch01_q30, ox_ch01_q31, ox_ch01_q32, ox_ch01_q33, ox_ch01_q34, ox_ch01_q35, ox_ch01_q36, ox_ch01_q37, ox_ch01_q38, ox_ch01_q39, ox_ch01_q40) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
     conn.query(sql, [qst[0], qst[1], qst[2], qst[3], qst[4], qst[5], qst[6], qst[7], qst[8], qst[9], qst[10], qst[11], qst[12], qst[13], qst[14], qst[15], qst[16], qst[17], qst[18], qst[19], qst[20], qst[21], qst[22], qst[23], qst[24], qst[25], qst[26], qst[27], qst[28], qst[29], qst[30], qst[31], qst[32], qst[33], qst[34], qst[35], qst[36], qst[37], qst[38], qst[39] ], (err, rows, fields) => {
+        if(err) {
+            console.log(err);
+            res.status(500).send('Internal Server Error');
+        } else {
+            console.log(rows);
+            res.send(rows);
+        }
+    });
+});
+*/
+
+///////////// (Table ID : s_ox_users_order_ch01) OX Chapter-1 순차 정보 생성 (q1 ~ q40) ///////////////////////////
+app.post('/api/s_ox_users_order_ch01/add', function(req, res) {
+    var req_body = req.body;
+    console.log(req_body);
+    var qst = new Array();
+    var q_count = 40;
+    for(var i = 0; i < q_count; i++){  // 문항별 순차 정보 초기화 (1값 입력) //
+        qst[i] = 1;
+    }
+
+    var sql = 'INSERT INTO s_ox_users_order_ch01 (ox_ch01_q1, ox_ch01_q2, ox_ch01_q3, ox_ch01_q4, ox_ch01_q5, ox_ch01_q6, ox_ch01_q7, ox_ch01_q8, ox_ch01_q9, ox_ch01_q10, ox_ch01_q11, ox_ch01_q12, ox_ch01_q13, ox_ch01_q14, ox_ch01_q15, ox_ch01_q16, ox_ch01_q17, ox_ch01_q18, ox_ch01_q19, ox_ch01_q20, ox_ch01_q21, ox_ch01_q22, ox_ch01_q23, ox_ch01_q24, ox_ch01_q25, ox_ch01_q26, ox_ch01_q27, ox_ch01_q28, ox_ch01_q29, ox_ch01_q30, ox_ch01_q31, ox_ch01_q32, ox_ch01_q33, ox_ch01_q34, ox_ch01_q35, ox_ch01_q36, ox_ch01_q37, ox_ch01_q38, ox_ch01_q39, ox_ch01_q40) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    conn.query(sql, qst, (err, rows, fields) => {
         if(err) {
             console.log(err);
             res.status(500).send('Internal Server Error');
@@ -516,7 +540,6 @@ app.get('/api/s_ox_users_order_ch012/read/:type', async(req, res) => {
 
 ///////////// (Table ID : s_ox_users_(s1~s5)_ch01) OX Chapter-1~12 사용자 신규 추가 ///////////////////////////
 ///////////// OX Chapter-1 /////////////
-/*
 app.post('/api/s_ox_users_s1_ch01/add', function(req, res) {
     var req_body = req.body;
     console.log(req_body);
@@ -526,24 +549,6 @@ app.post('/api/s_ox_users_s1_ch01/add', function(req, res) {
     'ox_ch01_q11, ox_ch01_q12, ox_ch01_q13, ox_ch01_q14, ox_ch01_q15, ox_ch01_q16, ox_ch01_q17, ox_ch01_q18, ox_ch01_q19, ox_ch01_q20, ' +
     'ox_ch01_q21, ox_ch01_q22, ox_ch01_q23, ox_ch01_q24, ox_ch01_q25, ox_ch01_q26, ox_ch01_q27, ox_ch01_q28, ox_ch01_q29, ox_ch01_q30, ' +
     'ox_ch01_q31, ox_ch01_q32, ox_ch01_q33, ox_ch01_q34, ox_ch01_q35, ox_ch01_q36, ox_ch01_q37, ox_ch01_q38, ox_ch01_q39, ox_ch01_q40) ' +
-    'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'; 
-    conn.query(sql, [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], (err, rows, fields) => {
-        if(err) {
-            console.log(err);
-            res.status(500).send('Internal Server Error');
-        } else {
-            console.log(rows);
-            res.send(rows);
-        }
-    });
-});
-*/
-
-app.post('/api/s_ox_users_s1_ch01/add', function(req, res) {
-    var req_body = req.body;
-    console.log(req_body);
-
-    var sql = 'INSERT INTO s_ox_users_s1_ch01 ' +
     'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'; 
     conn.query(sql, [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], (err, rows, fields) => {
         if(err) {
