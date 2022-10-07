@@ -106,56 +106,7 @@ app.get('/api/s_system_id_info/read/:type', async(req, res) => {
     });
 });
 
-/*
-///////////// (Table ID : s_ox_users_order_ch01) OX Chapter-1 순차 정보 생성 (q1 ~ q40) ///////////////////////////
-app.post('/api/s_ox_users_order_ch01/add', function(req, res) {
-    var req_body = req.body;
-    console.log(req_body);
-    var qst = new Array();
-    var q_count = 40;
-    for(var i = 0; i < q_count; i++){  // 문항별 순차 정보 초기화 (1값 입력) //
-        qst[i] = 1;
-    }
 
-    var sql = 'INSERT INTO s_ox_users_order_ch01 (ox_ch01_q1, ox_ch01_q2, ox_ch01_q3, ox_ch01_q4, ox_ch01_q5, ox_ch01_q6, ox_ch01_q7, ox_ch01_q8, ox_ch01_q9, ox_ch01_q10, ox_ch01_q11, ox_ch01_q12, ox_ch01_q13, ox_ch01_q14, ox_ch01_q15, ox_ch01_q16, ox_ch01_q17, ox_ch01_q18, ox_ch01_q19, ox_ch01_q20, ox_ch01_q21, ox_ch01_q22, ox_ch01_q23, ox_ch01_q24, ox_ch01_q25, ox_ch01_q26, ox_ch01_q27, ox_ch01_q28, ox_ch01_q29, ox_ch01_q30, ox_ch01_q31, ox_ch01_q32, ox_ch01_q33, ox_ch01_q34, ox_ch01_q35, ox_ch01_q36, ox_ch01_q37, ox_ch01_q38, ox_ch01_q39, ox_ch01_q40) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    conn.query(sql, [qst[0], qst[1], qst[2], qst[3], qst[4], qst[5], qst[6], qst[7], qst[8], qst[9], qst[10], qst[11], qst[12], qst[13], qst[14], qst[15], qst[16], qst[17], qst[18], qst[19], qst[20], qst[21], qst[22], qst[23], qst[24], qst[25], qst[26], qst[27], qst[28], qst[29], qst[30], qst[31], qst[32], qst[33], qst[34], qst[35], qst[36], qst[37], qst[38], qst[39] ], (err, rows, fields) => {
-        if(err) {
-            console.log(err);
-            res.status(500).send('Internal Server Error');
-        } else {
-            console.log(rows);
-            res.send(rows);
-        }
-    });
-});
-*/
-
-///////////// (Table ID : s_ox_users_order_ch01) OX Chapter-1 순차 정보 생성 (q1 ~ q40) ///////////////////////////
-app.post('/api/s_ox_users_order_ch01/add', function(req, res) {
-    var req_body = req.body;
-    console.log(req_body);
-    var qst = new Array();
-    var q_count = 40;
-    for(var i = 0; i < q_count; i++){  // 문항별 순차 정보 초기화 (1값 입력) //
-        qst[i] = 1;
-    }
-
-    var sql = 'INSERT INTO s_ox_users_order_ch01 ' +
-    '(ox_ch01_q1, ox_ch01_q2, ox_ch01_q3, ox_ch01_q4, ox_ch01_q5, ox_ch01_q6, ox_ch01_q7, ox_ch01_q8, ox_ch01_q9, ox_ch01_q10, ' +
-    'ox_ch01_q11, ox_ch01_q12, ox_ch01_q13, ox_ch01_q14, ox_ch01_q15, ox_ch01_q16, ox_ch01_q17, ox_ch01_q18, ox_ch01_q19, ox_ch01_q20, ' +
-    'ox_ch01_q21, ox_ch01_q22, ox_ch01_q23, ox_ch01_q24, ox_ch01_q25, ox_ch01_q26, ox_ch01_q27, ox_ch01_q28, ox_ch01_q29, ox_ch01_q30, ' +
-    'ox_ch01_q31, ox_ch01_q32, ox_ch01_q33, ox_ch01_q34, ox_ch01_q35, ox_ch01_q36, ox_ch01_q37, ox_ch01_q38, ox_ch01_q39, ox_ch01_q40) ' +
-    'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    conn.query(sql, qst, (err, rows, fields) => {
-        if(err) {
-            console.log(err);
-            res.status(500).send('Internal Server Error');
-        } else {
-            console.log(rows);
-            res.send(rows);
-        }
-    });
-});
 
 ///////////// (Table ID : s_ox_users_order_ch01) OX Chapter-1~12 순차 정보 업데이트 (q1 ~ q40) ///////////////////////////
 ///////////// OX Chapter-1 /////////////
@@ -627,3 +578,331 @@ const j = schedule.scheduleJob('10 * * * * *', function() {
 
 
 //conn.end();
+
+input_order()
+function input_order() {
+    ///////////// (Table ID : s_ox_users_order_ch01) OX 순차 정보 생성 (q1 ~ q40) ///////////////////////////
+    ///////////// OX Chapter-1 /////////////
+    app.post('/api/s_ox_users_order_ch01/add', function(req, res) {
+        var req_body = req.body;
+        console.log(req_body);
+        var qst = new Array();
+        var q_count = 40;
+        for(var i = 0; i < q_count; i++){  // 문항별 순차 정보 초기화 (1값 입력) //
+            qst[i] = 1;
+        }
+
+        var sql = 'INSERT INTO s_ox_users_order_ch01 ' +
+        '(ox_ch01_q1, ox_ch01_q2, ox_ch01_q3, ox_ch01_q4, ox_ch01_q5, ox_ch01_q6, ox_ch01_q7, ox_ch01_q8, ox_ch01_q9, ox_ch01_q10, ' +
+        'ox_ch01_q11, ox_ch01_q12, ox_ch01_q13, ox_ch01_q14, ox_ch01_q15, ox_ch01_q16, ox_ch01_q17, ox_ch01_q18, ox_ch01_q19, ox_ch01_q20, ' +
+        'ox_ch01_q21, ox_ch01_q22, ox_ch01_q23, ox_ch01_q24, ox_ch01_q25, ox_ch01_q26, ox_ch01_q27, ox_ch01_q28, ox_ch01_q29, ox_ch01_q30, ' +
+        'ox_ch01_q31, ox_ch01_q32, ox_ch01_q33, ox_ch01_q34, ox_ch01_q35, ox_ch01_q36, ox_ch01_q37, ox_ch01_q38, ox_ch01_q39, ox_ch01_q40) ' +
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        conn.query(sql, qst, (err, rows, fields) => {
+            if(err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-2 /////////////
+    app.post('/api/s_ox_users_order_ch02/add', function(req, res) {
+        var req_body = req.body;
+        console.log(req_body);
+        var qst = new Array();
+        var q_count = 40;
+        for(var i = 0; i < q_count; i++){  // 문항별 순차 정보 초기화 (1값 입력) //
+            qst[i] = 1;
+        }
+
+        var sql = 'INSERT INTO s_ox_users_order_ch02 ' +
+        '(ox_ch02_q1, ox_ch02_q2, ox_ch02_q3, ox_ch02_q4, ox_ch02_q5, ox_ch02_q6, ox_ch02_q7, ox_ch02_q8, ox_ch02_q9, ox_ch02_q10, ' +
+        'ox_ch02_q11, ox_ch02_q12, ox_ch02_q13, ox_ch02_q14, ox_ch02_q15, ox_ch02_q16, ox_ch02_q17, ox_ch02_q18, ox_ch02_q19, ox_ch02_q20, ' +
+        'ox_ch02_q21, ox_ch02_q22, ox_ch02_q23, ox_ch02_q24, ox_ch02_q25, ox_ch02_q26, ox_ch02_q27, ox_ch02_q28, ox_ch02_q29, ox_ch02_q30, ' +
+        'ox_ch02_q31, ox_ch02_q32, ox_ch02_q33, ox_ch02_q34, ox_ch02_q35, ox_ch02_q36, ox_ch02_q37, ox_ch02_q38, ox_ch02_q39, ox_ch02_q40) ' +
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        conn.query(sql, qst, (err, rows, fields) => {
+            if(err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-3 /////////////
+    app.post('/api/s_ox_users_order_ch03/add', function(req, res) {
+        var req_body = req.body;
+        console.log(req_body);
+        var qst = new Array();
+        var q_count = 40;
+        for(var i = 0; i < q_count; i++){  // 문항별 순차 정보 초기화 (1값 입력) //
+            qst[i] = 1;
+        }
+
+        var sql = 'INSERT INTO s_ox_users_order_ch03 ' +
+        '(ox_ch03_q1, ox_ch03_q2, ox_ch03_q3, ox_ch03_q4, ox_ch03_q5, ox_ch03_q6, ox_ch03_q7, ox_ch03_q8, ox_ch03_q9, ox_ch03_q10, ' +
+        'ox_ch03_q11, ox_ch03_q12, ox_ch03_q13, ox_ch03_q14, ox_ch03_q15, ox_ch03_q16, ox_ch03_q17, ox_ch03_q18, ox_ch03_q19, ox_ch03_q20, ' +
+        'ox_ch03_q21, ox_ch03_q22, ox_ch03_q23, ox_ch03_q24, ox_ch03_q25, ox_ch03_q26, ox_ch03_q27, ox_ch03_q28, ox_ch03_q29, ox_ch03_q30, ' +
+        'ox_ch03_q31, ox_ch03_q32, ox_ch03_q33, ox_ch03_q34, ox_ch03_q35, ox_ch03_q36, ox_ch03_q37, ox_ch03_q38, ox_ch03_q39, ox_ch03_q40) ' +
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        conn.query(sql, qst, (err, rows, fields) => {
+            if(err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-4 /////////////
+    app.post('/api/s_ox_users_order_ch04/add', function(req, res) {
+        var req_body = req.body;
+        console.log(req_body);
+        var qst = new Array();
+        var q_count = 40;
+        for(var i = 0; i < q_count; i++){  // 문항별 순차 정보 초기화 (1값 입력) //
+            qst[i] = 1;
+        }
+
+        var sql = 'INSERT INTO s_ox_users_order_ch04 ' +
+        '(ox_ch04_q1, ox_ch04_q2, ox_ch04_q3, ox_ch04_q4, ox_ch04_q5, ox_ch04_q6, ox_ch04_q7, ox_ch04_q8, ox_ch04_q9, ox_ch04_q10, ' +
+        'ox_ch04_q11, ox_ch04_q12, ox_ch04_q13, ox_ch04_q14, ox_ch04_q15, ox_ch04_q16, ox_ch04_q17, ox_ch04_q18, ox_ch04_q19, ox_ch04_q20, ' +
+        'ox_ch04_q21, ox_ch04_q22, ox_ch04_q23, ox_ch04_q24, ox_ch04_q25, ox_ch04_q26, ox_ch04_q27, ox_ch04_q28, ox_ch04_q29, ox_ch04_q30, ' +
+        'ox_ch04_q31, ox_ch04_q32, ox_ch04_q33, ox_ch04_q34, ox_ch04_q35, ox_ch04_q36, ox_ch04_q37, ox_ch04_q38, ox_ch04_q39, ox_ch04_q40) ' +
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        conn.query(sql, qst, (err, rows, fields) => {
+            if(err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-5 /////////////
+    app.post('/api/s_ox_users_order_ch05/add', function(req, res) {
+        var req_body = req.body;
+        console.log(req_body);
+        var qst = new Array();
+        var q_count = 40;
+        for(var i = 0; i < q_count; i++){  // 문항별 순차 정보 초기화 (1값 입력) //
+            qst[i] = 1;
+        }
+
+        var sql = 'INSERT INTO s_ox_users_order_ch05 ' +
+        '(ox_ch05_q1, ox_ch05_q2, ox_ch05_q3, ox_ch05_q4, ox_ch05_q5, ox_ch05_q6, ox_ch05_q7, ox_ch05_q8, ox_ch05_q9, ox_ch05_q10, ' +
+        'ox_ch05_q11, ox_ch05_q12, ox_ch05_q13, ox_ch05_q14, ox_ch05_q15, ox_ch05_q16, ox_ch05_q17, ox_ch05_q18, ox_ch05_q19, ox_ch05_q20, ' +
+        'ox_ch05_q21, ox_ch05_q22, ox_ch05_q23, ox_ch05_q24, ox_ch05_q25, ox_ch05_q26, ox_ch05_q27, ox_ch05_q28, ox_ch05_q29, ox_ch05_q30, ' +
+        'ox_ch05_q31, ox_ch05_q32, ox_ch05_q33, ox_ch05_q34, ox_ch05_q35, ox_ch05_q36, ox_ch05_q37, ox_ch05_q38, ox_ch05_q39, ox_ch05_q40) ' +
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        conn.query(sql, qst, (err, rows, fields) => {
+            if(err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-6 /////////////
+    app.post('/api/s_ox_users_order_ch06/add', function(req, res) {
+        var req_body = req.body;
+        console.log(req_body);
+        var qst = new Array();
+        var q_count = 40;
+        for(var i = 0; i < q_count; i++){  // 문항별 순차 정보 초기화 (1값 입력) //
+            qst[i] = 1;
+        }
+
+        var sql = 'INSERT INTO s_ox_users_order_ch06 ' +
+        '(ox_ch06_q1, ox_ch06_q2, ox_ch06_q3, ox_ch06_q4, ox_ch06_q5, ox_ch06_q6, ox_ch06_q7, ox_ch06_q8, ox_ch06_q9, ox_ch06_q10, ' +
+        'ox_ch06_q11, ox_ch06_q12, ox_ch06_q13, ox_ch06_q14, ox_ch06_q15, ox_ch06_q16, ox_ch06_q17, ox_ch06_q18, ox_ch06_q19, ox_ch06_q20, ' +
+        'ox_ch06_q21, ox_ch06_q22, ox_ch06_q23, ox_ch06_q24, ox_ch06_q25, ox_ch06_q26, ox_ch06_q27, ox_ch06_q28, ox_ch06_q29, ox_ch06_q30, ' +
+        'ox_ch06_q31, ox_ch06_q32, ox_ch06_q33, ox_ch06_q34, ox_ch06_q35, ox_ch06_q36, ox_ch06_q37, ox_ch06_q38, ox_ch06_q39, ox_ch06_q40) ' +
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        conn.query(sql, qst, (err, rows, fields) => {
+            if(err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-7 /////////////
+    app.post('/api/s_ox_users_order_ch07/add', function(req, res) {
+        var req_body = req.body;
+        console.log(req_body);
+        var qst = new Array();
+        var q_count = 40;
+        for(var i = 0; i < q_count; i++){  // 문항별 순차 정보 초기화 (1값 입력) //
+            qst[i] = 1;
+        }
+
+        var sql = 'INSERT INTO s_ox_users_order_ch07 ' +
+        '(ox_ch07_q1, ox_ch07_q2, ox_ch07_q3, ox_ch07_q4, ox_ch07_q5, ox_ch07_q6, ox_ch07_q7, ox_ch07_q8, ox_ch07_q9, ox_ch07_q10, ' +
+        'ox_ch07_q11, ox_ch07_q12, ox_ch07_q13, ox_ch07_q14, ox_ch07_q15, ox_ch07_q16, ox_ch07_q17, ox_ch07_q18, ox_ch07_q19, ox_ch07_q20, ' +
+        'ox_ch07_q21, ox_ch07_q22, ox_ch07_q23, ox_ch07_q24, ox_ch07_q25, ox_ch07_q26, ox_ch07_q27, ox_ch07_q28, ox_ch07_q29, ox_ch07_q30, ' +
+        'ox_ch07_q31, ox_ch07_q32, ox_ch07_q33, ox_ch07_q34, ox_ch07_q35, ox_ch07_q36, ox_ch07_q37, ox_ch07_q38, ox_ch07_q39, ox_ch07_q40) ' +
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        conn.query(sql, qst, (err, rows, fields) => {
+            if(err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-8 /////////////
+    app.post('/api/s_ox_users_order_ch08/add', function(req, res) {
+        var req_body = req.body;
+        console.log(req_body);
+        var qst = new Array();
+        var q_count = 40;
+        for(var i = 0; i < q_count; i++){  // 문항별 순차 정보 초기화 (1값 입력) //
+            qst[i] = 1;
+        }
+
+        var sql = 'INSERT INTO s_ox_users_order_ch08 ' +
+        '(ox_ch08_q1, ox_ch08_q2, ox_ch08_q3, ox_ch08_q4, ox_ch08_q5, ox_ch08_q6, ox_ch08_q7, ox_ch08_q8, ox_ch08_q9, ox_ch08_q10, ' +
+        'ox_ch08_q11, ox_ch08_q12, ox_ch08_q13, ox_ch08_q14, ox_ch08_q15, ox_ch08_q16, ox_ch08_q17, ox_ch08_q18, ox_ch08_q19, ox_ch08_q20, ' +
+        'ox_ch08_q21, ox_ch08_q22, ox_ch08_q23, ox_ch08_q24, ox_ch08_q25, ox_ch08_q26, ox_ch08_q27, ox_ch08_q28, ox_ch08_q29, ox_ch08_q30, ' +
+        'ox_ch08_q31, ox_ch08_q32, ox_ch08_q33, ox_ch08_q34, ox_ch08_q35, ox_ch08_q36, ox_ch08_q37, ox_ch08_q38, ox_ch08_q39, ox_ch08_q40) ' +
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        conn.query(sql, qst, (err, rows, fields) => {
+            if(err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-9 /////////////
+    app.post('/api/s_ox_users_order_ch09/add', function(req, res) {
+        var req_body = req.body;
+        console.log(req_body);
+        var qst = new Array();
+        var q_count = 40;
+        for(var i = 0; i < q_count; i++){  // 문항별 순차 정보 초기화 (1값 입력) //
+            qst[i] = 1;
+        }
+
+        var sql = 'INSERT INTO s_ox_users_order_ch09 ' +
+        '(ox_ch09_q1, ox_ch09_q2, ox_ch09_q3, ox_ch09_q4, ox_ch09_q5, ox_ch09_q6, ox_ch09_q7, ox_ch09_q8, ox_ch09_q9, ox_ch09_q10, ' +
+        'ox_ch09_q11, ox_ch09_q12, ox_ch09_q13, ox_ch09_q14, ox_ch09_q15, ox_ch09_q16, ox_ch09_q17, ox_ch09_q18, ox_ch09_q19, ox_ch09_q20, ' +
+        'ox_ch09_q21, ox_ch09_q22, ox_ch09_q23, ox_ch09_q24, ox_ch09_q25, ox_ch09_q26, ox_ch09_q27, ox_ch09_q28, ox_ch09_q29, ox_ch09_q30, ' +
+        'ox_ch09_q31, ox_ch09_q32, ox_ch09_q33, ox_ch09_q34, ox_ch09_q35, ox_ch09_q36, ox_ch09_q37, ox_ch09_q38, ox_ch09_q39, ox_ch09_q40) ' +
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        conn.query(sql, qst, (err, rows, fields) => {
+            if(err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-10 /////////////
+    app.post('/api/s_ox_users_order_ch10/add', function(req, res) {
+        var req_body = req.body;
+        console.log(req_body);
+        var qst = new Array();
+        var q_count = 40;
+        for(var i = 0; i < q_count; i++){  // 문항별 순차 정보 초기화 (1값 입력) //
+            qst[i] = 1;
+        }
+
+        var sql = 'INSERT INTO s_ox_users_order_ch10 ' +
+        '(ox_ch10_q1, ox_ch10_q2, ox_ch10_q3, ox_ch10_q4, ox_ch10_q5, ox_ch10_q6, ox_ch10_q7, ox_ch10_q8, ox_ch10_q9, ox_ch10_q10, ' +
+        'ox_ch10_q11, ox_ch10_q12, ox_ch10_q13, ox_ch10_q14, ox_ch10_q15, ox_ch10_q16, ox_ch10_q17, ox_ch10_q18, ox_ch10_q19, ox_ch10_q20, ' +
+        'ox_ch10_q21, ox_ch10_q22, ox_ch10_q23, ox_ch10_q24, ox_ch10_q25, ox_ch10_q26, ox_ch10_q27, ox_ch10_q28, ox_ch10_q29, ox_ch10_q30, ' +
+        'ox_ch10_q31, ox_ch10_q32, ox_ch10_q33, ox_ch10_q34, ox_ch10_q35, ox_ch10_q36, ox_ch10_q37, ox_ch10_q38, ox_ch10_q39, ox_ch10_q40) ' +
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        conn.query(sql, qst, (err, rows, fields) => {
+            if(err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-11 /////////////
+    app.post('/api/s_ox_users_order_ch11/add', function(req, res) {
+        var req_body = req.body;
+        console.log(req_body);
+        var qst = new Array();
+        var q_count = 40;
+        for(var i = 0; i < q_count; i++){  // 문항별 순차 정보 초기화 (1값 입력) //
+            qst[i] = 1;
+        }
+
+        var sql = 'INSERT INTO s_ox_users_order_ch11 ' +
+        '(ox_ch11_q1, ox_ch11_q2, ox_ch11_q3, ox_ch11_q4, ox_ch11_q5, ox_ch11_q6, ox_ch11_q7, ox_ch11_q8, ox_ch11_q9, ox_ch11_q10, ' +
+        'ox_ch11_q11, ox_ch11_q12, ox_ch11_q13, ox_ch11_q14, ox_ch11_q15, ox_ch11_q16, ox_ch11_q17, ox_ch11_q18, ox_ch11_q19, ox_ch11_q20, ' +
+        'ox_ch11_q21, ox_ch11_q22, ox_ch11_q23, ox_ch11_q24, ox_ch11_q25, ox_ch11_q26, ox_ch11_q27, ox_ch11_q28, ox_ch11_q29, ox_ch11_q30, ' +
+        'ox_ch11_q31, ox_ch11_q32, ox_ch11_q33, ox_ch11_q34, ox_ch11_q35, ox_ch11_q36, ox_ch11_q37, ox_ch11_q38, ox_ch11_q39, ox_ch11_q40) ' +
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        conn.query(sql, qst, (err, rows, fields) => {
+            if(err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+
+    ///////////// OX Chapter-12 /////////////
+    app.post('/api/s_ox_users_order_ch12/add', function(req, res) {
+        var req_body = req.body;
+        console.log(req_body);
+        var qst = new Array();
+        var q_count = 40;
+        for(var i = 0; i < q_count; i++){  // 문항별 순차 정보 초기화 (1값 입력) //
+            qst[i] = 1;
+        }
+
+        var sql = 'INSERT INTO s_ox_users_order_ch12 ' +
+        '(ox_ch12_q1, ox_ch12_q2, ox_ch12_q3, ox_ch12_q4, ox_ch12_q5, ox_ch12_q6, ox_ch12_q7, ox_ch12_q8, ox_ch12_q9, ox_ch12_q10, ' +
+        'ox_ch12_q11, ox_ch12_q12, ox_ch12_q13, ox_ch12_q14, ox_ch12_q15, ox_ch12_q16, ox_ch12_q17, ox_ch12_q18, ox_ch12_q19, ox_ch12_q20, ' +
+        'ox_ch12_q21, ox_ch12_q22, ox_ch12_q23, ox_ch12_q24, ox_ch12_q25, ox_ch12_q26, ox_ch12_q27, ox_ch12_q28, ox_ch12_q29, ox_ch12_q30, ' +
+        'ox_ch12_q31, ox_ch12_q32, ox_ch12_q33, ox_ch12_q34, ox_ch12_q35, ox_ch12_q36, ox_ch12_q37, ox_ch12_q38, ox_ch12_q39, ox_ch12_q40) ' +
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        conn.query(sql, qst, (err, rows, fields) => {
+            if(err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows);
+                res.send(rows);
+            }
+        });
+    });
+}
