@@ -516,6 +516,7 @@ app.get('/api/s_ox_users_order_ch012/read/:type', async(req, res) => {
 
 ///////////// (Table ID : s_ox_users_(s1~s5)_ch01) OX Chapter-1~12 사용자 신규 추가 ///////////////////////////
 ///////////// OX Chapter-1 /////////////
+/*
 app.post('/api/s_ox_users_s1_ch01/add', function(req, res) {
     var req_body = req.body;
     console.log(req_body);
@@ -525,6 +526,24 @@ app.post('/api/s_ox_users_s1_ch01/add', function(req, res) {
     'ox_ch01_q11, ox_ch01_q12, ox_ch01_q13, ox_ch01_q14, ox_ch01_q15, ox_ch01_q16, ox_ch01_q17, ox_ch01_q18, ox_ch01_q19, ox_ch01_q20, ' +
     'ox_ch01_q21, ox_ch01_q22, ox_ch01_q23, ox_ch01_q24, ox_ch01_q25, ox_ch01_q26, ox_ch01_q27, ox_ch01_q28, ox_ch01_q29, ox_ch01_q30, ' +
     'ox_ch01_q31, ox_ch01_q32, ox_ch01_q33, ox_ch01_q34, ox_ch01_q35, ox_ch01_q36, ox_ch01_q37, ox_ch01_q38, ox_ch01_q39, ox_ch01_q40) ' +
+    'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'; 
+    conn.query(sql, [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], (err, rows, fields) => {
+        if(err) {
+            console.log(err);
+            res.status(500).send('Internal Server Error');
+        } else {
+            console.log(rows);
+            res.send(rows);
+        }
+    });
+});
+*/
+
+app.post('/api/s_ox_users_s1_ch01/add', function(req, res) {
+    var req_body = req.body;
+    console.log(req_body);
+
+    var sql = 'INSERT INTO s_ox_users_s1_ch01 ' +
     'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'; 
     conn.query(sql, [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], (err, rows, fields) => {
         if(err) {
