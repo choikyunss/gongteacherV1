@@ -2476,6 +2476,62 @@ add_ox_solve_s5()
 //////////////////////////////////////////////////////////////////////
 
 
+///////////// OX Chapter-1 /////////////
+app.put('/api/s_ox_users_s1_ch01/update/:type', function(req, res) {
+    let {type} = req.params;
+    var order_num = req.body.order_num;
+    var col_num = req.body.col_num;
+    var solve_result = req.body.solve_result;
+
+    if (order_num = 1) {
+        var sql1 = 'UPDATE s_ox_users_s1_ch01 SET ??=? WHERE user_id=?';
+        var params = [col_num, solve_result, type]
+        conn.query(sql1, params, function(err1, rows1, fields) {
+            if (err1) {
+                console.log(err1);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows1);
+                res.send(rows1);
+            }
+        });
+    }
+
+    else if (order_num = 2) {
+        var sql2 = 'UPDATE s_ox_users_s2_ch01 SET ??=? WHERE user_id=?';
+        var params = [col_num, solve_result, type]
+        conn.query(sql2, params, function(err2, rows2, fields) {
+            if (err2) {
+                console.log(err2);
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.log(rows2);
+                res.send(rows2);
+            }
+        });
+    }
+});
+
+/*
+///////////// OX Chapter-1 /////////////
+app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
+    let {type} = req.params;
+    var col_num = req.body.col_num;
+        
+    var sql = 'UPDATE s_ox_users_order_ch01 SET ??=??%5+1 WHERE user_id=?';
+    var params = [col_num, col_num, type]
+    conn.query(sql, params, function(err, rows, fields) {
+        if (err) {
+            console.log(err);
+            res.status(500).send('Internal Server Error');
+        } else {
+            console.log(rows);
+            res.send(rows);
+        }
+    });
+});
+*/
+
 const schedule = require('node-schedule');
 
 const j = schedule.scheduleJob('10 * * * * *', function() {
