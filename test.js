@@ -2482,8 +2482,7 @@ app.put('/api/s_ox_users_s1_ch01/update/:type', function(req, res) {
     var order_table = req.body.order_table;
     var col_num = req.body.col_num;
     var solve_result = req.body.solve_result;
-    var qst_pre = "s_ox_users_s";
-    var qst_post = "_ch01";
+    var table_name = "s_ox_users_s" + order_table + "_ch01";
 
     var sql = 'UPDATE s_ox_users_s1_ch01 ' +
     'JOIN s_ox_users_s2_ch01 ON s_ox_users_s2_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
@@ -2495,6 +2494,7 @@ app.put('/api/s_ox_users_s1_ch01/update/:type', function(req, res) {
     conn.query(sql, params, function(err, rows, fields) {
         if (err) {
             console.log(err);
+            console.log(table_name);
             res.status(500).send('Internal Server Error');
         } else {
             console.log(rows);
