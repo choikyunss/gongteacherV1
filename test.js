@@ -2482,14 +2482,16 @@ app.put('/api/s_ox_users_s1_ch01/update/:type', function(req, res) {
     var order_table = req.body.order_table;
     var col_num = req.body.col_num;
     var solve_result = req.body.solve_result;
+    var qst_pre = "s_ox_users_s";
+    var qst_post = "_ch01";
 
     var sql = 'UPDATE s_ox_users_s1_ch01 ' +
     'JOIN s_ox_users_s2_ch01 ON s_ox_users_s2_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
     'JOIN s_ox_users_s3_ch01 ON s_ox_users_s3_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
     'JOIN s_ox_users_s4_ch01 ON s_ox_users_s4_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
     'JOIN s_ox_users_s5_ch01 ON s_ox_users_s5_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
-    'SET CONCAT("s_ox_users_s",??,"_ch01").??=? WHERE s_ox_users_s1_ch01.user_id=?';
-    var params = [order_table, col_num, solve_result, type]
+    'SET CONCAT(??, ??, ??).??=? WHERE s_ox_users_s1_ch01.user_id=?';
+    var params = [qst_pre, order_table, qst_post, col_num, solve_result, type]
     conn.query(sql, params, function(err, rows, fields) {
         if (err) {
             console.log(err);
