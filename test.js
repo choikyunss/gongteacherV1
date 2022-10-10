@@ -2510,6 +2510,8 @@ app.put('/api/s_ox_users_s1_ch01/update/:type', function(req, res) {
             }
         });
     }
+
+    else {}
 });
 
 /*
