@@ -2488,8 +2488,8 @@ app.put('/api/s_ox_users_s1_ch01/update/:type', function(req, res) {
     'JOIN s_ox_users_s3_ch01 ON s_ox_users_s1.user_id = s_ox_users_s3.user_id ' +
     'JOIN s_ox_users_s4_ch01 ON s_ox_users_s1.user_id = s_ox_users_s4.user_id ' +
     'JOIN s_ox_users_s5_ch01 ON s_ox_users_s1.user_id = s_ox_users_s5.user_id ' +
-    'SET ??.??=? WHERE user_id=?';
-    var params = [order_table, col_num, solve_result, type]
+    'SET s_ox_users_s2_ch01.ox_ch01_q10=? WHERE user_id=?';
+    var params = [solve_result, type]
     conn.query(sql, params, function(err, rows, fields) {
         if (err) {
             console.log(err);
