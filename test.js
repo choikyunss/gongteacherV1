@@ -2490,7 +2490,7 @@ app.put('/api/s_ox_users_s1_ch01/update/:type', function(req, res) {
     'JOIN s_ox_users_s3_ch01 ON s_ox_users_s3_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
     'JOIN s_ox_users_s4_ch01 ON s_ox_users_s4_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
     'JOIN s_ox_users_s5_ch01 ON s_ox_users_s5_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
-    'SET CONCAT(??, ??, ??).??=? WHERE s_ox_users_s1_ch01.user_id=?';
+    'SET CONCAT_WS(, ??, ??, ??).??=? WHERE s_ox_users_s1_ch01.user_id=?';
     var params = [qst_pre, order_table, qst_post, col_num, solve_result, type]
     conn.query(sql, params, function(err, rows, fields) {
         if (err) {
