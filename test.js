@@ -2484,12 +2484,12 @@ app.put('/api/s_ox_users_s1_ch01/update/:type', function(req, res) {
     var solve_result = req.body.solve_result;
 
     var sql = 'UPDATE s_ox_users_s1_ch01 ' +
-    'JOIN s_ox_users_s2_ch01 ON s_ox_users_s1.user_id = s_ox_users_s2.user_id ' +
-    'JOIN s_ox_users_s3_ch01 ON s_ox_users_s1.user_id = s_ox_users_s3.user_id ' +
-    'JOIN s_ox_users_s4_ch01 ON s_ox_users_s1.user_id = s_ox_users_s4.user_id ' +
-    'JOIN s_ox_users_s5_ch01 ON s_ox_users_s1.user_id = s_ox_users_s5.user_id ' +
-    'SET s_ox_users_s2_ch01.ox_ch01_q10=? WHERE user_id=?';
-    var params = [solve_result, type]
+    'JOIN s_ox_users_s2_ch01 ON s_ox_users_s2.user_id = s_ox_users_s1.user_id ' +
+    'JOIN s_ox_users_s3_ch01 ON s_ox_users_s3.user_id = s_ox_users_s1.user_id ' +
+    'JOIN s_ox_users_s4_ch01 ON s_ox_users_s4.user_id = s_ox_users_s1.user_id ' +
+    'JOIN s_ox_users_s5_ch01 ON s_ox_users_s5.user_id = s_ox_users_s1.user_id ' +
+    'SET s_ox_users_s2_ch01.ox_ch01_q10=?';
+    var params = [solve_result]
     conn.query(sql, params, function(err, rows, fields) {
         if (err) {
             console.log(err);
