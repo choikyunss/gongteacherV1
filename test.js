@@ -2479,10 +2479,28 @@ add_ox_solve_s5()
 ///////////// OX Chapter-1 /////////////
 app.put('/api/s_ox_users_s1_ch01/update/:type', function(req, res) {
     let {type} = req.params;
-    var order_num = req.body.order_num;
+    var order_table = req.body.order_table;
     var col_num = req.body.col_num;
     var solve_result = req.body.solve_result;
 
+    var sql = 'UPDATE s_ox_users_s1_ch01' +
+    'JOIN s_ox_users_s2_ch01 ON s_ox_users_s1.user_id = s_ox_users_s2.user_id' +
+    'JOIN s_ox_users_s3_ch01 ON s_ox_users_s1.user_id = s_ox_users_s3.user_id' +
+    'JOIN s_ox_users_s4_ch01 ON s_ox_users_s1.user_id = s_ox_users_s4.user_id' +
+    'JOIN s_ox_users_s5_ch01 ON s_ox_users_s1.user_id = s_ox_users_s5.user_id' +
+    'SET ??.??=? WHERE user_id=?';
+    var params = [order_table, col_num, solve_result, type]
+    conn.query(sql, params, function(err, rows, fields) {
+        if (err) {
+            console.log(err);
+            res.status(500).send('Internal Server Error');
+        } else {
+            console.log(rows);
+            res.send(rows);
+        }
+    });
+
+    /*
     if (order_num = 1) {
         var sql1 = 'UPDATE s_ox_users_s1_ch01 SET ??=? WHERE user_id=?';
         var params = [col_num, solve_result, type]
@@ -2512,6 +2530,7 @@ app.put('/api/s_ox_users_s1_ch01/update/:type', function(req, res) {
     }
 
     else {}
+    */
 });
 
 /*
