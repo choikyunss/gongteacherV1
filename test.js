@@ -307,7 +307,7 @@ function read_ox_order() {
 }
 read_ox_order()
 
-/*
+
 app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
     conn.beginTransaction((err)=>{
         let {type} = req.params;
@@ -322,9 +322,6 @@ app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
                 res.status(500).send('Internal Server Error');
                 conn.rollback();
             } else {
-                console.log(rows1);
-                res.send(rows1);
-
                 var sql2 = 'UPDATE s_ox_users_s1_ch01 SET ??=1 WHERE user_id=?';
                 var params2 = [qst_string, type]
                 conn.query(sql2, params2, function(err2, rows2, fields) {
@@ -343,9 +340,9 @@ app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
         });
     });
 });
-*/
 
 
+/*
 ///////////// (Table ID : s_ox_users_order_ch01~12) OX 순차 업데이트 ///////////////////////////
 function update_ox_order() {
     ///////////// OX Chapter-1 /////////////
@@ -577,7 +574,7 @@ function update_ox_order() {
     });
 }
 update_ox_order()
-
+*/
 ///////////// (Table ID : s_ox_users_(s1~s5)_ch01~12) OX 풀이 업데이트 ///////////////////////////
 function update_ox_solve() {
     ///////////// OX Chapter-1 /////////////
