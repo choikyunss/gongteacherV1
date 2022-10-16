@@ -307,6 +307,7 @@ function read_ox_order() {
 }
 read_ox_order()
 
+/*
 app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
     conn.beginTransaction((err)=>{
         let {type} = req.params;
@@ -340,10 +341,10 @@ app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
                 });
             }
         });
+    });
+*/
 
-    })
 
-/*
 ///////////// (Table ID : s_ox_users_order_ch01~12) OX 순차 업데이트 ///////////////////////////
 function update_ox_order() {
     ///////////// OX Chapter-1 /////////////
@@ -575,7 +576,7 @@ function update_ox_order() {
     });
 }
 update_ox_order()
-*/
+
 ///////////// (Table ID : s_ox_users_(s1~s5)_ch01~12) OX 풀이 업데이트 ///////////////////////////
 function update_ox_solve() {
     ///////////// OX Chapter-1 /////////////
