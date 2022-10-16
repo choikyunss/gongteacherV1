@@ -4,7 +4,9 @@ const app = express();
 
 var mysql = require('mysql');
 
+
 /* ********** Make transaction object ********** */
+/*
 var transaction = require('node-mysql-transaction');
 var trconn = transaction({
     // mysql connection config
@@ -28,6 +30,7 @@ var trconn = transaction({
     // turn off is 0
     timeout: 600
 });
+*/
 
 var conn = mysql.createConnection({
     host : 'kyunss-db.cjwyxnwnqovj.ap-northeast-2.rds.amazonaws.com',
