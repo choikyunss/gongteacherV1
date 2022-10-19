@@ -52,24 +52,38 @@ var bodyParser = require('body-parser');
 
 // body-parser 가 클라이언트에서 오는 정보를 서버에서 분석 후 가져오게 하는데 1. 인코딩된 url을 가져오는 방법, 2. json 타입으로 된 것을 가져오는 방법 두 가지 모두 가져올 수 있도록 합니다.
 app.use(bodyParser.urlencoded({ extended: true,}));
-app.use(bodyParser.json()); 
+app.use(bodyParser.json());
+
+function getFormatDate(date){
+    var year = date.getFullYear();
+    var month = (1 + date.getMonth());
+    month = month > 10 ? month : '0' + month;
+    var day = date.getDay();
+    day = day > 10 ? day : '0' + day;
+
+    return '${year}-${month}-${day}'
+}
+
+var date = getFormatDate(new Date());
+console.log(date);
 
 ///////////// (Table ID : s_users_id_info) 사용자 신규 추가 ///////////////////////////
+// ** URL : http://13.124.234.170:3001/api/s_users_id_info/add
+// ** Body(JSON) : { "login_id" = (VARCHAR), "email" = (VARCHAR), "join_route" = (VARCHAR), "app_version" = (INT) }
 /// TODO : 동일 이메일 가입 시도 시, 체크하여 중복가입 막기 -> 적용 해야함.//
 app.post('/api/s_users_id_info/add', function(req, res) {
     var req_body = req.body;
     console.log(req_body);
+
     var login_id = req.body.login_id.toString();
     var email = req.body.email.toString();
     var join_route = req.body.join_route.toString();
-    var join_date = req.body.join_date.toString();
+    var join_date = date.toString();
     var level = 1; // 신규 가입자의 학습레벨은 무조건 1단계 //
     var app_version = req.body.app_version;
-    var c_login_date = req.body.c_login_date.toString();
-    var p_login_date = req.body.c_login_date.toString();
     
     var sql = 'INSERT INTO s_users_id_info (login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-    conn.query(sql, [login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date], (err, rows, fields) => {
+    conn.query(sql, [login_id, email, join_route, join_date, level, app_version, join_date, join_date], (err, rows, fields) => {
         if(err) {
             console.log(err);
             res.status(500).send('Internal Server Error');
@@ -135,7 +149,7 @@ app.get('/api/s_system_id_info/read/:type', async(req, res) => {
     });
 });
 
-///////////// (Table ID : s_ox_users_order_ch01~12) OX 순차 불러오기 ///////////////////////////
+///////////// (Table ID : s_ox_users_order_ch01~12) Read OX order ///////////////////////////
 function read_ox_order() {
     ///////////// OX Chapter-1 /////////////
     app.get('/api/s_ox_users_order_ch01/read/:type', async(req, res) => {
@@ -307,638 +321,691 @@ function read_ox_order() {
 }
 read_ox_order()
 
-// Parameter
-// "q_num" = 1 ~ n (INT)
-// "order_t" = 1 ~ 5 (INT)
-// "solve_r" = 0/1 (BIT)
-app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
-    conn.beginTransaction((err)=>{
-        let {type} = req.params;
-        var q_num = req.body.q_num; // 문항 번호 (Input value : 1, 2, 3, 4 ... n)
-        var order_t = req.body.order_t; // Order info.에 따른 table ID 선택 (Input value : 1, 2, 3, 4, 5)
-        var solve_r = req.body.solve_r; // 풀이 결과값 (Input value : 1 / 0)
-        var qst_string = "ox_ch01_q" + q_num; // 문항 번호 String
-        var t_string = "s_ox_users_s" + order_t + "_ch01"; // Table ID String
-
-        let today = new Date();
-        let year = today.getFullYear(); // 연도
-        let month = today.getMonth() + 1; // 월
-        var date_string = year + "_" + month; // Date String
-
-        var sql1 = 'UPDATE s_ox_users_order_ch01 SET ??=??%5+1 WHERE user_id=?';
-        var params1 = [qst_string, qst_string, type]
-        conn.query(sql1, params1, function(err1, rows1, fields) {
-            if (err1) {
-                console.log(err1);
-                res.status(500).send('Internal Server Error');
-            } else {
-                var sql2 = 'UPDATE s_ox_users_s1_ch01 ' +
-                'JOIN s_ox_users_s2_ch01 ON s_ox_users_s2_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
-                'JOIN s_ox_users_s3_ch01 ON s_ox_users_s3_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
-                'JOIN s_ox_users_s4_ch01 ON s_ox_users_s4_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
-                'JOIN s_ox_users_s5_ch01 ON s_ox_users_s5_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
-                'SET ??.??=? WHERE s_ox_users_s1_ch01.user_id=?';
-                var params2 = [t_string, qst_string, solve_r, type]
-                conn.query(sql2, params2, function(err2, rows2, fields) {
-                    if (err2) {
-                        console.log(err2);
-                        res.status(500).send('Internal Server Error');
-                        conn.rollback();
-                    } else {
-                        console.log(rows2);
-                        var sql3 = 'UPDATE s_ox_users_vol_ch01 SET ??=??+1 WHERE user_id=?';
-                        var params3 = [date_string, date_string, type]
-                        conn.query(sql3, params3, function(err3, rows3, fields) {
-                            if (err3) {
-                                console.log(err3);
-                                res.status(500).send('Internal Server Error');
-                                conn.rollback();
-                            } else {
-                                console.log(rows3);
-                                res.send(rows3);
-                                conn.commit();
-                            }
-                        });
-                    }
-                });
-            }
-        });
-    });
-});
-
-
-/*
-///////////// (Table ID : s_ox_users_order_ch01~12) OX 순차 업데이트 ///////////////////////////
-function update_ox_order() {
+///////////// (Table ID : s_ox_users_order_ch01~12) Update OX ///////////////////////////
+// ** Sequence 
+// 1 Step : update OX order table 0 to 5
+// 2 Step : update OX solve result table 0 or 1 (1 is collect answer, 0 is wrong answer) 
+// 3 Step : update OX learning volume table by counting the number of times learned
+// ** URL : http://13.124.234.170:3001/api/s_ox_users_order_ch01/update/:type (type : user_id )
+// ** Body(JSON) : { "q_num" = 1 ~ n (INT), "order_t" = 1 ~ 5 (INT), "solve_r" = 0/1 (BIT) }
+function update_ox() {
     ///////////// OX Chapter-1 /////////////
     app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
-        let {type} = req.params;
-        var col_num = req.body.col_num;
-        var qst_string = "ox_ch01_q" + col_num;
-        
-        var sql = 'UPDATE s_ox_users_order_ch01 SET ??=??%5+1 WHERE user_id=?';
-        var params = [qst_string, qst_string, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
+        conn.beginTransaction((err)=>{
+            let {type} = req.params;
+            var q_num = req.body.q_num; // 문항 번호 (Input value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t; // Order info.에 따른 table ID 선택 (Input value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r; // 풀이 결과값 (Input value : 1 / 0)
+            var qst_string = "ox_ch01_q" + q_num; // 문항 번호 String
+            var t_string = "s_ox_users_s" + order_t + "_ch01"; // Table ID String
+
+            let today = new Date();
+            let year = today.getFullYear(); // 연도
+            let month = today.getMonth() + 1; // 월
+            var date_string = year + "_" + month; // Date String
+
+            var sql1 = 'UPDATE s_ox_users_order_ch01 SET ??=??%5+1 WHERE user_id=?';
+            var params1 = [qst_string, qst_string, type]
+            conn.query(sql1, params1, function(err1, rows1, fields) {
+                if (err1) {
+                    console.log(err1);
+                    res.status(500).send('Internal Server Error');
+                } else {
+                    var sql2 = 'UPDATE s_ox_users_s1_ch01 ' +
+                    'JOIN s_ox_users_s2_ch01 ON s_ox_users_s2_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
+                    'JOIN s_ox_users_s3_ch01 ON s_ox_users_s3_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
+                    'JOIN s_ox_users_s4_ch01 ON s_ox_users_s4_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
+                    'JOIN s_ox_users_s5_ch01 ON s_ox_users_s5_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
+                    'SET ??.??=? WHERE s_ox_users_s1_ch01.user_id=?';
+                    var params2 = [t_string, qst_string, solve_r, type]
+                    conn.query(sql2, params2, function(err2, rows2, fields) {
+                        if (err2) {
+                            console.log(err2);
+                            res.status(500).send('Internal Server Error');
+                            conn.rollback();
+                        } else {
+                            console.log(rows2);
+                            var sql3 = 'UPDATE s_ox_users_vol_ch01 SET ??=??+1 WHERE user_id=?';
+                            var params3 = [date_string, date_string, type]
+                            conn.query(sql3, params3, function(err3, rows3, fields) {
+                                if (err3) {
+                                    console.log(err3);
+                                    res.status(500).send('Internal Server Error');
+                                    conn.rollback();
+                                } else {
+                                    console.log(rows3);
+                                    res.send(rows3);
+                                    conn.commit();
+                                }
+                            });
+                        }
+                    });
+                }
+            });
         });
     });
-  
+
     ///////////// OX Chapter-2 /////////////
     app.put('/api/s_ox_users_order_ch02/update/:type', function(req, res) {
-        let {type} = req.params;
-        var col_num = req.body.col_num;
-        var qst_string = "ox_ch02_q" + col_num;
-        
-        var sql = 'UPDATE s_ox_users_order_ch02 SET ??=??%5+1 WHERE user_id=?';
-        var params = [qst_string, qst_string, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
+        conn.beginTransaction((err)=>{
+            let {type} = req.params;
+            var q_num = req.body.q_num; // 문항 번호 (Input value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t; // Order info.에 따른 table ID 선택 (Input value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r; // 풀이 결과값 (Input value : 1 / 0)
+            var qst_string = "ox_ch02_q" + q_num; // 문항 번호 String
+            var t_string = "s_ox_users_s" + order_t + "_ch02"; // Table ID String
+
+            let today = new Date();
+            let year = today.getFullYear(); // 연도
+            let month = today.getMonth() + 1; // 월
+            var date_string = year + "_" + month; // Date String
+
+            var sql1 = 'UPDATE s_ox_users_order_ch02 SET ??=??%5+1 WHERE user_id=?';
+            var params1 = [qst_string, qst_string, type]
+            conn.query(sql1, params1, function(err1, rows1, fields) {
+                if (err1) {
+                    console.log(err1);
+                    res.status(500).send('Internal Server Error');
+                } else {
+                    var sql2 = 'UPDATE s_ox_users_s1_ch02 ' +
+                    'JOIN s_ox_users_s2_ch02 ON s_ox_users_s2_ch02.user_id = s_ox_users_s1_ch02.user_id ' +
+                    'JOIN s_ox_users_s3_ch02 ON s_ox_users_s3_ch02.user_id = s_ox_users_s1_ch02.user_id ' +
+                    'JOIN s_ox_users_s4_ch02 ON s_ox_users_s4_ch02.user_id = s_ox_users_s1_ch02.user_id ' +
+                    'JOIN s_ox_users_s5_ch02 ON s_ox_users_s5_ch02.user_id = s_ox_users_s1_ch02.user_id ' +
+                    'SET ??.??=? WHERE s_ox_users_s1_ch02.user_id=?';
+                    var params2 = [t_string, qst_string, solve_r, type]
+                    conn.query(sql2, params2, function(err2, rows2, fields) {
+                        if (err2) {
+                            console.log(err2);
+                            res.status(500).send('Internal Server Error');
+                            conn.rollback();
+                        } else {
+                            console.log(rows2);
+                            var sql3 = 'UPDATE s_ox_users_vol_ch02 SET ??=??+1 WHERE user_id=?';
+                            var params3 = [date_string, date_string, type]
+                            conn.query(sql3, params3, function(err3, rows3, fields) {
+                                if (err3) {
+                                    console.log(err3);
+                                    res.status(500).send('Internal Server Error');
+                                    conn.rollback();
+                                } else {
+                                    console.log(rows3);
+                                    res.send(rows3);
+                                    conn.commit();
+                                }
+                            });
+                        }
+                    });
+                }
+            });
         });
     });
 
     ///////////// OX Chapter-3 /////////////
     app.put('/api/s_ox_users_order_ch03/update/:type', function(req, res) {
-        let {type} = req.params;
-        var col_num = req.body.col_num;
-        var qst_string = "ox_ch03_q" + col_num;
-        
-        var sql = 'UPDATE s_ox_users_order_ch03 SET ??=??%5+1 WHERE user_id=?';
-        var params = [qst_string, qst_string, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
+        conn.beginTransaction((err)=>{
+            let {type} = req.params;
+            var q_num = req.body.q_num; // 문항 번호 (Input value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t; // Order info.에 따른 table ID 선택 (Input value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r; // 풀이 결과값 (Input value : 1 / 0)
+            var qst_string = "ox_ch03_q" + q_num; // 문항 번호 String
+            var t_string = "s_ox_users_s" + order_t + "_ch03"; // Table ID String
+
+            let today = new Date();
+            let year = today.getFullYear(); // 연도
+            let month = today.getMonth() + 1; // 월
+            var date_string = year + "_" + month; // Date String
+
+            var sql1 = 'UPDATE s_ox_users_order_ch03 SET ??=??%5+1 WHERE user_id=?';
+            var params1 = [qst_string, qst_string, type]
+            conn.query(sql1, params1, function(err1, rows1, fields) {
+                if (err1) {
+                    console.log(err1);
+                    res.status(500).send('Internal Server Error');
+                } else {
+                    var sql2 = 'UPDATE s_ox_users_s1_ch03 ' +
+                    'JOIN s_ox_users_s2_ch03 ON s_ox_users_s2_ch03.user_id = s_ox_users_s1_ch03.user_id ' +
+                    'JOIN s_ox_users_s3_ch03 ON s_ox_users_s3_ch03.user_id = s_ox_users_s1_ch03.user_id ' +
+                    'JOIN s_ox_users_s4_ch03 ON s_ox_users_s4_ch03.user_id = s_ox_users_s1_ch03.user_id ' +
+                    'JOIN s_ox_users_s5_ch03 ON s_ox_users_s5_ch03.user_id = s_ox_users_s1_ch03.user_id ' +
+                    'SET ??.??=? WHERE s_ox_users_s1_ch03.user_id=?';
+                    var params2 = [t_string, qst_string, solve_r, type]
+                    conn.query(sql2, params2, function(err2, rows2, fields) {
+                        if (err2) {
+                            console.log(err2);
+                            res.status(500).send('Internal Server Error');
+                            conn.rollback();
+                        } else {
+                            console.log(rows2);
+                            var sql3 = 'UPDATE s_ox_users_vol_ch03 SET ??=??+1 WHERE user_id=?';
+                            var params3 = [date_string, date_string, type]
+                            conn.query(sql3, params3, function(err3, rows3, fields) {
+                                if (err3) {
+                                    console.log(err3);
+                                    res.status(500).send('Internal Server Error');
+                                    conn.rollback();
+                                } else {
+                                    console.log(rows3);
+                                    res.send(rows3);
+                                    conn.commit();
+                                }
+                            });
+                        }
+                    });
+                }
+            });
         });
     });
 
     ///////////// OX Chapter-4 /////////////
     app.put('/api/s_ox_users_order_ch04/update/:type', function(req, res) {
-        let {type} = req.params;
-        var col_num = req.body.col_num;
-        var qst_string = "ox_ch04_q" + col_num;
-        
-        var sql = 'UPDATE s_ox_users_order_ch04 SET ??=??%5+1 WHERE user_id=?';
-        var params = [qst_string, qst_string, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
+        conn.beginTransaction((err)=>{
+            let {type} = req.params;
+            var q_num = req.body.q_num; // 문항 번호 (Input value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t; // Order info.에 따른 table ID 선택 (Input value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r; // 풀이 결과값 (Input value : 1 / 0)
+            var qst_string = "ox_ch04_q" + q_num; // 문항 번호 String
+            var t_string = "s_ox_users_s" + order_t + "_ch04"; // Table ID String
+
+            let today = new Date();
+            let year = today.getFullYear(); // 연도
+            let month = today.getMonth() + 1; // 월
+            var date_string = year + "_" + month; // Date String
+
+            var sql1 = 'UPDATE s_ox_users_order_ch04 SET ??=??%5+1 WHERE user_id=?';
+            var params1 = [qst_string, qst_string, type]
+            conn.query(sql1, params1, function(err1, rows1, fields) {
+                if (err1) {
+                    console.log(err1);
+                    res.status(500).send('Internal Server Error');
+                } else {
+                    var sql2 = 'UPDATE s_ox_users_s1_ch04 ' +
+                    'JOIN s_ox_users_s2_ch04 ON s_ox_users_s2_ch04.user_id = s_ox_users_s1_ch04.user_id ' +
+                    'JOIN s_ox_users_s3_ch04 ON s_ox_users_s3_ch04.user_id = s_ox_users_s1_ch04.user_id ' +
+                    'JOIN s_ox_users_s4_ch04 ON s_ox_users_s4_ch04.user_id = s_ox_users_s1_ch04.user_id ' +
+                    'JOIN s_ox_users_s5_ch04 ON s_ox_users_s5_ch04.user_id = s_ox_users_s1_ch04.user_id ' +
+                    'SET ??.??=? WHERE s_ox_users_s1_ch04.user_id=?';
+                    var params2 = [t_string, qst_string, solve_r, type]
+                    conn.query(sql2, params2, function(err2, rows2, fields) {
+                        if (err2) {
+                            console.log(err2);
+                            res.status(500).send('Internal Server Error');
+                            conn.rollback();
+                        } else {
+                            console.log(rows2);
+                            var sql3 = 'UPDATE s_ox_users_vol_ch04 SET ??=??+1 WHERE user_id=?';
+                            var params3 = [date_string, date_string, type]
+                            conn.query(sql3, params3, function(err3, rows3, fields) {
+                                if (err3) {
+                                    console.log(err3);
+                                    res.status(500).send('Internal Server Error');
+                                    conn.rollback();
+                                } else {
+                                    console.log(rows3);
+                                    res.send(rows3);
+                                    conn.commit();
+                                }
+                            });
+                        }
+                    });
+                }
+            });
         });
     });
 
     ///////////// OX Chapter-5 /////////////
     app.put('/api/s_ox_users_order_ch05/update/:type', function(req, res) {
-        let {type} = req.params;
-        var col_num = req.body.col_num;
-        var qst_string = "ox_ch05_q" + col_num;
-        
-        var sql = 'UPDATE s_ox_users_order_ch05 SET ??=??%5+1 WHERE user_id=?';
-        var params = [qst_string, qst_string, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
+        conn.beginTransaction((err)=>{
+            let {type} = req.params;
+            var q_num = req.body.q_num; // 문항 번호 (Input value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t; // Order info.에 따른 table ID 선택 (Input value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r; // 풀이 결과값 (Input value : 1 / 0)
+            var qst_string = "ox_ch05_q" + q_num; // 문항 번호 String
+            var t_string = "s_ox_users_s" + order_t + "_ch05"; // Table ID String
+
+            let today = new Date();
+            let year = today.getFullYear(); // 연도
+            let month = today.getMonth() + 1; // 월
+            var date_string = year + "_" + month; // Date String
+
+            var sql1 = 'UPDATE s_ox_users_order_ch05 SET ??=??%5+1 WHERE user_id=?';
+            var params1 = [qst_string, qst_string, type]
+            conn.query(sql1, params1, function(err1, rows1, fields) {
+                if (err1) {
+                    console.log(err1);
+                    res.status(500).send('Internal Server Error');
+                } else {
+                    var sql2 = 'UPDATE s_ox_users_s1_ch05 ' +
+                    'JOIN s_ox_users_s2_ch05 ON s_ox_users_s2_ch05.user_id = s_ox_users_s1_ch05.user_id ' +
+                    'JOIN s_ox_users_s3_ch05 ON s_ox_users_s3_ch05.user_id = s_ox_users_s1_ch05.user_id ' +
+                    'JOIN s_ox_users_s4_ch05 ON s_ox_users_s4_ch05.user_id = s_ox_users_s1_ch05.user_id ' +
+                    'JOIN s_ox_users_s5_ch05 ON s_ox_users_s5_ch05.user_id = s_ox_users_s1_ch05.user_id ' +
+                    'SET ??.??=? WHERE s_ox_users_s1_ch05.user_id=?';
+                    var params2 = [t_string, qst_string, solve_r, type]
+                    conn.query(sql2, params2, function(err2, rows2, fields) {
+                        if (err2) {
+                            console.log(err2);
+                            res.status(500).send('Internal Server Error');
+                            conn.rollback();
+                        } else {
+                            console.log(rows2);
+                            var sql3 = 'UPDATE s_ox_users_vol_ch05 SET ??=??+1 WHERE user_id=?';
+                            var params3 = [date_string, date_string, type]
+                            conn.query(sql3, params3, function(err3, rows3, fields) {
+                                if (err3) {
+                                    console.log(err3);
+                                    res.status(500).send('Internal Server Error');
+                                    conn.rollback();
+                                } else {
+                                    console.log(rows3);
+                                    res.send(rows3);
+                                    conn.commit();
+                                }
+                            });
+                        }
+                    });
+                }
+            });
         });
     });
 
     ///////////// OX Chapter-6 /////////////
     app.put('/api/s_ox_users_order_ch06/update/:type', function(req, res) {
-        let {type} = req.params;
-        var col_num = req.body.col_num;
-        var qst_string = "ox_ch06_q" + col_num;
-        
-        var sql = 'UPDATE s_ox_users_order_ch06 SET ??=??%5+1 WHERE user_id=?';
-        var params = [qst_string, qst_string, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
+        conn.beginTransaction((err)=>{
+            let {type} = req.params;
+            var q_num = req.body.q_num; // 문항 번호 (Input value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t; // Order info.에 따른 table ID 선택 (Input value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r; // 풀이 결과값 (Input value : 1 / 0)
+            var qst_string = "ox_ch06_q" + q_num; // 문항 번호 String
+            var t_string = "s_ox_users_s" + order_t + "_ch06"; // Table ID String
+
+            let today = new Date();
+            let year = today.getFullYear(); // 연도
+            let month = today.getMonth() + 1; // 월
+            var date_string = year + "_" + month; // Date String
+
+            var sql1 = 'UPDATE s_ox_users_order_ch06 SET ??=??%5+1 WHERE user_id=?';
+            var params1 = [qst_string, qst_string, type]
+            conn.query(sql1, params1, function(err1, rows1, fields) {
+                if (err1) {
+                    console.log(err1);
+                    res.status(500).send('Internal Server Error');
+                } else {
+                    var sql2 = 'UPDATE s_ox_users_s1_ch06 ' +
+                    'JOIN s_ox_users_s2_ch06 ON s_ox_users_s2_ch06.user_id = s_ox_users_s1_ch06.user_id ' +
+                    'JOIN s_ox_users_s3_ch06 ON s_ox_users_s3_ch06.user_id = s_ox_users_s1_ch06.user_id ' +
+                    'JOIN s_ox_users_s4_ch06 ON s_ox_users_s4_ch06.user_id = s_ox_users_s1_ch06.user_id ' +
+                    'JOIN s_ox_users_s5_ch06 ON s_ox_users_s5_ch06.user_id = s_ox_users_s1_ch06.user_id ' +
+                    'SET ??.??=? WHERE s_ox_users_s1_ch06.user_id=?';
+                    var params2 = [t_string, qst_string, solve_r, type]
+                    conn.query(sql2, params2, function(err2, rows2, fields) {
+                        if (err2) {
+                            console.log(err2);
+                            res.status(500).send('Internal Server Error');
+                            conn.rollback();
+                        } else {
+                            console.log(rows2);
+                            var sql3 = 'UPDATE s_ox_users_vol_ch06 SET ??=??+1 WHERE user_id=?';
+                            var params3 = [date_string, date_string, type]
+                            conn.query(sql3, params3, function(err3, rows3, fields) {
+                                if (err3) {
+                                    console.log(err3);
+                                    res.status(500).send('Internal Server Error');
+                                    conn.rollback();
+                                } else {
+                                    console.log(rows3);
+                                    res.send(rows3);
+                                    conn.commit();
+                                }
+                            });
+                        }
+                    });
+                }
+            });
         });
     });
 
     ///////////// OX Chapter-7 /////////////
     app.put('/api/s_ox_users_order_ch07/update/:type', function(req, res) {
-        let {type} = req.params;
-        var col_num = req.body.col_num;
-        var qst_string = "ox_ch07_q" + col_num;
-        
-        var sql = 'UPDATE s_ox_users_order_ch07 SET ??=??%5+1 WHERE user_id=?';
-        var params = [qst_string, qst_string, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
+        conn.beginTransaction((err)=>{
+            let {type} = req.params;
+            var q_num = req.body.q_num; // 문항 번호 (Input value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t; // Order info.에 따른 table ID 선택 (Input value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r; // 풀이 결과값 (Input value : 1 / 0)
+            var qst_string = "ox_ch07_q" + q_num; // 문항 번호 String
+            var t_string = "s_ox_users_s" + order_t + "_ch07"; // Table ID String
+
+            let today = new Date();
+            let year = today.getFullYear(); // 연도
+            let month = today.getMonth() + 1; // 월
+            var date_string = year + "_" + month; // Date String
+
+            var sql1 = 'UPDATE s_ox_users_order_ch07 SET ??=??%5+1 WHERE user_id=?';
+            var params1 = [qst_string, qst_string, type]
+            conn.query(sql1, params1, function(err1, rows1, fields) {
+                if (err1) {
+                    console.log(err1);
+                    res.status(500).send('Internal Server Error');
+                } else {
+                    var sql2 = 'UPDATE s_ox_users_s1_ch07 ' +
+                    'JOIN s_ox_users_s2_ch07 ON s_ox_users_s2_ch07.user_id = s_ox_users_s1_ch07.user_id ' +
+                    'JOIN s_ox_users_s3_ch07 ON s_ox_users_s3_ch07.user_id = s_ox_users_s1_ch07.user_id ' +
+                    'JOIN s_ox_users_s4_ch07 ON s_ox_users_s4_ch07.user_id = s_ox_users_s1_ch07.user_id ' +
+                    'JOIN s_ox_users_s5_ch07 ON s_ox_users_s5_ch07.user_id = s_ox_users_s1_ch07.user_id ' +
+                    'SET ??.??=? WHERE s_ox_users_s1_ch07.user_id=?';
+                    var params2 = [t_string, qst_string, solve_r, type]
+                    conn.query(sql2, params2, function(err2, rows2, fields) {
+                        if (err2) {
+                            console.log(err2);
+                            res.status(500).send('Internal Server Error');
+                            conn.rollback();
+                        } else {
+                            console.log(rows2);
+                            var sql3 = 'UPDATE s_ox_users_vol_ch07 SET ??=??+1 WHERE user_id=?';
+                            var params3 = [date_string, date_string, type]
+                            conn.query(sql3, params3, function(err3, rows3, fields) {
+                                if (err3) {
+                                    console.log(err3);
+                                    res.status(500).send('Internal Server Error');
+                                    conn.rollback();
+                                } else {
+                                    console.log(rows3);
+                                    res.send(rows3);
+                                    conn.commit();
+                                }
+                            });
+                        }
+                    });
+                }
+            });
         });
     });
 
     ///////////// OX Chapter-8 /////////////
     app.put('/api/s_ox_users_order_ch08/update/:type', function(req, res) {
-        let {type} = req.params;
-        var col_num = req.body.col_num;
-        var qst_string = "ox_ch08_q" + col_num;
-        
-        var sql = 'UPDATE s_ox_users_order_ch08 SET ??=??%5+1 WHERE user_id=?';
-        var params = [qst_string, qst_string, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
+        conn.beginTransaction((err)=>{
+            let {type} = req.params;
+            var q_num = req.body.q_num; // 문항 번호 (Input value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t; // Order info.에 따른 table ID 선택 (Input value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r; // 풀이 결과값 (Input value : 1 / 0)
+            var qst_string = "ox_ch08_q" + q_num; // 문항 번호 String
+            var t_string = "s_ox_users_s" + order_t + "_ch08"; // Table ID String
+
+            let today = new Date();
+            let year = today.getFullYear(); // 연도
+            let month = today.getMonth() + 1; // 월
+            var date_string = year + "_" + month; // Date String
+
+            var sql1 = 'UPDATE s_ox_users_order_ch08 SET ??=??%5+1 WHERE user_id=?';
+            var params1 = [qst_string, qst_string, type]
+            conn.query(sql1, params1, function(err1, rows1, fields) {
+                if (err1) {
+                    console.log(err1);
+                    res.status(500).send('Internal Server Error');
+                } else {
+                    var sql2 = 'UPDATE s_ox_users_s1_ch08 ' +
+                    'JOIN s_ox_users_s2_ch08 ON s_ox_users_s2_ch08.user_id = s_ox_users_s1_ch08.user_id ' +
+                    'JOIN s_ox_users_s3_ch08 ON s_ox_users_s3_ch08.user_id = s_ox_users_s1_ch08.user_id ' +
+                    'JOIN s_ox_users_s4_ch08 ON s_ox_users_s4_ch08.user_id = s_ox_users_s1_ch08.user_id ' +
+                    'JOIN s_ox_users_s5_ch08 ON s_ox_users_s5_ch08.user_id = s_ox_users_s1_ch08.user_id ' +
+                    'SET ??.??=? WHERE s_ox_users_s1_ch08.user_id=?';
+                    var params2 = [t_string, qst_string, solve_r, type]
+                    conn.query(sql2, params2, function(err2, rows2, fields) {
+                        if (err2) {
+                            console.log(err2);
+                            res.status(500).send('Internal Server Error');
+                            conn.rollback();
+                        } else {
+                            console.log(rows2);
+                            var sql3 = 'UPDATE s_ox_users_vol_ch08 SET ??=??+1 WHERE user_id=?';
+                            var params3 = [date_string, date_string, type]
+                            conn.query(sql3, params3, function(err3, rows3, fields) {
+                                if (err3) {
+                                    console.log(err3);
+                                    res.status(500).send('Internal Server Error');
+                                    conn.rollback();
+                                } else {
+                                    console.log(rows3);
+                                    res.send(rows3);
+                                    conn.commit();
+                                }
+                            });
+                        }
+                    });
+                }
+            });
         });
     });
 
     ///////////// OX Chapter-9 /////////////
     app.put('/api/s_ox_users_order_ch09/update/:type', function(req, res) {
-        let {type} = req.params;
-        var col_num = req.body.col_num;
-        var qst_string = "ox_ch09_q" + col_num;
-        
-        var sql = 'UPDATE s_ox_users_order_ch09 SET ??=??%5+1 WHERE user_id=?';
-        var params = [qst_string, qst_string, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
+        conn.beginTransaction((err)=>{
+            let {type} = req.params;
+            var q_num = req.body.q_num; // 문항 번호 (Input value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t; // Order info.에 따른 table ID 선택 (Input value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r; // 풀이 결과값 (Input value : 1 / 0)
+            var qst_string = "ox_ch09_q" + q_num; // 문항 번호 String
+            var t_string = "s_ox_users_s" + order_t + "_ch09"; // Table ID String
+
+            let today = new Date();
+            let year = today.getFullYear(); // 연도
+            let month = today.getMonth() + 1; // 월
+            var date_string = year + "_" + month; // Date String
+
+            var sql1 = 'UPDATE s_ox_users_order_ch09 SET ??=??%5+1 WHERE user_id=?';
+            var params1 = [qst_string, qst_string, type]
+            conn.query(sql1, params1, function(err1, rows1, fields) {
+                if (err1) {
+                    console.log(err1);
+                    res.status(500).send('Internal Server Error');
+                } else {
+                    var sql2 = 'UPDATE s_ox_users_s1_ch09 ' +
+                    'JOIN s_ox_users_s2_ch09 ON s_ox_users_s2_ch09.user_id = s_ox_users_s1_ch09.user_id ' +
+                    'JOIN s_ox_users_s3_ch09 ON s_ox_users_s3_ch09.user_id = s_ox_users_s1_ch09.user_id ' +
+                    'JOIN s_ox_users_s4_ch09 ON s_ox_users_s4_ch09.user_id = s_ox_users_s1_ch09.user_id ' +
+                    'JOIN s_ox_users_s5_ch09 ON s_ox_users_s5_ch09.user_id = s_ox_users_s1_ch09.user_id ' +
+                    'SET ??.??=? WHERE s_ox_users_s1_ch09.user_id=?';
+                    var params2 = [t_string, qst_string, solve_r, type]
+                    conn.query(sql2, params2, function(err2, rows2, fields) {
+                        if (err2) {
+                            console.log(err2);
+                            res.status(500).send('Internal Server Error');
+                            conn.rollback();
+                        } else {
+                            console.log(rows2);
+                            var sql3 = 'UPDATE s_ox_users_vol_ch09 SET ??=??+1 WHERE user_id=?';
+                            var params3 = [date_string, date_string, type]
+                            conn.query(sql3, params3, function(err3, rows3, fields) {
+                                if (err3) {
+                                    console.log(err3);
+                                    res.status(500).send('Internal Server Error');
+                                    conn.rollback();
+                                } else {
+                                    console.log(rows3);
+                                    res.send(rows3);
+                                    conn.commit();
+                                }
+                            });
+                        }
+                    });
+                }
+            });
         });
     });
 
     ///////////// OX Chapter-10 /////////////
     app.put('/api/s_ox_users_order_ch10/update/:type', function(req, res) {
-        let {type} = req.params;
-        var col_num = req.body.col_num;
-        var qst_string = "ox_ch10_q" + col_num;
-        
-        var sql = 'UPDATE s_ox_users_order_ch10 SET ??=??%5+1 WHERE user_id=?';
-        var params = [qst_string, qst_string, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
+        conn.beginTransaction((err)=>{
+            let {type} = req.params;
+            var q_num = req.body.q_num; // 문항 번호 (Input value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t; // Order info.에 따른 table ID 선택 (Input value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r; // 풀이 결과값 (Input value : 1 / 0)
+            var qst_string = "ox_ch10_q" + q_num; // 문항 번호 String
+            var t_string = "s_ox_users_s" + order_t + "_ch10"; // Table ID String
+
+            let today = new Date();
+            let year = today.getFullYear(); // 연도
+            let month = today.getMonth() + 1; // 월
+            var date_string = year + "_" + month; // Date String
+
+            var sql1 = 'UPDATE s_ox_users_order_ch10 SET ??=??%5+1 WHERE user_id=?';
+            var params1 = [qst_string, qst_string, type]
+            conn.query(sql1, params1, function(err1, rows1, fields) {
+                if (err1) {
+                    console.log(err1);
+                    res.status(500).send('Internal Server Error');
+                } else {
+                    var sql2 = 'UPDATE s_ox_users_s1_ch10 ' +
+                    'JOIN s_ox_users_s2_ch10 ON s_ox_users_s2_ch10.user_id = s_ox_users_s1_ch10.user_id ' +
+                    'JOIN s_ox_users_s3_ch10 ON s_ox_users_s3_ch10.user_id = s_ox_users_s1_ch10.user_id ' +
+                    'JOIN s_ox_users_s4_ch10 ON s_ox_users_s4_ch10.user_id = s_ox_users_s1_ch10.user_id ' +
+                    'JOIN s_ox_users_s5_ch10 ON s_ox_users_s5_ch10.user_id = s_ox_users_s1_ch10.user_id ' +
+                    'SET ??.??=? WHERE s_ox_users_s1_ch10.user_id=?';
+                    var params2 = [t_string, qst_string, solve_r, type]
+                    conn.query(sql2, params2, function(err2, rows2, fields) {
+                        if (err2) {
+                            console.log(err2);
+                            res.status(500).send('Internal Server Error');
+                            conn.rollback();
+                        } else {
+                            console.log(rows2);
+                            var sql3 = 'UPDATE s_ox_users_vol_ch10 SET ??=??+1 WHERE user_id=?';
+                            var params3 = [date_string, date_string, type]
+                            conn.query(sql3, params3, function(err3, rows3, fields) {
+                                if (err3) {
+                                    console.log(err3);
+                                    res.status(500).send('Internal Server Error');
+                                    conn.rollback();
+                                } else {
+                                    console.log(rows3);
+                                    res.send(rows3);
+                                    conn.commit();
+                                }
+                            });
+                        }
+                    });
+                }
+            });
         });
     });
 
     ///////////// OX Chapter-11 /////////////
     app.put('/api/s_ox_users_order_ch11/update/:type', function(req, res) {
-        let {type} = req.params;
-        var col_num = req.body.col_num;
-        var qst_string = "ox_ch11_q" + col_num;
-        
-        var sql = 'UPDATE s_ox_users_order_ch11 SET ??=??%5+1 WHERE user_id=?';
-        var params = [qst_string, qst_string, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
+        conn.beginTransaction((err)=>{
+            let {type} = req.params;
+            var q_num = req.body.q_num; // 문항 번호 (Input value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t; // Order info.에 따른 table ID 선택 (Input value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r; // 풀이 결과값 (Input value : 1 / 0)
+            var qst_string = "ox_ch11_q" + q_num; // 문항 번호 String
+            var t_string = "s_ox_users_s" + order_t + "_ch11"; // Table ID String
+
+            let today = new Date();
+            let year = today.getFullYear(); // 연도
+            let month = today.getMonth() + 1; // 월
+            var date_string = year + "_" + month; // Date String
+
+            var sql1 = 'UPDATE s_ox_users_order_ch11 SET ??=??%5+1 WHERE user_id=?';
+            var params1 = [qst_string, qst_string, type]
+            conn.query(sql1, params1, function(err1, rows1, fields) {
+                if (err1) {
+                    console.log(err1);
+                    res.status(500).send('Internal Server Error');
+                } else {
+                    var sql2 = 'UPDATE s_ox_users_s1_ch11 ' +
+                    'JOIN s_ox_users_s2_ch11 ON s_ox_users_s2_ch11.user_id = s_ox_users_s1_ch11.user_id ' +
+                    'JOIN s_ox_users_s3_ch11 ON s_ox_users_s3_ch11.user_id = s_ox_users_s1_ch11.user_id ' +
+                    'JOIN s_ox_users_s4_ch11 ON s_ox_users_s4_ch11.user_id = s_ox_users_s1_ch11.user_id ' +
+                    'JOIN s_ox_users_s5_ch11 ON s_ox_users_s5_ch11.user_id = s_ox_users_s1_ch11.user_id ' +
+                    'SET ??.??=? WHERE s_ox_users_s1_ch11.user_id=?';
+                    var params2 = [t_string, qst_string, solve_r, type]
+                    conn.query(sql2, params2, function(err2, rows2, fields) {
+                        if (err2) {
+                            console.log(err2);
+                            res.status(500).send('Internal Server Error');
+                            conn.rollback();
+                        } else {
+                            console.log(rows2);
+                            var sql3 = 'UPDATE s_ox_users_vol_ch11 SET ??=??+1 WHERE user_id=?';
+                            var params3 = [date_string, date_string, type]
+                            conn.query(sql3, params3, function(err3, rows3, fields) {
+                                if (err3) {
+                                    console.log(err3);
+                                    res.status(500).send('Internal Server Error');
+                                    conn.rollback();
+                                } else {
+                                    console.log(rows3);
+                                    res.send(rows3);
+                                    conn.commit();
+                                }
+                            });
+                        }
+                    });
+                }
+            });
         });
     });
 
     ///////////// OX Chapter-12 /////////////
     app.put('/api/s_ox_users_order_ch12/update/:type', function(req, res) {
-        let {type} = req.params;
-        var col_num = req.body.col_num;
-        var qst_string = "ox_ch12_q" + col_num;
-        
-        var sql = 'UPDATE s_ox_users_order_ch12 SET ??=??%5+1 WHERE user_id=?';
-        var params = [qst_string, qst_string, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
+        conn.beginTransaction((err)=>{
+            let {type} = req.params;
+            var q_num = req.body.q_num; // 문항 번호 (Input value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t; // Order info.에 따른 table ID 선택 (Input value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r; // 풀이 결과값 (Input value : 1 / 0)
+            var qst_string = "ox_ch12_q" + q_num; // 문항 번호 String
+            var t_string = "s_ox_users_s" + order_t + "_ch12"; // Table ID String
+
+            let today = new Date();
+            let year = today.getFullYear(); // 연도
+            let month = today.getMonth() + 1; // 월
+            var date_string = year + "_" + month; // Date String
+
+            var sql1 = 'UPDATE s_ox_users_order_ch12 SET ??=??%5+1 WHERE user_id=?';
+            var params1 = [qst_string, qst_string, type]
+            conn.query(sql1, params1, function(err1, rows1, fields) {
+                if (err1) {
+                    console.log(err1);
+                    res.status(500).send('Internal Server Error');
+                } else {
+                    var sql2 = 'UPDATE s_ox_users_s1_ch12 ' +
+                    'JOIN s_ox_users_s2_ch12 ON s_ox_users_s2_ch12.user_id = s_ox_users_s1_ch12.user_id ' +
+                    'JOIN s_ox_users_s3_ch12 ON s_ox_users_s3_ch12.user_id = s_ox_users_s1_ch12.user_id ' +
+                    'JOIN s_ox_users_s4_ch12 ON s_ox_users_s4_ch12.user_id = s_ox_users_s1_ch12.user_id ' +
+                    'JOIN s_ox_users_s5_ch12 ON s_ox_users_s5_ch12.user_id = s_ox_users_s1_ch12.user_id ' +
+                    'SET ??.??=? WHERE s_ox_users_s1_ch12.user_id=?';
+                    var params2 = [t_string, qst_string, solve_r, type]
+                    conn.query(sql2, params2, function(err2, rows2, fields) {
+                        if (err2) {
+                            console.log(err2);
+                            res.status(500).send('Internal Server Error');
+                            conn.rollback();
+                        } else {
+                            console.log(rows2);
+                            var sql3 = 'UPDATE s_ox_users_vol_ch12 SET ??=??+1 WHERE user_id=?';
+                            var params3 = [date_string, date_string, type]
+                            conn.query(sql3, params3, function(err3, rows3, fields) {
+                                if (err3) {
+                                    console.log(err3);
+                                    res.status(500).send('Internal Server Error');
+                                    conn.rollback();
+                                } else {
+                                    console.log(rows3);
+                                    res.send(rows3);
+                                    conn.commit();
+                                }
+                            });
+                        }
+                    });
+                }
+            });
         });
     });
 }
-update_ox_order()
-*/
-///////////// (Table ID : s_ox_users_(s1~s5)_ch01~12) OX 풀이 업데이트 ///////////////////////////
-function update_ox_solve() {
-    ///////////// OX Chapter-1 /////////////
-    app.put('/api/s_ox_users_s1_ch01/update/:type', function(req, res) {
-        let {type} = req.params;
-        var order_table = req.body.order_table;
-        var col_num = req.body.col_num;
-        var solve_result = req.body.solve_result;
-        var table_string = "s_ox_users_s" + order_table + "_ch01";
-        var qst_string = "ox_ch01_q" + col_num;
+update_ox()
 
-        var sql = 'UPDATE s_ox_users_s1_ch01 ' +
-        'JOIN s_ox_users_s2_ch01 ON s_ox_users_s2_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
-        'JOIN s_ox_users_s3_ch01 ON s_ox_users_s3_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
-        'JOIN s_ox_users_s4_ch01 ON s_ox_users_s4_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
-        'JOIN s_ox_users_s5_ch01 ON s_ox_users_s5_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
-        'SET ??.??=? WHERE s_ox_users_s1_ch01.user_id=?';
-        var params = [table_string, qst_string, solve_result, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                console.log(table_name);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
-        });
-    });
 
-    ///////////// OX Chapter-2 /////////////
-    app.put('/api/s_ox_users_s1_ch02/update/:type', function(req, res) {
-        let {type} = req.params;
-        var order_table = req.body.order_table;
-        var col_num = req.body.col_num;
-        var solve_result = req.body.solve_result;
-        var table_string = "s_ox_users_s" + order_table + "_ch02";
-        var qst_string = "ox_ch02_q" + col_num
 
-        var sql = 'UPDATE s_ox_users_s1_ch02 ' +
-        'JOIN s_ox_users_s2_ch02 ON s_ox_users_s2_ch02.user_id = s_ox_users_s1_ch02.user_id ' +
-        'JOIN s_ox_users_s3_ch02 ON s_ox_users_s3_ch02.user_id = s_ox_users_s1_ch02.user_id ' +
-        'JOIN s_ox_users_s4_ch02 ON s_ox_users_s4_ch02.user_id = s_ox_users_s1_ch02.user_id ' +
-        'JOIN s_ox_users_s5_ch02 ON s_ox_users_s5_ch02.user_id = s_ox_users_s1_ch02.user_id ' +
-        'SET ??.??=? WHERE s_ox_users_s1_ch02.user_id=?';
-        var params = [table_string, qst_string, solve_result, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                console.log(table_name);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
-        });
-    });
 
-    ///////////// OX Chapter-3 /////////////
-    app.put('/api/s_ox_users_s1_ch03/update/:type', function(req, res) {
-        let {type} = req.params;
-        var order_table = req.body.order_table;
-        var col_num = req.body.col_num;
-        var solve_result = req.body.solve_result;
-        var table_string = "s_ox_users_s" + order_table + "_ch03";
-        var qst_string = "ox_ch03_q" + col_num
-
-        var sql = 'UPDATE s_ox_users_s1_ch03 ' +
-        'JOIN s_ox_users_s2_ch03 ON s_ox_users_s2_ch03.user_id = s_ox_users_s1_ch03.user_id ' +
-        'JOIN s_ox_users_s3_ch03 ON s_ox_users_s3_ch03.user_id = s_ox_users_s1_ch03.user_id ' +
-        'JOIN s_ox_users_s4_ch03 ON s_ox_users_s4_ch03.user_id = s_ox_users_s1_ch03.user_id ' +
-        'JOIN s_ox_users_s5_ch03 ON s_ox_users_s5_ch03.user_id = s_ox_users_s1_ch03.user_id ' +
-        'SET ??.??=? WHERE s_ox_users_s1_ch03.user_id=?';
-        var params = [table_string, qst_string, solve_result, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                console.log(table_name);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
-        });
-    });
-
-    ///////////// OX Chapter-4 /////////////
-    app.put('/api/s_ox_users_s1_ch04/update/:type', function(req, res) {
-        let {type} = req.params;
-        var order_table = req.body.order_table;
-        var col_num = req.body.col_num;
-        var solve_result = req.body.solve_result;
-        var table_string = "s_ox_users_s" + order_table + "_ch04";
-        var qst_string = "ox_ch04_q" + col_num
-
-        var sql = 'UPDATE s_ox_users_s1_ch04 ' +
-        'JOIN s_ox_users_s2_ch04 ON s_ox_users_s2_ch04.user_id = s_ox_users_s1_ch04.user_id ' +
-        'JOIN s_ox_users_s3_ch04 ON s_ox_users_s3_ch04.user_id = s_ox_users_s1_ch04.user_id ' +
-        'JOIN s_ox_users_s4_ch04 ON s_ox_users_s4_ch04.user_id = s_ox_users_s1_ch04.user_id ' +
-        'JOIN s_ox_users_s5_ch04 ON s_ox_users_s5_ch04.user_id = s_ox_users_s1_ch04.user_id ' +
-        'SET ??.??=? WHERE s_ox_users_s1_ch04.user_id=?';
-        var params = [table_string, qst_string, solve_result, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                console.log(table_name);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
-        });
-    });
-
-    ///////////// OX Chapter-5 /////////////
-    app.put('/api/s_ox_users_s1_ch05/update/:type', function(req, res) {
-        let {type} = req.params;
-        var order_table = req.body.order_table;
-        var col_num = req.body.col_num;
-        var solve_result = req.body.solve_result;
-        var table_string = "s_ox_users_s" + order_table + "_ch05";
-        var qst_string = "ox_ch05_q" + col_num
-
-        var sql = 'UPDATE s_ox_users_s1_ch05 ' +
-        'JOIN s_ox_users_s2_ch05 ON s_ox_users_s2_ch05.user_id = s_ox_users_s1_ch05.user_id ' +
-        'JOIN s_ox_users_s3_ch05 ON s_ox_users_s3_ch05.user_id = s_ox_users_s1_ch05.user_id ' +
-        'JOIN s_ox_users_s4_ch05 ON s_ox_users_s4_ch05.user_id = s_ox_users_s1_ch05.user_id ' +
-        'JOIN s_ox_users_s5_ch05 ON s_ox_users_s5_ch05.user_id = s_ox_users_s1_ch05.user_id ' +
-        'SET ??.??=? WHERE s_ox_users_s1_ch05.user_id=?';
-        var params = [table_string, qst_string, solve_result, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                console.log(table_name);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
-        });
-    });
-
-    ///////////// OX Chapter-6 /////////////
-    app.put('/api/s_ox_users_s1_ch06/update/:type', function(req, res) {
-        let {type} = req.params;
-        var order_table = req.body.order_table;
-        var col_num = req.body.col_num;
-        var solve_result = req.body.solve_result;
-        var table_string = "s_ox_users_s" + order_table + "_ch06";
-        var qst_string = "ox_ch06_q" + col_num
-
-        var sql = 'UPDATE s_ox_users_s1_ch06 ' +
-        'JOIN s_ox_users_s2_ch06 ON s_ox_users_s2_ch06.user_id = s_ox_users_s1_ch06.user_id ' +
-        'JOIN s_ox_users_s3_ch06 ON s_ox_users_s3_ch06.user_id = s_ox_users_s1_ch06.user_id ' +
-        'JOIN s_ox_users_s4_ch06 ON s_ox_users_s4_ch06.user_id = s_ox_users_s1_ch06.user_id ' +
-        'JOIN s_ox_users_s5_ch06 ON s_ox_users_s5_ch06.user_id = s_ox_users_s1_ch06.user_id ' +
-        'SET ??.??=? WHERE s_ox_users_s1_ch06.user_id=?';
-        var params = [table_string, qst_string, solve_result, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                console.log(table_name);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
-        });
-    });
-
-    ///////////// OX Chapter-7 /////////////
-    app.put('/api/s_ox_users_s1_ch07/update/:type', function(req, res) {
-        let {type} = req.params;
-        var order_table = req.body.order_table;
-        var col_num = req.body.col_num;
-        var solve_result = req.body.solve_result;
-        var table_string = "s_ox_users_s" + order_table + "_ch07";
-        var qst_string = "ox_ch07_q" + col_num
-
-        var sql = 'UPDATE s_ox_users_s1_ch07 ' +
-        'JOIN s_ox_users_s2_ch07 ON s_ox_users_s2_ch07.user_id = s_ox_users_s1_ch07.user_id ' +
-        'JOIN s_ox_users_s3_ch07 ON s_ox_users_s3_ch07.user_id = s_ox_users_s1_ch07.user_id ' +
-        'JOIN s_ox_users_s4_ch07 ON s_ox_users_s4_ch07.user_id = s_ox_users_s1_ch07.user_id ' +
-        'JOIN s_ox_users_s5_ch07 ON s_ox_users_s5_ch07.user_id = s_ox_users_s1_ch07.user_id ' +
-        'SET ??.??=? WHERE s_ox_users_s1_ch07.user_id=?';
-        var params = [table_string, qst_string, solve_result, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                console.log(table_name);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
-        });
-    });
-
-    ///////////// OX Chapter-8 /////////////
-    app.put('/api/s_ox_users_s1_ch08/update/:type', function(req, res) {
-        let {type} = req.params;
-        var order_table = req.body.order_table;
-        var col_num = req.body.col_num;
-        var solve_result = req.body.solve_result;
-        var table_string = "s_ox_users_s" + order_table + "_ch08";
-        var qst_string = "ox_ch08_q" + col_num
-
-        var sql = 'UPDATE s_ox_users_s1_ch08 ' +
-        'JOIN s_ox_users_s2_ch08 ON s_ox_users_s2_ch08.user_id = s_ox_users_s1_ch08.user_id ' +
-        'JOIN s_ox_users_s3_ch08 ON s_ox_users_s3_ch08.user_id = s_ox_users_s1_ch08.user_id ' +
-        'JOIN s_ox_users_s4_ch08 ON s_ox_users_s4_ch08.user_id = s_ox_users_s1_ch08.user_id ' +
-        'JOIN s_ox_users_s5_ch08 ON s_ox_users_s5_ch08.user_id = s_ox_users_s1_ch08.user_id ' +
-        'SET ??.??=? WHERE s_ox_users_s1_ch08.user_id=?';
-        var params = [table_string, qst_string, solve_result, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                console.log(table_name);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
-        });
-    });
-
-    ///////////// OX Chapter-9 /////////////
-    app.put('/api/s_ox_users_s1_ch09/update/:type', function(req, res) {
-        let {type} = req.params;
-        var order_table = req.body.order_table;
-        var col_num = req.body.col_num;
-        var solve_result = req.body.solve_result;
-        var table_string = "s_ox_users_s" + order_table + "_ch09";
-        var qst_string = "ox_ch09_q" + col_num
-
-        var sql = 'UPDATE s_ox_users_s1_ch09 ' +
-        'JOIN s_ox_users_s2_ch09 ON s_ox_users_s2_ch09.user_id = s_ox_users_s1_ch09.user_id ' +
-        'JOIN s_ox_users_s3_ch09 ON s_ox_users_s3_ch09.user_id = s_ox_users_s1_ch09.user_id ' +
-        'JOIN s_ox_users_s4_ch09 ON s_ox_users_s4_ch09.user_id = s_ox_users_s1_ch09.user_id ' +
-        'JOIN s_ox_users_s5_ch09 ON s_ox_users_s5_ch09.user_id = s_ox_users_s1_ch09.user_id ' +
-        'SET ??.??=? WHERE s_ox_users_s1_ch09.user_id=?';
-        var params = [table_string, qst_string, solve_result, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                console.log(table_name);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
-        });
-    });
-
-    ///////////// OX Chapter-10 /////////////
-    app.put('/api/s_ox_users_s1_ch10/update/:type', function(req, res) {
-        let {type} = req.params;
-        var order_table = req.body.order_table;
-        var col_num = req.body.col_num;
-        var solve_result = req.body.solve_result;
-        var table_string = "s_ox_users_s" + order_table + "_ch10";
-        var qst_string = "ox_ch10_q" + col_num
-
-        var sql = 'UPDATE s_ox_users_s1_ch10 ' +
-        'JOIN s_ox_users_s2_ch10 ON s_ox_users_s2_ch10.user_id = s_ox_users_s1_ch10.user_id ' +
-        'JOIN s_ox_users_s3_ch10 ON s_ox_users_s3_ch10.user_id = s_ox_users_s1_ch10.user_id ' +
-        'JOIN s_ox_users_s4_ch10 ON s_ox_users_s4_ch10.user_id = s_ox_users_s1_ch10.user_id ' +
-        'JOIN s_ox_users_s5_ch10 ON s_ox_users_s5_ch10.user_id = s_ox_users_s1_ch10.user_id ' +
-        'SET ??.??=? WHERE s_ox_users_s1_ch10.user_id=?';
-        var params = [table_string, qst_string, solve_result, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                console.log(table_name);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
-        });
-    });
-
-    ///////////// OX Chapter-11 /////////////
-    app.put('/api/s_ox_users_s1_ch11/update/:type', function(req, res) {
-        let {type} = req.params;
-        var order_table = req.body.order_table;
-        var col_num = req.body.col_num;
-        var solve_result = req.body.solve_result;
-        var table_string = "s_ox_users_s" + order_table + "_ch11";
-        var qst_string = "ox_ch11_q" + col_num
-
-        var sql = 'UPDATE s_ox_users_s1_ch11 ' +
-        'JOIN s_ox_users_s2_ch11 ON s_ox_users_s2_ch11.user_id = s_ox_users_s1_ch11.user_id ' +
-        'JOIN s_ox_users_s3_ch11 ON s_ox_users_s3_ch11.user_id = s_ox_users_s1_ch11.user_id ' +
-        'JOIN s_ox_users_s4_ch11 ON s_ox_users_s4_ch11.user_id = s_ox_users_s1_ch11.user_id ' +
-        'JOIN s_ox_users_s5_ch11 ON s_ox_users_s5_ch11.user_id = s_ox_users_s1_ch11.user_id ' +
-        'SET ??.??=? WHERE s_ox_users_s1_ch11.user_id=?';
-        var params = [table_string, qst_string, solve_result, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                console.log(table_name);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
-        });
-    });
-
-    ///////////// OX Chapter-12 /////////////
-    app.put('/api/s_ox_users_s1_ch12/update/:type', function(req, res) {
-        let {type} = req.params;
-        var order_table = req.body.order_table;
-        var col_num = req.body.col_num;
-        var solve_result = req.body.solve_result;
-        var table_string = "s_ox_users_s" + order_table + "_ch12";
-        var qst_string = "ox_ch12_q" + col_num
-
-        var sql = 'UPDATE s_ox_users_s1_ch12 ' +
-        'JOIN s_ox_users_s2_ch12 ON s_ox_users_s2_ch12.user_id = s_ox_users_s1_ch12.user_id ' +
-        'JOIN s_ox_users_s3_ch12 ON s_ox_users_s3_ch12.user_id = s_ox_users_s1_ch12.user_id ' +
-        'JOIN s_ox_users_s4_ch12 ON s_ox_users_s4_ch12.user_id = s_ox_users_s1_ch12.user_id ' +
-        'JOIN s_ox_users_s5_ch12 ON s_ox_users_s5_ch12.user_id = s_ox_users_s1_ch12.user_id ' +
-        'SET ??.??=? WHERE s_ox_users_s1_ch12.user_id=?';
-        var params = [table_string, qst_string, solve_result, type]
-        conn.query(sql, params, function(err, rows, fields) {
-            if (err) {
-                console.log(err);
-                console.log(table_name);
-                res.status(500).send('Internal Server Error');
-            } else {
-                console.log(rows);
-                res.send(rows);
-            }
-        });
-    });
-}
-update_ox_solve()
 
 
 
