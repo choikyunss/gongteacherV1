@@ -61,7 +61,7 @@ function getFormatDate(date){
     var day = date.getDay();
     day = day > 10 ? day : '0' + day;
 
-    return '${year}-${month}-${day}'
+    return year + "-" + month + "-" + day;
 }
 
 var date = getFormatDate(new Date());
