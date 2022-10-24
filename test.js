@@ -144,7 +144,7 @@ app.put('/api/s_users_id_info/update1/:type', function(req, res) {
 ///////////// (Table ID : s_users_id_info) 사용자 정보 업데이트 (app_version, c_login_date, p_login_date, terms_accept, ad_accept) ///////////////////////////
 // ** URL : http://13.124.234.170:3001/api/s_users_id_info/update/:type
 // ** Body(JSON) : { "app_version": (INT), "terms_accept": 0/1 (BIT), "ad_accept": 0/1 (BIT)  }
-app.put('/api/s_users_id_info/update2/:type', function(req, res) {
+app.put('/api/s_users_id_info/update/:type', function(req, res) {
     let {type} = req.params;
     var terms_accept = req.body.terms_accept;
     var ad_accept = req.body.ad_accept;
