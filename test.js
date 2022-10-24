@@ -113,7 +113,7 @@ app.get('/api/s_users_id_info/read/:type', async(req, res) => {
 });
 
 ///////////// (Table ID : s_users_id_info) 사용자 정보 업데이트 (app_version, c_login_date, p_login_date) ///////////////////////////
-// ** URL : http://13.124.234.170:3001/api/s_users_id_info/update/:type
+// ** URL : http://13.124.234.170:3001/api/s_users_id_info/update1/:type
 // ** Body(JSON) : { "app_version": (INT) }
 app.put('/api/s_users_id_info/update1/:type', function(req, res) {
     let {type} = req.params;
@@ -141,10 +141,9 @@ app.put('/api/s_users_id_info/update1/:type', function(req, res) {
     });
 });
 
-/*
-///////////// (Table ID : s_users_id_info) 사용자 정보 업데이트 (app_version, c_login_date, p_login_date, terms_accept, ad_accept) ///////////////////////////
-// ** URL : http://13.124.234.170:3001/api/s_users_id_info/update/:type
-// ** Body(JSON) : { "app_version": (INT), "terms_accept": 0/1 (BIT), "ad_accept": 0/1 (BIT)  }
+///////////// (Table ID : s_users_id_info) 사용자 정보 업데이트 (terms_accept, ad_accept) ///////////////////////////
+// ** URL : http://13.124.234.170:3001/api/s_users_id_info/update2/:type
+// ** Body(JSON) : { "terms_accept": 0/1 (BIT), "ad_accept": 0/1 (BIT)  }
 app.put('/api/s_users_id_info/update2/:type', function(req, res) {
     let {type} = req.params;
     var terms_accept = req.body.terms_accept;
@@ -162,7 +161,6 @@ app.put('/api/s_users_id_info/update2/:type', function(req, res) {
         }
     });
 });
-*/
 
 ///////////// (Table ID : s_system_id_info) 시스템 정보 불러오기 (final_ver, mandatory_update_ver) ///////////////////////////
 app.get('/api/s_system_id_info/read/:type', async(req, res) => {
