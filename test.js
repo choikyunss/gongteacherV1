@@ -85,7 +85,8 @@ app.post('/api/s_users_id_info/add', function(req, res) {
     var terms_accept = req.body.terms_accept; // 이용약관 동의 여부 //
     var ad_accept = req.body.ad_accept; // 광고 수신 동의 여부 //
     
-    var sql = 'INSERT INTO s_users_id_info (login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date, terms_accept, ad_accept) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    var sql = 'INSERT INTO s_users_id_info (login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date, terms_accept, ad_accept)'
+            + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
     conn.query(sql, [login_id, email, join_route, join_date, level, app_version, join_date, join_date, terms_accept, ad_accept], (err, rows, fields) => {
         if(err) {
             console.log(err);
@@ -111,15 +112,13 @@ app.get('/api/s_users_id_info/read/:type', async(req, res) => {
     });
 });
 
-///////////// (Table ID : s_users_id_info) 사용자 정보 업데이트 (app_version, c_login_date, p_login_date, terms_accept, ad_accept) ///////////////////////////
+///////////// (Table ID : s_users_id_info) 사용자 정보 업데이트 (app_version, c_login_date, p_login_date) ///////////////////////////
 // ** URL : http://13.124.234.170:3001/api/s_users_id_info/update/:type
-// ** Body(JSON) : { "app_version": (INT), "terms_accept": 0/1 (BIT), "ad_accept": 0/1 (BIT)  }
-app.put('/api/s_users_id_info/update/:type', function(req, res) {
+// ** Body(JSON) : { "app_version": (INT) }
+app.put('/api/s_users_id_info/update1/:type', function(req, res) {
     let {type} = req.params;
     var app_version = req.body.app_version;
     var c_login_date = date.toString();
-    var terms_accept = req.body.terms_accept;
-    var ad_accept = req.body.ad_accept;
 
     conn.query('SELECT c_login_date FROM s_users_id_info WHERE login_id = ?;', type, function(err1, rows1, fields) {
         if (err1) {
@@ -127,8 +126,8 @@ app.put('/api/s_users_id_info/update/:type', function(req, res) {
         } else {
             console.log(rows1.c_login_date);
             var p_login_date = rows1[0].c_login_date;
-            var sql = 'UPDATE s_users_id_info SET app_version=?, c_login_date=?, p_login_date=?, terms_accept=?, ad_accept=? WHERE login_id=?';
-            var params = [app_version, c_login_date, p_login_date, terms_accept, ad_accept, type]
+            var sql = 'UPDATE s_users_id_info SET app_version=?, c_login_date=?, p_login_date=? WHERE login_id=?';
+            var params = [app_version, c_login_date, p_login_date, type]
             conn.query(sql, params, function(err2, rows2, fields) {
                 if (err2) {
                     console.log(err2);
@@ -138,6 +137,27 @@ app.put('/api/s_users_id_info/update/:type', function(req, res) {
                     res.send(rows2);
                 }
             });
+        }
+    });
+});
+
+///////////// (Table ID : s_users_id_info) 사용자 정보 업데이트 (app_version, c_login_date, p_login_date, terms_accept, ad_accept) ///////////////////////////
+// ** URL : http://13.124.234.170:3001/api/s_users_id_info/update/:type
+// ** Body(JSON) : { "app_version": (INT), "terms_accept": 0/1 (BIT), "ad_accept": 0/1 (BIT)  }
+app.put('/api/s_users_id_info/update2/:type', function(req, res) {
+    let {type} = req.params;
+    var terms_accept = req.body.terms_accept;
+    var ad_accept = req.body.ad_accept;
+
+    var sql = 'UPDATE s_users_id_info SET terms_accept=?, ad_accept=? WHERE login_id=?';
+    var params = [terms_accept, ad_accept, type]
+    conn.query(sql, params, function(err, rows, fields) {
+        if (err) {
+            console.log(err);
+            res.status(500).send('Internal Server Error');
+        } else {
+            console.log(rows);
+            res.send(rows);
         }
     });
 });
