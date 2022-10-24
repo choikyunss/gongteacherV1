@@ -115,7 +115,7 @@ app.get('/api/s_users_id_info/read/:type', async(req, res) => {
 ///////////// (Table ID : s_users_id_info) 사용자 정보 업데이트 (app_version, c_login_date, p_login_date) ///////////////////////////
 // ** URL : http://13.124.234.170:3001/api/s_users_id_info/update/:type
 // ** Body(JSON) : { "app_version": (INT) }
-app.put('/api/s_users_id_info/update1/:type', function(req, res) {
+app.put('/api/s_users_id_info/update/:type', function(req, res) {
     let {type} = req.params;
     var app_version = req.body.app_version;
     var c_login_date = date.toString();
@@ -167,9 +167,10 @@ app.get('/api/s_system_id_info/read/:type', async(req, res) => {
 
     let {type} = req.params;
 
-    conn.query('SELECT final_ver, mandatory_update_ver FROM s_system_id_info WHERE system_id = ?;', type, function(err, rows, fields) {
+    conn.query('SELECT final_ver, mandatory_update_ver, maint_period FROM s_system_id_info WHERE system_id = ?;', type, function(err, rows, fields) {
         if (err) {
             res.send(err);
+            res.status(500).send('Internal Server Error');
         } else {
             res.send(rows);
         }
