@@ -113,7 +113,7 @@ app.get('/api/s_users_id_info/read/:type', async(req, res) => {
 });
 
 ///////////// (Table ID : s_users_id_info) 사용자 정보 업데이트 (app_version, c_login_date, p_login_date) ///////////////////////////
-// ** URL : http://13.124.234.170:3001/api/s_users_id_info/update1/:type
+// ** URL : http://13.124.234.170:3001/api/s_users_id_info/update1/:type (type : login_id)
 // ** Body(JSON) : { "app_version": (INT) }
 app.put('/api/s_users_id_info/update1/:type', function(req, res) {
     let {type} = req.params;
@@ -141,8 +141,8 @@ app.put('/api/s_users_id_info/update1/:type', function(req, res) {
     });
 });
 
-///////////// (Table ID : s_users_id_info) 사용자 정보 업데이트 (terms_accept, ad_accept) ///////////////////////////
-// ** URL : http://13.124.234.170:3001/api/s_users_id_info/update2/:type
+///////////// (Table ID : s_users_id_info) 사용자 정보 업데이트 (약관 및 광고수신 동의 여부) ///////////////////////////
+// ** URL : http://13.124.234.170:3001/api/s_users_id_info/update2/:type (type : login_id)
 // ** Body(JSON) : { "terms_accept": 0/1 (BIT), "ad_accept": 0/1 (BIT)  }
 app.put('/api/s_users_id_info/update2/:type', function(req, res) {
     let {type} = req.params;
@@ -162,7 +162,7 @@ app.put('/api/s_users_id_info/update2/:type', function(req, res) {
     });
 });
 
-///////////// (Table ID : s_system_id_info) 시스템 정보 불러오기 (final_ver, mandatory_update_ver) ///////////////////////////
+///////////// (Table ID : s_system_id_info) 시스템 정보 불러오기 (final_ver, mandatory_update_ver, maint_period) ///////////////////////////
 app.get('/api/s_system_id_info/read/:type', async(req, res) => {
 
     let {type} = req.params;
@@ -355,7 +355,7 @@ read_ox_order()
 // 2 Step : update OX solve result table 0 or 1 (1 is collect answer, 0 is wrong answer) 
 // 3 Step : update OX learning volume table by counting the number of times learned
 // ** URL : http://13.124.234.170:3001/api/s_ox_users_order_ch01/update/:type (type : user_id )
-// ** Body(JSON) : { "q_num" = 1 ~ n (INT), "order_t" = 1 ~ 5 (INT), "solve_r" = 0/1 (BIT) }
+// ** Body(JSON) : { "q_num": 1 ~ n (INT), "order_t": 1 ~ 5 (INT), "solve_r": 0/1 (BIT) }
 function update_ox() {
     ///////////// OX Chapter-1 /////////////
     app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
@@ -1031,10 +1031,22 @@ function update_ox() {
 }
 update_ox()
 
-
-
-
-
+    for(var i = 0; i <40; i++){
+        var qst_string = "ox_ch01_q" + i;
+        var qst = new Array();
+        // var table_string = "s_ox_users_s" + j + "ch01";
+        var sql = 'SELECT SUM(??) FROM s_ox_users_s1_ch01';
+        var params = [qst_string]
+        conn.query(sql, params, function(err, result, fields) {
+            if (err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
+            } else {
+                qst[i] = result;
+                console.log(result);
+            }
+        });
+    }
 
 
 //////////////////////////////////////////////////////////////////////
