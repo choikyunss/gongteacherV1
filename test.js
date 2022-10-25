@@ -1031,8 +1031,8 @@ function update_ox() {
 }
 update_ox()
 
-    for(var i = 0; i <40; i++){
-        var qst_string = "ox_ch01_q" + i + 1;
+    for(var i = 1; i <41; i++){
+        var qst_string = "ox_ch01_q" + i;
         var qst = new Array();
         // var table_string = "s_ox_users_s" + j + "ch01";
         var sql = 'SELECT SUM(??) FROM s_ox_users_s1_ch01';
