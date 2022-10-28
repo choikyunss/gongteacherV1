@@ -1041,6 +1041,11 @@ function trigger_ox_sum() {
         for(var j = 1; j <= ox_qst_count; j++){
             var qst5_sum = 0;
             for(var k = 1; k <= ox_ans_count; k++){
+                if (i<10) {
+                    var qst_string = "ox_ch0" + i + "_q" + j;
+                } else {
+                    var qst_string = "ox_ch" + i + "_q" + j;
+                }
                 var qst_string = "ox_ch01_q" + j; // OX 문항 번호 입력
                 if (i<10) {
                     var table_string = "s_ox_users_s" + k + "_ch0" + i;
@@ -1055,7 +1060,7 @@ function trigger_ox_sum() {
                     var sql1 = 'SELECT COUNT(*) FROM ?? '
                     + 'JOIN s_users_id_info ON s_users_id_info.user_id = s_ox_users_s1_ch01.user_id '
                     + 'WHERE ?? = 1 AND s_users_id_info.level = ?';
-                    var params1 = [table_string, qst_string, lv]
+                    var params1 = [table_string, qst_string, l]
                     conn.query(sql1, params1, function(err1, result1, fields) {
                         if (err1) {
                             console.log(err1);
