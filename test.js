@@ -1041,12 +1041,13 @@ function trigger_ox_sum() {
         for(var j = 1; j <= ox_qst_count; j++){
             var qst5_sum = 0;
             for(var k = 1; k <= ox_ans_count; k++){
+                // Update 문항 번호 선택
                 if (i<10) {
                     var qst_string = "ox_ch0" + i + "_q" + j;
                 } else {
                     var qst_string = "ox_ch" + i + "_q" + j;
                 }
-                var qst_string = "ox_ch01_q" + j; // OX 문항 번호 입력
+                // Update 테이블 ID 선택 (s_ox_users_s1~s5_ch01~ch12)
                 if (i<10) {
                     var table_string = "s_ox_users_s" + k + "_ch0" + i;
                 } else {
@@ -1058,9 +1059,9 @@ function trigger_ox_sum() {
                     var ch_string = "s_ox_qs_ansr_ch" + i; // Update 단원 선택 (ch01~ch12)
                     var lv_string = "l" + l + "_o_sum"; // Update 학습레벨 선택 (lv.1~lv.5)
                     var sql1 = 'SELECT COUNT(*) FROM ?? '
-                    + 'JOIN s_users_id_info ON s_users_id_info.user_id = s_ox_users_s1_ch01.user_id '
+                    + 'JOIN s_users_id_info ON s_users_id_info.user_id = ??.user_id '
                     + 'WHERE ?? = 1 AND s_users_id_info.level = ?';
-                    var params1 = [table_string, qst_string, l]
+                    var params1 = [table_string, table_string, qst_string, l]
                     conn.query(sql1, params1, function(err1, result1, fields) {
                         if (err1) {
                             console.log(err1);
