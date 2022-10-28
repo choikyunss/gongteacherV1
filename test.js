@@ -1093,7 +1093,7 @@ function trigger_ox_sum() {
                     conn.query(sql3, params3, function(err3, result3, fields) {
                         if (err3) {
                             console.log(err3);
-                            res.status(500).send('Internal Server Error');
+                            // res.status(500).send('Internal Server Error');
                         } else {
                             qst5_sum = qst5_sum + result3;
                             var sql4 = 'UPDATE ?? SET ??=? WHERE qst_id=?'
