@@ -1051,7 +1051,7 @@ function trigger_ox_sum() {
                 // (Table ID : s_ox_qs_ansr_ch01~ch12) Update 각 Lv. 별 <<정답>> 수     
                 for(var l = 1; l <= lv; l++){
                     var ch_string = "s_ox_qs_ansr_ch" + i; // Update 단원 선택 (ch01~ch12)
-                    var_lv_string = "l" + l + "_o_sum"; // Update 학습레벨 선택 (lv.1~lv.5)
+                    var lv_string = "l" + l + "_o_sum"; // Update 학습레벨 선택 (lv.1~lv.5)
                     var sql1 = 'SELECT COUNT(*) FROM ?? '
                     + 'JOIN s_users_id_info ON s_users_id_info.user_id = s_ox_users_s1_ch01.user_id '
                     + 'WHERE ?? = 1';
