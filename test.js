@@ -1075,6 +1075,7 @@ function trigger_ox_sum() {
                                     console.log(err2);
                                     res.status(500).send('Internal Server Error');
                                 } else {
+                                    console.log(rows2);
                                 }
                             });
                         }
@@ -1103,6 +1104,7 @@ function trigger_ox_sum() {
                                     console.log(err4);
                                     res.status(500).send('Internal Server Error');
                                 } else {
+                                    console.log(rows4);
                                 }
                             });
                         }
