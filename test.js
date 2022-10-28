@@ -1086,10 +1086,10 @@ function trigger_ox_sum() {
                     var ch_string = "s_ox_qs_ansr_ch" + i; // Update 단원 선택 (ch01~ch12)
                     var lv_string = "l" + l + "_x_sum"; // Update 학습레벨 선택 (lv.1~lv.5)
                     var sql3 = 'SELECT COUNT(*) FROM ?? '
-                    + 'JOIN s_users_id_info ON s_users_id_info.user_id = s_ox_users_s1_ch01.user_id '
+                    + 'JOIN s_users_id_info ON s_users_id_info.user_id = ??.user_id '
                     + 'WHERE ?? = 0';
                     + 'WHERE s_users_id_info.level = ?';
-                    var params3 = [table_string, qst_string, lv]
+                    var params3 = [table_string, table_string, qst_string, lv]
                     conn.query(sql3, params3, function(err3, result3, fields) {
                         if (err3) {
                             console.log(err3);
