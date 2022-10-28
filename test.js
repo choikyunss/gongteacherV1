@@ -1054,8 +1054,7 @@ function trigger_ox_sum() {
                     var lv_string = "l" + l + "_o_sum"; // Update 학습레벨 선택 (lv.1~lv.5)
                     var sql1 = 'SELECT COUNT(*) FROM ?? '
                     + 'JOIN s_users_id_info ON s_users_id_info.user_id = s_ox_users_s1_ch01.user_id '
-                    + 'WHERE ?? = 1';
-                    + 'WHERE s_users_id_info.level = ?';
+                    + 'WHERE ?? = 1 AND s_users_id_info.level = ?';
                     var params1 = [table_string, qst_string, lv]
                     conn.query(sql1, params1, function(err1, result1, fields) {
                         if (err1) {
