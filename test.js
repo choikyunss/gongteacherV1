@@ -1122,8 +1122,8 @@ function trigger_ox_sum() {
 //////////////////////////////////////////////////////////////////////
 const schedule = require('node-schedule');
 
-const j = schedule.scheduleJob('10 * * * * *', function() {
-    console.log("매 10초마다 실행");
+const j = schedule.scheduleJob('* 30 * * * *', function() {
+    console.log("매 30분마다 실행");
     trigger_ox_sum()
 });
 
