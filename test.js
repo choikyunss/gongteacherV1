@@ -1031,6 +1031,7 @@ function update_ox() {
 }
 update_ox()
 
+/*
 function trigger_ox_sum() {
     var ox_ch_count = 12; // OX 전체 단원 수 
     var ox_qst_count = 40; // OX 단원 별 문항 수 (40문항)
@@ -1080,7 +1081,7 @@ function trigger_ox_sum() {
                         }
                     });
                 }
-/*
+
                 // (Table ID : s_ox_qs_ansr_ch01~ch12) Update 각 Lv. 별 <<오답>> 수     
                 for(var l = 1; l <= lv; l++){
                     var ch_string = "s_ox_qs_ansr_ch" + i; // Update 단원 선택 (ch01~ch12)
@@ -1108,7 +1109,7 @@ function trigger_ox_sum() {
                             });
                         }
                     });
-                }    */   
+                }     
                 console.log('operating...');   
             }
         }
@@ -1116,6 +1117,7 @@ function trigger_ox_sum() {
 }
     
 trigger_ox_sum();
+*/
 
 //////////////////////////////////////////////////////////////////////
 // 특정시간 예약 이벤트 (node-schedule)
