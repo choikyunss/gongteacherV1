@@ -1053,7 +1053,7 @@ function trigger_ox_sum() {
                 } else {
                     var table_string = "s_ox_users_s" + k + "_ch" + i;
                 }
-
+/*
                 // (Table ID : s_ox_qs_ansr_ch01~ch12) Update 각 Lv. 별 <<정답>> 수     
                 for(var l = 1; l <= lv; l++){
                     var ch_string = "s_ox_qs_ansr_ch" + i; // Update 단원 선택 (ch01~ch12)
@@ -1109,7 +1109,8 @@ function trigger_ox_sum() {
                             });
                         }
                     });
-                }              
+                }    */   
+                console.log('operating...');   
             }
         }
     }
