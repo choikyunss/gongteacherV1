@@ -1031,22 +1031,83 @@ function update_ox() {
 }
 update_ox()
 
-    for(var i = 1; i <41; i++){
-        var qst_string = "ox_ch01_q" + i;
-        var qst = new Array();
-        // var table_string = "s_ox_users_s" + j + "ch01";
-        var sql = 'SELECT SUM(??) FROM s_ox_users_s1_ch01';
-        var params = [qst_string]
-        conn.query(sql, params, function(err, result, fields) {
-            if (err) {
-                console.log(err);
-                res.status(500).send('Internal Server Error');
-            } else {
-                qst[i] = result;
-                console.log(result);
+function trigger_ox_sum() {
+    var ox_ch_count = 12; // OX 전체 단원 수 
+    var ox_qst_count = 40; // OX 단원 별 문항 수 (40문항)
+    var ox_ans_count = 5; // OX 풀이 차수 (1~5회)
+    var lv = 5; // 학습레벨 단계 (1~5단계)
+
+    for(var i = 1; i <= ox_ch_count; i++){
+        for(var j = 1; j <= ox_qst_count; j++){
+            var qst5_sum = 0;
+            for(var k = 1; k <= ox_ans_count; k++){
+                var qst_string = "ox_ch01_q" + j; // OX 문항 번호 입력
+                if (i<10) {
+                    var table_string = "s_ox_users_s" + k + "ch0" + i;
+                } else {
+                    var table_string = "s_ox_users_s" + k + "ch" + i;
+                }
+
+                // (Table ID : s_ox_qs_ansr_ch01~ch12) Update 각 Lv. 별 <<정답>> 수     
+                for(var l = 1; l <= lv; l++){
+                    var ch_string = "s_ox_qs_ansr_ch" + i; // Update 단원 선택 (ch01~ch12)
+                    var_lv_string = "l" + l + "_o_sum"; // Update 학습레벨 선택 (lv.1~lv.5)
+                    var sql1 = 'SELECT COUNT(*) FROM ?? '
+                    + 'JOIN s_users_id_info ON s_users_id_info.user_id = s_ox_users_s1_ch01.user_id '
+                    + 'WHERE ?? = 1';
+                    + 'WHERE s_users_id_info.level = ?';
+                    var params1 = [table_string, qst_string, lv]
+                    conn.query(sql1, params1, function(err1, result1, fields) {
+                        if (err1) {
+                            console.log(err1);
+                            res.status(500).send('Internal Server Error');
+                        } else {
+                            qst5_sum = qst5_sum + result1;
+                            var sql2 = 'UPDATE ?? SET ??=? WHERE qst_id=?'
+                            var params2 = [ch_string, lv_string, qst5_sum, qst_string]
+                            conn.query(sql2, params2, function(err2, rows, fields) {
+                                if (err2) {
+                                    console.log(err2);
+                                    res.status(500).send('Internal Server Error');
+                                } else {
+                                }
+                            });
+                        }
+                    });
+                }
+
+                // (Table ID : s_ox_qs_ansr_ch01~ch12) Update 각 Lv. 별 <<오답>> 수     
+                for(var l = 1; l <= lv; l++){
+                    var ch_string = "s_ox_qs_ansr_ch" + i; // Update 단원 선택 (ch01~ch12)
+                    var_lv_string = "l" + l + "_o_sum"; // Update 학습레벨 선택 (lv.1~lv.5)
+                    var sql1 = 'SELECT COUNT(*) FROM ?? '
+                    + 'JOIN s_users_id_info ON s_users_id_info.user_id = s_ox_users_s1_ch01.user_id '
+                    + 'WHERE ?? = 1';
+                    + 'WHERE s_users_id_info.level = ?';
+                    var params1 = [table_string, qst_string, lv]
+                    conn.query(sql1, params1, function(err1, result1, fields) {
+                        if (err1) {
+                            console.log(err1);
+                            res.status(500).send('Internal Server Error');
+                        } else {
+                            qst5_sum = qst5_sum + result1;
+                            var sql2 = 'UPDATE ?? SET ??=? WHERE qst_id=?'
+                            var params2 = [ch_string, lv_string, qst5_sum, qst_string]
+                            conn.query(sql2, params2, function(err2, rows, fields) {
+                                if (err2) {
+                                    console.log(err2);
+                                    res.status(500).send('Internal Server Error');
+                                } else {
+                                }
+                            });
+                        }
+                    });
+                }              
             }
-        });
+        }
     }
+}
+    
 
 
 //////////////////////////////////////////////////////////////////////
@@ -1056,6 +1117,7 @@ const schedule = require('node-schedule');
 
 const j = schedule.scheduleJob('10 * * * * *', function() {
     console.log("매 10초마다 실행");
+    trigger_ox_sum()
 });
 
 
