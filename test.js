@@ -1043,9 +1043,9 @@ function trigger_ox_sum() {
             for(var k = 1; k <= ox_ans_count; k++){
                 var qst_string = "ox_ch01_q" + j; // OX 문항 번호 입력
                 if (i<10) {
-                    var table_string = "s_ox_users_s" + k + "ch0" + i;
+                    var table_string = "s_ox_users_s" + k + "_ch0" + i;
                 } else {
-                    var table_string = "s_ox_users_s" + k + "ch" + i;
+                    var table_string = "s_ox_users_s" + k + "_ch" + i;
                 }
 
                 // (Table ID : s_ox_qs_ansr_ch01~ch12) Update 각 Lv. 별 <<정답>> 수     
