@@ -1070,7 +1070,7 @@ function trigger_ox_sum() {
                             qst5_sum = qst5_sum + result1;
                             var sql2 = 'UPDATE ?? SET ??=? WHERE qst_id=?'
                             var params2 = [ch_string, lv_string, qst5_sum, qst_string]
-                            conn.query(sql2, params2, function(err2, rows, fields) {
+                            conn.query(sql2, params2, function(err2, rows2, fields) {
                                 if (err2) {
                                     console.log(err2);
                                     res.status(500).send('Internal Server Error');
@@ -1084,23 +1084,23 @@ function trigger_ox_sum() {
                 // (Table ID : s_ox_qs_ansr_ch01~ch12) Update 각 Lv. 별 <<오답>> 수     
                 for(var l = 1; l <= lv; l++){
                     var ch_string = "s_ox_qs_ansr_ch" + i; // Update 단원 선택 (ch01~ch12)
-                    var_lv_string = "l" + l + "_o_sum"; // Update 학습레벨 선택 (lv.1~lv.5)
-                    var sql1 = 'SELECT COUNT(*) FROM ?? '
+                    var lv_string = "l" + l + "_x_sum"; // Update 학습레벨 선택 (lv.1~lv.5)
+                    var sql3 = 'SELECT COUNT(*) FROM ?? '
                     + 'JOIN s_users_id_info ON s_users_id_info.user_id = s_ox_users_s1_ch01.user_id '
-                    + 'WHERE ?? = 1';
+                    + 'WHERE ?? = 0';
                     + 'WHERE s_users_id_info.level = ?';
-                    var params1 = [table_string, qst_string, lv]
-                    conn.query(sql1, params1, function(err1, result1, fields) {
-                        if (err1) {
-                            console.log(err1);
+                    var params3 = [table_string, qst_string, lv]
+                    conn.query(sql3, params3, function(err3, result3, fields) {
+                        if (err3) {
+                            console.log(err3);
                             res.status(500).send('Internal Server Error');
                         } else {
-                            qst5_sum = qst5_sum + result1;
-                            var sql2 = 'UPDATE ?? SET ??=? WHERE qst_id=?'
-                            var params2 = [ch_string, lv_string, qst5_sum, qst_string]
-                            conn.query(sql2, params2, function(err2, rows, fields) {
-                                if (err2) {
-                                    console.log(err2);
+                            qst5_sum = qst5_sum + result3;
+                            var sql4 = 'UPDATE ?? SET ??=? WHERE qst_id=?'
+                            var params4 = [ch_string, lv_string, qst5_sum, qst_string]
+                            conn.query(sql4, params4, function(err4, rows4, fields) {
+                                if (err4) {
+                                    console.log(err4);
                                     res.status(500).send('Internal Server Error');
                                 } else {
                                 }
