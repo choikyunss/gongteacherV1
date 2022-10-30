@@ -1031,108 +1031,30 @@ function update_ox() {
 }
 update_ox()
 
-function trigger_ox_sum() {
-    var ox_ch_count = 12; // OX 전체 단원 수 
-    var ox_qst_count = 40; // OX 단원 별 문항 수 (40문항)
-    var ox_ans_count = 5; // OX 풀이 차수 (1~5회)
-    var lv = 5; // 학습레벨 단계 (1~5단계)
+let sql = 'SELECT COUNT(*) AS sumCount FROM ?? '
++ 'JOIN s_users_id_info ON s_users_id_info.user_id = ??.user_id '
++ 'WHERE ?? = 1 AND s_users_id_info.level = ?';
 
-    for(var i = 1; i <= ox_ch_count; i++){
-        for(var j = 1; j <= ox_qst_count; j++){
-            let qst5_sum = 0;
-            // Update 문항 번호 선택
-            if (i<10) {
-                var qst_string = "ox_ch0" + i + "_q" + j;
+trigger_sumTest();
+
+async function trigger_sumTest() {
+    var ox_ans_count = 5;
+    for(let i=1; i>=ox_ans_count; i++){
+        var table_string = "s_ox_users_s" + i + "_ch01";
+        const conn = await mysql.createPool.getConnection(async conn => conn);
+        var params = [table_string, table_string, "ox_ch01_q1", 1]
+        conn.query(sql, params, function(err, rows, fields) {
+            if (err) {
+                console.log(err);
+                res.status(500).send('Internal Server Error');
             } else {
-                var qst_string = "ox_ch" + i + "_q" + j;
+                qst5_sum = qst5_sum + rows[0].sumCount;
+                console.log(qst5_sum);
             }
-
-            // Update 단원 선택 (ch01~ch12)
-            if (i<10) {
-                var ch_string = "s_ox_qs_ansr_ch0" + i;
-            } else {
-                var ch_string = "s_ox_qs_ansr_ch" + i;
-            }
-            console.log(" " + qst_string + " " + qst5_sum);
-
-            for(var k = 1; k <= ox_ans_count; k++){
-                // Update 테이블 ID 선택 (s_ox_users_s1~s5_ch01~ch12)
-                if (i<10) {
-                    var table_string = "s_ox_users_s" + k + "_ch0" + i;
-                } else {
-                    var table_string = "s_ox_users_s" + k + "_ch" + i;
-                }
-
-                console.log(table_string + "_" + qst_string);
-
-                var sql1 = 'SELECT COUNT(*) AS sumCount FROM ?? '
-                + 'JOIN s_users_id_info ON s_users_id_info.user_id = ??.user_id '
-                + 'WHERE ?? = 1 AND s_users_id_info.level = ?';
-                var params1 = [table_string, table_string, qst_string, 1]
-                conn.query(sql1, params1, function(err1, rows1, fields) {
-                    if (err1) {
-                        console.log(err1);
-                        res.status(500).send('Internal Server Error');
-                    } else {
-                        qst5_sum = qst5_sum + rows1[0].sumCount;
-                        console.log(qst5_sum);
-                    }
-                });
-            }
-
-            /*
-            //console.log(table_string + " " + qst_string + " " + qst5_sum);
-            var sql2 = 'UPDATE ?? SET ??=? WHERE qst_id=?'
-            var params2 = [ch_string, lv_string, qst5_sum, qst_string]
-            conn.query(sql2, params2, function(err2, rows2, fields) {
-                if (err2) {
-                    console.log(err2);
-                    res.status(500).send('Internal Server Error');
-                } else {
-                }
-            });
-            */
-        }
+        });
     }
+    conn.release()
 }
-
-/*
-                // (Table ID : s_ox_qs_ansr_ch01~ch12) Update 각 Lv. 별 <<오답>> 수     
-                for(var l = 1; l <= lv; l++){
-                    var ch_string = "s_ox_qs_ansr_ch" + i; // Update 단원 선택 (ch01~ch12)
-                    var lv_string = "l" + l + "_x_sum"; // Update 학습레벨 선택 (lv.1~lv.5)
-                    var sql3 = 'SELECT COUNT(*) FROM ?? '
-                    + 'JOIN s_users_id_info ON s_users_id_info.user_id = ??.user_id '
-                    + 'WHERE ?? = 0';
-                    + 'WHERE s_users_id_info.level = ?';
-                    var params3 = [table_string, table_string, qst_string, lv]
-                    conn.query(sql3, params3, function(err3, result3, fields) {
-                        if (err3) {
-                            console.log(err3);
-                            // res.status(500).send('Internal Server Error');
-                        } else {
-                            qst5_sum = qst5_sum + result3;
-                            var sql4 = 'UPDATE ?? SET ??=? WHERE qst_id=?'
-                            var params4 = [ch_string, lv_string, qst5_sum, qst_string]
-                            conn.query(sql4, params4, function(err4, rows4, fields) {
-                                if (err4) {
-                                    console.log(err4);
-                                    res.status(500).send('Internal Server Error');
-                                } else {
-                                    console.log(rows4);
-                                }
-                            });
-                        }
-                    });
-                }     
-                console.log('operating...');   
-            }
-        }
-    }
-} */
-    
-trigger_ox_sum();
-
 
 //////////////////////////////////////////////////////////////////////
 // 특정시간 예약 이벤트 (node-schedule)
