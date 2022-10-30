@@ -1047,7 +1047,7 @@ async function trigger_sumTest() {
     var ox_ans_count = 5;
     for(let i=1; i>=ox_ans_count; i++){
         var table_string = "s_ox_users_s" + i + "_ch01";
-        const connection = await pool.getConnection(async conn => conn);
+        let connection = await pool.getConnection(async (conn) => conn);
         var params = [table_string, table_string, "ox_ch01_q1", 1]
         await connection.query(sql, params, function(err, rows, fields) {
             if (err) {
