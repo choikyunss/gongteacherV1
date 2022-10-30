@@ -1041,7 +1041,7 @@ async function trigger_sumTest() {
     var ox_ans_count = 5;
     for(let i=1; i>=ox_ans_count; i++){
         var table_string = "s_ox_users_s" + i + "_ch01";
-        const conn = await mysql.createPool.getConnection(async conn => conn);
+        const conn = await pool.getConnection(async conn => conn);
         var params = [table_string, table_string, "ox_ch01_q1", 1]
         conn.query(sql, params, function(err, rows, fields) {
             if (err) {
@@ -1053,7 +1053,7 @@ async function trigger_sumTest() {
             }
         });
     }
-    connection.release()
+    conn.release()
 }
 
 //////////////////////////////////////////////////////////////////////
