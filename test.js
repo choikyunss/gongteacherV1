@@ -1053,9 +1053,14 @@ function trigger_ox_sum() {
                 } else {
                     var table_string = "s_ox_users_s" + k + "_ch" + i;
                 }
+                // Update 단원 선택 (ch01~ch12)
+                if (i<10) {
+                    var ch_string = "s_ox_qs_ansr_ch0" + i;
+                } else {
+                    var ch_string = "s_ox_qs_ansr_ch" + i;
+                }
 
                 var l = 1;
-                var ch_string = "s_ox_qs_ansr_ch" + i; // Update 단원 선택 (ch01~ch12)
                 var lv_string = "l" + "1" + "_o_sum"; // Update 학습레벨 선택 (lv.1~lv.5)
                 var sql1 = 'SELECT COUNT(*) FROM ?? '
                 + 'JOIN s_users_id_info ON s_users_id_info.user_id = ??.user_id '
