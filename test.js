@@ -1062,17 +1062,16 @@ function trigger_ox_sum() {
 
                 var l = 1;
                 var lv_string = "l" + "1" + "_o_sum"; // Update 학습레벨 선택 (lv.1~lv.5)
-                var sql1 = 'SELECT COUNT(*) FROM ?? '
+                var sql1 = 'SELECT COUNT(*) AS sumCount FROM ?? '
                 + 'JOIN s_users_id_info ON s_users_id_info.user_id = ??.user_id '
                 + 'WHERE ?? = 1 AND s_users_id_info.level = ?';
                 var params1 = [table_string, table_string, qst_string, 1]
-                conn.query(sql1, params1, function(err1, result1, fields) {
+                conn.query(sql1, params1, function(err1, rows1, fields) {
                     if (err1) {
                         console.log(err1);
                         res.status(500).send('Internal Server Error');
                     } else {
-                        console.log(result1);
-                        qst5_sum = qst5_sum + result1;
+                        qst5_sum = qst5_sum + result1[0].sumCount;
                     }
                 });
             }
