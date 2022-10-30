@@ -1040,28 +1040,28 @@ function trigger_ox_sum() {
     for(var i = 1; i <= ox_ch_count; i++){
         for(var j = 1; j <= ox_qst_count; j++){
             var qst5_sum = 0;
+            // Update 문항 번호 선택
+            if (i<10) {
+                var qst_string = "ox_ch0" + i + "_q" + j;
+            } else {
+                var qst_string = "ox_ch" + i + "_q" + j;
+            }
+
+            // Update 단원 선택 (ch01~ch12)
+            if (i<10) {
+                var ch_string = "s_ox_qs_ansr_ch0" + i;
+            } else {
+                var ch_string = "s_ox_qs_ansr_ch" + i;
+            }
+
             for(var k = 1; k <= ox_ans_count; k++){
-                // Update 문항 번호 선택
-                if (i<10) {
-                    var qst_string = "ox_ch0" + i + "_q" + j;
-                } else {
-                    var qst_string = "ox_ch" + i + "_q" + j;
-                }
                 // Update 테이블 ID 선택 (s_ox_users_s1~s5_ch01~ch12)
                 if (i<10) {
                     var table_string = "s_ox_users_s" + k + "_ch0" + i;
                 } else {
                     var table_string = "s_ox_users_s" + k + "_ch" + i;
                 }
-                // Update 단원 선택 (ch01~ch12)
-                if (i<10) {
-                    var ch_string = "s_ox_qs_ansr_ch0" + i;
-                } else {
-                    var ch_string = "s_ox_qs_ansr_ch" + i;
-                }
 
-                var l = 1;
-                var lv_string = "l" + "1" + "_o_sum"; // Update 학습레벨 선택 (lv.1~lv.5)
                 var sql1 = 'SELECT COUNT(*) AS sumCount FROM ?? '
                 + 'JOIN s_users_id_info ON s_users_id_info.user_id = ??.user_id '
                 + 'WHERE ?? = 1 AND s_users_id_info.level = ?';
