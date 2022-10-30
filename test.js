@@ -1053,7 +1053,7 @@ async function trigger_sumTest() {
             }
         });
     }
-    conn.release()
+    connection.release()
 }
 
 //////////////////////////////////////////////////////////////////////
