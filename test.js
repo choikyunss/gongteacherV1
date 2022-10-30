@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 
 var mysql = require('mysql');
-//const pool = mysql.createPool(conn);
+const pool = mysql.createPool(conn);
 
 
 /* ********** Make transaction object ********** */
@@ -1044,7 +1044,7 @@ async function trigger_sumTest() {
         var table_string = "s_ox_users_s" + i + "_ch01";
         const conn = await pool.getConnection(async conn => conn);
         var params = [table_string, table_string, "ox_ch01_q1", 1]
-        conn.query(sql, params, function(err, rows, fields) {
+        await conn.query(sql, params, function(err, rows, fields) {
             if (err) {
                 console.log(err);
                 res.status(500).send('Internal Server Error');
@@ -1053,8 +1053,9 @@ async function trigger_sumTest() {
                 console.log(qst5_sum);
             }
         });
+        conn.release();
     }
-    //conn.release();
+    pool.end();
 }
 
 //////////////////////////////////////////////////////////////////////
