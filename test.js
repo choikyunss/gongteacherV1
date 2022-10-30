@@ -1031,20 +1031,6 @@ function update_ox() {
 }
 update_ox()
 
-var sql1 = 'SELECT COUNT(*) FROM s_ox_users_s1_ch01 '
-         + 'JOIN s_users_id_info ON s_users_id_info.user_id = s_ox_users_s1_ch01.user_id '
-         + 'WHERE ox_ch01_q1 = ? AND s_users_id_info.level = ?';
-var params1 = [1, 1]
-conn.query(sql1, params1, function(err1, result1, fields) {
-    if (err1) {
-    console.log(err1);
-    res.status(500).send('Internal Server Error');
-    } else {
-        console.log(result1);
-    }
-});
-
-/*
 function trigger_ox_sum() {
     var ox_ch_count = 12; // OX 전체 단원 수 
     var ox_qst_count = 40; // OX 단원 별 문항 수 (40문항)
@@ -1068,33 +1054,36 @@ function trigger_ox_sum() {
                     var table_string = "s_ox_users_s" + k + "_ch" + i;
                 }
 
-                // (Table ID : s_ox_qs_ansr_ch01~ch12) Update 각 Lv. 별 <<정답>> 수     
-                for(var l = 1; l <= lv; l++){
-                    var ch_string = "s_ox_qs_ansr_ch" + i; // Update 단원 선택 (ch01~ch12)
-                    var lv_string = "l" + l + "_o_sum"; // Update 학습레벨 선택 (lv.1~lv.5)
-                    var sql1 = 'SELECT COUNT(*) FROM ?? '
-                    + 'JOIN s_users_id_info ON s_users_id_info.user_id = ??.user_id '
-                    + 'WHERE ?? = 1 AND s_users_id_info.level = ?';
-                    var params1 = [table_string, table_string, qst_string, l]
-                    conn.query(sql1, params1, function(err1, result1, fields) {
-                        if (err1) {
-                            console.log(err1);
-                            res.status(500).send('Internal Server Error');
-                        } else {
-                            qst5_sum = qst5_sum + result1;
-                            var sql2 = 'UPDATE ?? SET ??=? WHERE qst_id=?'
-                            var params2 = [ch_string, lv_string, qst5_sum, qst_string]
-                            conn.query(sql2, params2, function(err2, rows2, fields) {
-                                if (err2) {
-                                    console.log(err2);
-                                    res.status(500).send('Internal Server Error');
-                                } else {
-                                }
-                            });
-                        }
-                    });
+                var l = 1;
+                var ch_string = "s_ox_qs_ansr_ch" + i; // Update 단원 선택 (ch01~ch12)
+                var lv_string = "l" + "1" + "_o_sum"; // Update 학습레벨 선택 (lv.1~lv.5)
+                var sql1 = 'SELECT COUNT(*) FROM ?? '
+                + 'JOIN s_users_id_info ON s_users_id_info.user_id = ??.user_id '
+                + 'WHERE ?? = 1 AND s_users_id_info.level = ?';
+                var params1 = [table_string, table_string, qst_string, 1]
+                conn.query(sql1, params1, function(err1, result1, fields) {
+                    if (err1) {
+                        console.log(err1);
+                        res.status(500).send('Internal Server Error');
+                    } else {
+                        qst5_sum = qst5_sum + result1;
+                    }
+                });
+            }
+            var sql2 = 'UPDATE ?? SET ??=? WHERE qst_id=?'
+            var params2 = [ch_string, lv_string, qst5_sum, qst_string]
+            conn.query(sql2, params2, function(err2, rows2, fields) {
+                if (err2) {
+                    console.log(err2);
+                    res.status(500).send('Internal Server Error');
+                } else {
                 }
+            });
+        }
+    }
+}
 
+/*
                 // (Table ID : s_ox_qs_ansr_ch01~ch12) Update 각 Lv. 별 <<오답>> 수     
                 for(var l = 1; l <= lv; l++){
                     var ch_string = "s_ox_qs_ansr_ch" + i; // Update 단원 선택 (ch01~ch12)
@@ -1127,10 +1116,10 @@ function trigger_ox_sum() {
             }
         }
     }
-}
+} */
     
 trigger_ox_sum();
-*/
+
 
 //////////////////////////////////////////////////////////////////////
 // 특정시간 예약 이벤트 (node-schedule)
