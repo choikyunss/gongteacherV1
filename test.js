@@ -1031,6 +1031,18 @@ function update_ox() {
 }
 update_ox()
 
+var sql1 = 'SELECT COUNT(*) FROM s_ox_users_s1_ch01 '
+         + 'JOIN s_users_id_info ON s_users_id_info.user_id = s_ox_users_s1_ch01.user_id '
+         + 'WHERE ox_ch01_q1 = 1 AND s_users_id_info.level = 1';
+var params1 = [table_string, table_string, qst_string]
+conn.query(sql1, params1, function(err1, result1, fields) {
+    if (err1) {
+    console.log(err1);
+    res.status(500).send('Internal Server Error');
+    } else {
+        console.log(result1);
+    }
+});
 
 /*
 function trigger_ox_sum() {
