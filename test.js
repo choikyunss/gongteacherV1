@@ -1072,7 +1072,7 @@ function trigger_ox_sum() {
                         res.status(500).send('Internal Server Error');
                     } else {
                         qst5_sum = qst5_sum + rows1[0].sumCount;
-                        console.log(qst5_sum);
+                        console.log(table_string + " " + qst_string + " " + qst5_sum);
                     }
                 });
             }
