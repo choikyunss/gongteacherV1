@@ -42,7 +42,7 @@ var conn = mysql.createConnection({
 //conn.connect();
 
 const server = app.listen(3001, () => {
-    console.log('Start Server : 13.124.234.170:3001');
+    console.log('Start Server : 13.124.19.61:3001');
 
 });
 
