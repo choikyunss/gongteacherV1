@@ -1076,6 +1076,7 @@ function trigger_ox_sum() {
                     }
                 });
             }
+            /*
             //console.log(table_string + " " + qst_string + " " + qst5_sum);
             var sql2 = 'UPDATE ?? SET ??=? WHERE qst_id=?'
             var params2 = [ch_string, lv_string, qst5_sum, qst_string]
@@ -1086,6 +1087,7 @@ function trigger_ox_sum() {
                 } else {
                 }
             });
+            */
         }
     }
 }
