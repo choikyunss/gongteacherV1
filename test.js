@@ -1031,6 +1031,7 @@ function update_ox() {
 }
 update_ox()
 
+
 /*
 function trigger_ox_sum() {
     var ox_ch_count = 12; // OX 전체 단원 수 
@@ -1124,9 +1125,9 @@ trigger_ox_sum();
 //////////////////////////////////////////////////////////////////////
 const schedule = require('node-schedule');
 
-const j = schedule.scheduleJob('* 30 * * * *', function() {
+const j = schedule.scheduleJob('10 * * * * *', function() {
     console.log("매 30분마다 실행");
-    trigger_ox_sum()
+    //trigger_ox_sum()
 });
 
 
