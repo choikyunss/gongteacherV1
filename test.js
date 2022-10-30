@@ -1054,7 +1054,7 @@ function trigger_ox_sum() {
                 var ch_string = "s_ox_qs_ansr_ch" + i;
             }
             console.log(" " + qst_string + " " + qst5_sum);
-/*
+
             for(var k = 1; k <= ox_ans_count; k++){
                 // Update 테이블 ID 선택 (s_ox_users_s1~s5_ch01~ch12)
                 if (i<10) {
@@ -1063,6 +1063,9 @@ function trigger_ox_sum() {
                     var table_string = "s_ox_users_s" + k + "_ch" + i;
                 }
 
+                console.log(table_string + " " + qst_string + " " + qst5_sum);
+
+                /*
                 var sql1 = 'SELECT COUNT(*) AS sumCount FROM ?? '
                 + 'JOIN s_users_id_info ON s_users_id_info.user_id = ??.user_id '
                 + 'WHERE ?? = 1 AND s_users_id_info.level = ?';
@@ -1075,9 +1078,9 @@ function trigger_ox_sum() {
                         qst5_sum = qst5_sum + rows1[0].sumCount;
                         console.log(table_string + " " + qst_string + " " + qst5_sum);
                     }
-                });
+                }); */
             }
-            */
+
             /*
             //console.log(table_string + " " + qst_string + " " + qst5_sum);
             var sql2 = 'UPDATE ?? SET ??=? WHERE qst_id=?'
