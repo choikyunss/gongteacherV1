@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 
 var mysql = require('mysql');
+const pool = mysql.createPool(conn);
 
 
 /* ********** Make transaction object ********** */
