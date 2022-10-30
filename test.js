@@ -1041,8 +1041,6 @@ let sql = 'SELECT COUNT(*) AS sumCount FROM ?? '
 + 'JOIN s_users_id_info ON s_users_id_info.user_id = ??.user_id '
 + 'WHERE ?? = 1 AND s_users_id_info.level = ?';
 
-trigger_sumTest();
-
 async function trigger_sumTest() {
     var ox_ans_count = 5;
     for(let i=1; i>=ox_ans_count; i++){
@@ -1062,6 +1060,8 @@ async function trigger_sumTest() {
     }
     pool.end();
 }
+
+trigger_sumTest();
 
 //////////////////////////////////////////////////////////////////////
 // 특정시간 예약 이벤트 (node-schedule)
