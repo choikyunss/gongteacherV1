@@ -1063,9 +1063,8 @@ function trigger_ox_sum() {
                     var table_string = "s_ox_users_s" + k + "_ch" + i;
                 }
 
-                console.log(table_string + " " + qst_string + " " + qst5_sum);
+                console.log(table_string + "_" + qst_string);
 
-                /*
                 var sql1 = 'SELECT COUNT(*) AS sumCount FROM ?? '
                 + 'JOIN s_users_id_info ON s_users_id_info.user_id = ??.user_id '
                 + 'WHERE ?? = 1 AND s_users_id_info.level = ?';
@@ -1076,9 +1075,9 @@ function trigger_ox_sum() {
                         res.status(500).send('Internal Server Error');
                     } else {
                         qst5_sum = qst5_sum + rows1[0].sumCount;
-                        console.log(table_string + " " + qst_string + " " + qst5_sum);
+                        console.log(qst5_sum);
                     }
-                }); */
+                });
             }
 
             /*
