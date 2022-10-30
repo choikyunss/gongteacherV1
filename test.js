@@ -69,7 +69,7 @@ var date = getFormatDate(new Date());
 console.log(date);
 
 ///////////// (Table ID : s_users_id_info) 사용자 신규 추가 ///////////////////////////
-// ** URL : http://13.124.234.170:3001/api/s_users_id_info/add
+// ** URL : http://13.124.19.61:3001/api/s_users_id_info/add
 // ** Body(JSON) : { "login_id": (VARCHAR), "email": (VARCHAR), "join_route": (VARCHAR), "app_version": (INT), "terms_accept": 0/1 (BIT), "ad_accept": 0/1 (BIT)  }
 /// TODO : 동일 이메일 가입 시도 시, 체크하여 중복가입 막기 -> 적용 해야함.//
 app.post('/api/s_users_id_info/add', function(req, res) {
@@ -113,7 +113,7 @@ app.get('/api/s_users_id_info/read/:type', async(req, res) => {
 });
 
 ///////////// (Table ID : s_users_id_info) 사용자 정보 업데이트 (app_version, c_login_date, p_login_date) ///////////////////////////
-// ** URL : http://13.124.234.170:3001/api/s_users_id_info/update1/:type (type : login_id)
+// ** URL : http://13.124.19.61:3001/api/s_users_id_info/update1/:type (type : login_id)
 // ** Body(JSON) : { "app_version": (INT) }
 app.put('/api/s_users_id_info/update1/:type', function(req, res) {
     let {type} = req.params;
@@ -142,7 +142,7 @@ app.put('/api/s_users_id_info/update1/:type', function(req, res) {
 });
 
 ///////////// (Table ID : s_users_id_info) 사용자 정보 업데이트 (약관 및 광고수신 동의 여부) ///////////////////////////
-// ** URL : http://13.124.234.170:3001/api/s_users_id_info/update2/:type (type : login_id)
+// ** URL : http://13.124.19.61:3001/api/s_users_id_info/update2/:type (type : login_id)
 // ** Body(JSON) : { "terms_accept": 0/1 (BIT), "ad_accept": 0/1 (BIT)  }
 app.put('/api/s_users_id_info/update2/:type', function(req, res) {
     let {type} = req.params;
@@ -354,7 +354,7 @@ read_ox_order()
 // 1 Step : update OX order table 0 to 5
 // 2 Step : update OX solve result table 0 or 1 (1 is collect answer, 0 is wrong answer) 
 // 3 Step : update OX learning volume table by counting the number of times learned
-// ** URL : http://13.124.234.170:3001/api/s_ox_users_order_ch01/update/:type (type : user_id )
+// ** URL : http://13.124.19.61:3001/api/s_ox_users_order_ch01/update/:type (type : user_id )
 // ** Body(JSON) : { "q_num": 1 ~ n (INT), "order_t": 1 ~ 5 (INT), "solve_r": 0/1 (BIT) }
 function update_ox() {
     ///////////// OX Chapter-1 /////////////
