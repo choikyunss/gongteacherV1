@@ -1053,7 +1053,7 @@ function trigger_ox_sum() {
             } else {
                 var ch_string = "s_ox_qs_ansr_ch" + i;
             }
-            console.log(table_string + " " + qst_string + " " + qst5_sum);
+            console.log(" " + qst_string + " " + qst5_sum);
 /*
             for(var k = 1; k <= ox_ans_count; k++){
                 // Update 테이블 ID 선택 (s_ox_users_s1~s5_ch01~ch12)
