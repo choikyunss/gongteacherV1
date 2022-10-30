@@ -1039,7 +1039,7 @@ function trigger_ox_sum() {
 
     for(var i = 1; i <= ox_ch_count; i++){
         for(var j = 1; j <= ox_qst_count; j++){
-            var qst5_sum = 0;
+            let qst5_sum = 0;
             // Update 문항 번호 선택
             if (i<10) {
                 var qst_string = "ox_ch0" + i + "_q" + j;
