@@ -1075,7 +1075,7 @@ function trigger_ox_sum() {
                     }
                 });
             }
-            console.log(qst5_sum);
+            console.log(table_string + " " + qst_string + " " + qst5_sum);
             var sql2 = 'UPDATE ?? SET ??=? WHERE qst_id=?'
             var params2 = [ch_string, lv_string, qst5_sum, qst_string]
             conn.query(sql2, params2, function(err2, rows2, fields) {
