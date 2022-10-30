@@ -3,7 +3,12 @@ const express = require('express');
 const app = express();
 
 var mysql = require('mysql');
-const pool = mysql.createPool(conn);
+const pool = mysql.createPool({
+    host : 'kyunss-db.cjwyxnwnqovj.ap-northeast-2.rds.amazonaws.com',
+    user : 'kyunss_admin',
+    password : 'Choibjk6014#',
+    database : 'Gong_Teacher'
+});
 
 
 /* ********** Make transaction object ********** */
@@ -1042,9 +1047,9 @@ async function trigger_sumTest() {
     var ox_ans_count = 5;
     for(let i=1; i>=ox_ans_count; i++){
         var table_string = "s_ox_users_s" + i + "_ch01";
-        const conn = await pool.getConnection(async conn => conn);
+        const connection = await pool.getConnection(async conn => conn);
         var params = [table_string, table_string, "ox_ch01_q1", 1]
-        await conn.query(sql, params, function(err, rows, fields) {
+        await connection.query(sql, params, function(err, rows, fields) {
             if (err) {
                 console.log(err);
                 res.status(500).send('Internal Server Error');
@@ -1053,7 +1058,7 @@ async function trigger_sumTest() {
                 console.log(qst5_sum);
             }
         });
-        conn.release();
+        connection.release();
     }
     pool.end();
 }
