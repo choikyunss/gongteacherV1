@@ -2,7 +2,9 @@ const express = require('express');
 
 const app = express();
 
-var mysql = require('mysql');
+// Mysql2 Module 사용
+//var mysql = require('mysql');
+var mysql = require('mysql2/promise');
 
 /* ********** Make transaction object ********** */
 /*
