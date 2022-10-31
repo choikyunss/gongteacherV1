@@ -3,8 +3,8 @@ const express = require('express');
 const app = express();
 
 // Mysql2 Module 사용
-//var mysql = require('mysql');
-var mysql = require('mysql2/promise');
+var mysql = require('mysql');
+//var mysql = require('mysql2/promise');
 
 /* ********** Make transaction object ********** */
 /*
@@ -360,63 +360,60 @@ read_ox_order()
 function update_ox() {
     ///////////// OX Chapter-1 /////////////
     app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
-        Connection.getConnection(function(err,conn){
-            conn.beginTransaction((err)=>{
-                let {type} = req.params;
-                var q_num = req.body.q_num; // 문항 번호 (Input value : 1, 2, 3, 4 ... n)
-                var order_t = req.body.order_t; // Order info.에 따른 table ID 선택 (Input value : 1, 2, 3, 4, 5)
-                var solve_r = req.body.solve_r; // 풀이 결과값 (Input value : 1 / 0)
-                var qst_string = "ox_ch01_q" + q_num; // 문항 번호 String
-                var t_string = "s_ox_users_s" + order_t + "_ch01"; // Table ID String
-    
-                let today = new Date();
-                let year = today.getFullYear(); // 연도
-                let month = today.getMonth() + 1; // 월
-                var date_string = year + "_" + month; // Date String
-    
-                var sql1 = 'UPDATE s_ox_users_order_ch01 SET ??=??%5+1 WHERE user_id=?';
-                var params1 = [qst_string, qst_string, type]
-                conn.query(sql1, params1, function(err1, rows1, fields) {
-                    if (err1) {
-                        console.log(err1);
-                        res.status(500).send('Internal Server Error');
-                    } else {
-                        var sql2 = 'UPDATE s_ox_users_s1_ch01 ' +
-                        'JOIN s_ox_users_s2_ch01 ON s_ox_users_s2_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
-                        'JOIN s_ox_users_s3_ch01 ON s_ox_users_s3_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
-                        'JOIN s_ox_users_s4_ch01 ON s_ox_users_s4_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
-                        'JOIN s_ox_users_s5_ch01 ON s_ox_users_s5_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
-                        'SET ??.??=? WHERE s_ox_users_s1_ch01.user_id=?';
-                        var params2 = [t_string, qst_string, solve_r, type]
-                        conn.query(sql2, params2, function(err2, rows2, fields) {
-                            if (err2) {
-                                console.log(err2);
-                                res.status(500).send('Internal Server Error');
-                                conn.rollback();
-                            } else {
-                                console.log(rows2);
-                                var sql3 = 'UPDATE s_ox_users_vol_ch01 SET ??=??+1 WHERE user_id=?';
-                                var params3 = [date_string, date_string, type]
-                                conn.query(sql3, params3, function(err3, rows3, fields) {
-                                    if (err3) {
-                                        console.log(err3);
-                                        res.status(500).send('Internal Server Error');
-                                        conn.rollback();
-                                    } else {
-                                        console.log(rows3);
-                                        res.send(rows3);
-                                        conn.commit();
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
+        conn.beginTransaction((err)=>{
+            let {type} = req.params;
+            var q_num = req.body.q_num; // 문항 번호 (Input value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t; // Order info.에 따른 table ID 선택 (Input value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r; // 풀이 결과값 (Input value : 1 / 0)
+            var qst_string = "ox_ch01_q" + q_num; // 문항 번호 String
+            var t_string = "s_ox_users_s" + order_t + "_ch01"; // Table ID String
+
+            let today = new Date();
+            let year = today.getFullYear(); // 연도
+            let month = today.getMonth() + 1; // 월
+            var date_string = year + "_" + month; // Date String
+
+            var sql1 = 'UPDATE s_ox_users_order_ch01 SET ??=??%5+1 WHERE user_id=?';
+            var params1 = [qst_string, qst_string, type]
+            conn.query(sql1, params1, function(err1, rows1, fields) {
+                if (err1) {
+                    console.log(err1);
+                    res.status(500).send('Internal Server Error');
+                } else {
+                    var sql2 = 'UPDATE s_ox_users_s1_ch01 ' +
+                    'JOIN s_ox_users_s2_ch01 ON s_ox_users_s2_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
+                    'JOIN s_ox_users_s3_ch01 ON s_ox_users_s3_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
+                    'JOIN s_ox_users_s4_ch01 ON s_ox_users_s4_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
+                    'JOIN s_ox_users_s5_ch01 ON s_ox_users_s5_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
+                    'SET ??.??=? WHERE s_ox_users_s1_ch01.user_id=?';
+                    var params2 = [t_string, qst_string, solve_r, type]
+                    conn.query(sql2, params2, function(err2, rows2, fields) {
+                        if (err2) {
+                            console.log(err2);
+                            res.status(500).send('Internal Server Error');
+                            conn.rollback();
+                        } else {
+                            console.log(rows2);
+                            var sql3 = 'UPDATE s_ox_users_vol_ch01 SET ??=??+1 WHERE user_id=?';
+                            var params3 = [date_string, date_string, type]
+                            conn.query(sql3, params3, function(err3, rows3, fields) {
+                                if (err3) {
+                                    console.log(err3);
+                                    res.status(500).send('Internal Server Error');
+                                    conn.rollback();
+                                } else {
+                                    console.log(rows3);
+                                    res.send(rows3);
+                                    conn.commit();
+                                }
+                            });
+                        }
+                    });
+                }
             });
         });
     });
-        
-/*
+
     ///////////// OX Chapter-2 /////////////
     app.put('/api/s_ox_users_order_ch02/update/:type', function(req, res) {
         conn.beginTransaction((err)=>{
@@ -1032,7 +1029,6 @@ function update_ox() {
             });
         });
     });
-    */
 }
 update_ox()
 
@@ -1063,7 +1059,6 @@ trigger_sumTest();
 // 특정시간 예약 이벤트 (node-schedule)
 //////////////////////////////////////////////////////////////////////
 const schedule = require('node-schedule');
-const Connection = require('mysql2/typings/mysql/lib/Connection');
 
 const j = schedule.scheduleJob('10 * * * * *', function() {
     console.log("매 30분마다 실행");
