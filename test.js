@@ -1033,13 +1033,12 @@ function update_ox() {
 update_ox()
 
 
-
 async function trigger_sumTest() {
     var ox_ans_count = 5;
     for(let i=1; i>=ox_ans_count; i++){
         var table_string = "s_ox_users_s" + i + "_ch01";
         let sql = 'SELECT COUNT(*) AS sumCount FROM ?? '
-        + 'JOIN s_users_id_info ON s_users_id_info.user_id = ??.user_id '
+        + 'JOIN s_users_id_info ON s_users_id_info.appuser_id = ??.user_id '
         + 'WHERE ?? = 1 AND s_users_id_info.level = ?';
         var params = [table_string, table_string, "ox_ch01_q1", 1]
         await conn.query(sql, params, function(err, rows, fields) {
