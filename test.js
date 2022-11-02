@@ -1033,9 +1033,9 @@ function update_ox() {
 update_ox()
 
 
-function dbQueryAsync(query) {
+function dbQueryAsync(query, qValue) {
     return new Promise((resolve, reject) => {
-        conn.query(query, (error, result) => {
+        conn.query(query, qValue, (error, result) => {
             if (error) {
                 reject(error);
             }
