@@ -1032,6 +1032,7 @@ function update_ox() {
 }
 update_ox()
 
+/*
 function dbQueryAsync(query) {
     return new Promise((resolve, reject) => {
         conn.query(query, (error, result) => {
@@ -1054,6 +1055,8 @@ async function trigger_sumTest() {
         }
     }
 }
+trigger_sumTest();
+*/
 
 for(var i=1; i>=5; i++){
     console.log("test ing");
@@ -1079,7 +1082,7 @@ for(var i=1; i>=5; i++){
     }
 } */
 
-trigger_sumTest();
+
 
 //////////////////////////////////////////////////////////////////////
 // 특정시간 예약 이벤트 (node-schedule)
