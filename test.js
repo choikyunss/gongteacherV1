@@ -1048,7 +1048,7 @@ async function trigger_sumTest() {
     for(var i=1; i<=5; i++){
         try {
             var return_Result = await dbQueryAsync('SELECT ox_ch01_q1 FROM s_ox_users_s1_ch01');
-            console.log(return_Result);
+            console.log(return_Result.string());
             console.log("test complete" + i);
         } catch (error) {
             console.log(error);
