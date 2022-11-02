@@ -1065,14 +1065,14 @@ async function trigger_sumTest() {
                 var qst_string = "ox_ch" + i + "_q" + j;
             }
             for(var k=1; k<=user_lv_count; k++){
+                var lv_string = "l" + k + "_o_sum"; // Update 학습레벨 선택 (lv.1~lv.5)
                 var qst5_sum = 0; // 집계 합산 변수 초기화
                 for(var l=1; l<=ox_ans_count; l++){
-                    var lv_string = "l" + l + "_o_sum"; // Update 학습레벨 선택 (lv.1~lv.5)
                     // 풀이 Table ID 선택 (s1~s5)
                     if (i<10) {
-                        var table_string = "s_ox_users_s" + k + "_ch0" + i;
+                        var table_string = "s_ox_users_s" + l + "_ch0" + i;
                     } else {
-                        var table_string = "s_ox_users_s" + k + "_ch" + i;
+                        var table_string = "s_ox_users_s" + l + "_ch" + i;
                     }
 
                     // 단원/문항 별 정답수 산출 Query
@@ -1087,15 +1087,15 @@ async function trigger_sumTest() {
                     try {
                         var FeedResult = await dbQueryAsync(sql1, params1);
                         qst5_sum = qst5_sum + FeedResult[0].sumCount;
-                        try {
-                            await dbQueryAsync(sql2, params2);
-                            console.log(ch_string + "_" + lv_string + "_" + qst_string + "_ : " + qst5_sum); // 합산 값 로그 체크
-                        } catch (error) {
-                            console.log(error);
-                        }
                     } catch (error) {
                         console.log(error);
                     }
+                }
+                try {
+                    await dbQueryAsync(sql2, params2);
+                    console.log(ch_string + "_" + lv_string + "_" + qst_string + "_ : " + qst5_sum); // 합산 값 로그 체크
+                } catch (error) {
+                    console.log(error);
                 }
             }
         }
@@ -1104,7 +1104,7 @@ async function trigger_sumTest() {
 
 trigger_sumTest();
 
-
+/*
 //////////////////////////////////////////////////////////////////////
 // 특정시간 예약 이벤트 (node-schedule)
 //////////////////////////////////////////////////////////////////////
@@ -1114,6 +1114,6 @@ const j = schedule.scheduleJob('10 * * * * *', function() {
     console.log("매 30분마다 실행");
     //trigger_ox_sum()
 });
-
+*/
 
 //conn.end();
