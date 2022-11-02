@@ -1033,9 +1033,9 @@ function update_ox() {
 update_ox()
 
 
-function dbQueryAsync(query, qValue) {
+function dbQueryAsync(query, params) {
     return new Promise((resolve, reject) => {
-        conn.query(query, qValue, (error, result) => {
+        conn.query(query, params, (error, result) => {
             if (error) {
                 reject(error);
             }
@@ -1046,10 +1046,10 @@ function dbQueryAsync(query, qValue) {
 
 async function trigger_sumTest() {
     for(var i=1; i<=5; i++){
-        var fig = 11;
+        var fig = i + 10;
         try {
-            var result_q1 = await dbQueryAsync('SELECT * FROM s_ox_users_s1_ch01 WHERE user_id = ?', fig);
-            console.log(result_q1[0].ox_ch01_q1);
+            var result_q1 = await dbQueryAsync('SELECT *user_id, email, join_date, c_login_date, p_login_date, terms_accept, ad_accept FROM s_users_id_info WHERE login_id = ?', fig);
+            console.log(result_q1[0].email);
             console.log("test complete" + i);
         } catch (error) {
             console.log(error);
