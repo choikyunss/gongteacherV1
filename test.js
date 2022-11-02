@@ -1045,17 +1045,63 @@ function dbQueryAsync(query, params) {
 }
 
 async function trigger_sumTest() {
-    for(var i=1; i<=5; i++){
-        var fig = i + 10;
-        try {
-            var result_q1 = await dbQueryAsync('SELECT email, join_date, c_login_date, p_login_date, terms_accept, ad_accept FROM s_users_id_info WHERE user_id = ?', fig);
-            console.log(result_q1[0].email);
-            console.log("test complete" + i);
-        } catch (error) {
-            console.log(error);
+    var ox_ch_count = 12; // 전체 단원 수
+    var ox_qst_count = 40; // 단원 별 문항 수
+    var ox_ans_count = 5; // 풀이 횟수
+    var user_lv_count = 5; // 학습 레벨 단계
+
+    for(var i=1; i<=ox_ch_count; i++){
+        // 단원 선택 (ch01~ch12)
+        if (i<10) {
+            var ch_string = "s_ox_qs_ansr_ch0" + i;
+        } else {
+            var ch_string = "s_ox_qs_ansr_ch" + i;
+        }
+        for(var j=1; j<=ox_qst_count; j++){
+            // 문항 선택 (q1~q40)
+            if (i<10) {
+                var qst_string = "ox_ch0" + i + "_q" + j;
+            } else {
+                var qst_string = "ox_ch" + i + "_q" + j;
+            }
+            for(var k=1; k<=user_lv_count; k++){
+                var qst5_sum = 0; // 집계 합산 변수 초기화
+                for(var l=1; l<=ox_ans_count; l++){
+                    var lv_string = "l" + l + "_o_sum"; // Update 학습레벨 선택 (lv.1~lv.5)
+                    // 풀이 Table ID 선택 (s1~s5)
+                    if (i<10) {
+                        var table_string = "s_ox_users_s" + k + "_ch0" + i;
+                    } else {
+                        var table_string = "s_ox_users_s" + k + "_ch" + i;
+                    }
+
+                    // 단원/문항 별 정답수 산출 Query
+                    let sql1 = 'SELECT COUNT(*) AS sumCount FROM ?? '
+                    + 'JOIN s_users_id_info ON s_users_id_info.appuser_id = ??.user_id '
+                    + 'WHERE ?? = 1 AND s_users_id_info.level = ?';
+                    var params1 = [table_string, table_string, qst_string, k]
+                    // 정답 수 Update Query
+                    var sql2 = 'UPDATE ?? SET ??=? WHERE qst_id=?'
+                    var params2 = [ch_string, lv_string, qst5_sum, qst_string]
+
+                    try {
+                        var FeedResult = await dbQueryAsync(sql1, params1);
+                        qst5_sum = qst5_sum + FeedResult[0].sumCount;
+                        try {
+                            await dbQueryAsync(sql2, params2);
+                            console.log("입력값:" + qst5_sum); // 합산 값 로그 체크
+                        } catch (error) {
+                            console.log(error);
+                        }
+                    } catch (error) {
+                        console.log(error);
+                    }
+                }
+            }
         }
     }
-}
+}   
+
 trigger_sumTest();
 
 /*
