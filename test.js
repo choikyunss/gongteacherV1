@@ -1077,7 +1077,7 @@ async function trigger_sumTest() {
 
                     // 단원/문항 별 정답수 산출 Query
                     let sql1 = 'SELECT COUNT(*) AS sumCount FROM ?? '
-                    + 'JOIN s_users_id_info ON s_users_id_info.appuser_id = ??.user_id '
+                    + 'JOIN s_users_id_info ON s_users_id_info.user_id = ??.user_id '
                     + 'WHERE ?? = 1 AND s_users_id_info.level = ?';
                     var params1 = [table_string, table_string, qst_string, k]
                     // 정답 수 Update Query
