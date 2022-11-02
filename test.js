@@ -1032,8 +1032,27 @@ function update_ox() {
 }
 update_ox()
 
+function dbQueryAsync(query) {
+    return new Promise((resolve, reject) => {
+        conn.query(query, (error, result) => {
+            if (error) {
+                reject(error);
+            }
+            resolve(result);                
+        });
+    });
+}
 
 async function trigger_sumTest() {
+    for(var i=1; i>=5; i++){
+        try {
+            await dbQueryAsync('SELECT ox_ch01_q1 FROM s_ox_users_s1_ch01 WHERE user_id = 12');
+        } catch (error) {
+            console.log(error);
+        }
+    }
+}
+/*
     var ox_ans_count = 5;
     for(let i=1; i>=ox_ans_count; i++){
         var table_string = "s_ox_users_s" + i + "_ch01";
@@ -1051,7 +1070,7 @@ async function trigger_sumTest() {
         });
         console.log(qst5_sum);
     }
-}
+} */
 
 trigger_sumTest();
 
