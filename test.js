@@ -1089,7 +1089,7 @@ async function trigger_sumTest() {
                         qst5_sum = qst5_sum + FeedResult[0].sumCount;
                         try {
                             await dbQueryAsync(sql2, params2);
-                            console.log(sql2 + qst5_sum); // 합산 값 로그 체크
+                            console.log(ch_string + "_" + lv_string + "_" + qst_string + "_ : " + qst5_sum); // 합산 값 로그 체크
                         } catch (error) {
                             console.log(error);
                         }
