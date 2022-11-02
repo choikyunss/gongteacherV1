@@ -1048,7 +1048,7 @@ async function trigger_sumTest() {
     for(var i=1; i<=5; i++){
         var fig = i + 10;
         try {
-            var result_q1 = await dbQueryAsync('SELECT *user_id, email, join_date, c_login_date, p_login_date, terms_accept, ad_accept FROM s_users_id_info WHERE login_id = ?', fig);
+            var result_q1 = await dbQueryAsync('SELECT *user_id, email, join_date, c_login_date, p_login_date, terms_accept, ad_accept FROM s_users_id_info WHERE user_id = ?', fig);
             console.log(result_q1[0].email);
             console.log("test complete" + i);
         } catch (error) {
