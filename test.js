@@ -1046,7 +1046,7 @@ function dbQueryAsync(query) {
 async function trigger_sumTest() {
     for(var i=1; i>=5; i++){
         try {
-            return_Result = await dbQueryAsync('SELECT ox_ch01_q1 FROM s_ox_users_s1_ch01 WHERE user_id = 12');
+            const return_Result = await dbQueryAsync('SELECT ox_ch01_q1 FROM s_ox_users_s1_ch01 WHERE user_id = 12');
             console.log(return_Result);
         } catch (error) {
             console.log(error);
