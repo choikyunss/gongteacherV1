@@ -1058,7 +1058,7 @@ async function trigger_sumTest() {
 trigger_sumTest();
 */
 
-for(var m=1; m>=5; m++){
+for(var m=1; m<=5; m++){
     console.log("test ing");
 }
 
