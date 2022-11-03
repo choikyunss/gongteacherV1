@@ -1044,65 +1044,97 @@ function dbQueryAsync(query, params) {
     });
 }
 
-async function trigger_sumTest() {
-    var ox_ch_count = 12; // 전체 단원 수
-    var ox_qst_count = 40; // 단원 별 문항 수
-    var ox_ans_count = 5; // 풀이 횟수
-    var user_lv_count = 5; // 학습 레벨 단계
+///////////// (Table ID : s_ox_qs_ansr_ch01~12) Update OX 집계(풀이 합산) ///////////////////////////
+// ** Sequence
+// 1 Step : Read the ratio of correct/wrong answer -> Calculation 
+// 2 Step : update OX solving result (sum of correct/wrong answer)
+// function name : trigger_ox_OsumResult
+async function trigger_ox_OsumResult() {
+    var ox_ch_count = 12;  // OX 전체 단원 수
+    var ox_qst_count = 40; // OX 단원 별 문항 수
+    var ox_ans_count = 5;  // OX 풀이 회차
+    var user_lv_count = 5; // 학습 레벨 단계 구분 (Lv1. ~ Lv5.)
 
     for(var i=1; i<=ox_ch_count; i++){
-        // 단원 선택 (ch01~ch12)
-        if (i<10) {
-            var ch_string = "s_ox_qs_ansr_ch0" + i;
-        } else {
-            var ch_string = "s_ox_qs_ansr_ch" + i;
-        }
+        let ch_string = i<10 ? "s_ox_qs_ansr_ch0" + i : "s_ox_qs_ansr_ch" + i; // 집계 테이블(Table ID: s_ox_qs_ansr_ch01~ch12) 단원 선택
         for(var j=1; j<=ox_qst_count; j++){
-            // 문항 선택 (q1~q40)
-            if (i<10) {
-                var qst_string = "ox_ch0" + i + "_q" + j;
-            } else {
-                var qst_string = "ox_ch" + i + "_q" + j;
-            }
+            let qst_string = i<10 ? "ox_ch0" + i + "_q" + j : "ox_ch" + i + "_q" + j; // 문항 선택 (Column : ox_ch01(ch12)_q1~q40)
             for(var k=1; k<=user_lv_count; k++){
-                var lv_string = "l" + k + "_o_sum"; // Update 학습레벨 선택 (lv.1~lv.5)
+                var lv_string = "l" + k + "_o_sum"; // Update 학습 레벨 선택 (lv.1~lv.5)
                 var qst5_sum = 0; // 집계 합산 변수 초기화
                 for(var l=1; l<=ox_ans_count; l++){
-                    // 풀이 Table ID 선택 (s1~s5)
-                    if (i<10) {
-                        var table_string = "s_ox_users_s" + l + "_ch0" + i;
-                    } else {
-                        var table_string = "s_ox_users_s" + l + "_ch" + i;
-                    }
-
-                    // 단원/문항 별 정답수 산출 Query
+                    let table_string = i<10 ? "s_ox_users_s" + l + "_ch0" + i : "s_ox_users_s" + l + "_ch" + i; // 풀이 테이블(Table ID: s_ox_user_s1(s5)_ch01~ch12) 선택
+                // 단원&문항 별 정답수 산출 Query
                     let sql1 = 'SELECT COUNT(*) AS sumCount FROM ?? '
                     + 'JOIN s_users_id_info ON s_users_id_info.user_id = ??.user_id '
                     + 'WHERE ?? = 1 AND s_users_id_info.level = ?';
                     var params1 = [table_string, table_string, qst_string, k]
-                    // 정답 수 Update Query
+                // Update 정답 수 Query
                     var sql2 = 'UPDATE ?? SET ??=? WHERE qst_id=?'
                     var params2 = [ch_string, lv_string, qst5_sum, qst_string]
 
                     try {
                         var FeedResult = await dbQueryAsync(sql1, params1);
                         qst5_sum = qst5_sum + FeedResult[0].sumCount;
-                    } catch (error) {
-                        console.log(error);
+                    } catch (err) {
+                        console.log(err);
                     }
                 }
                 try {
                     await dbQueryAsync(sql2, params2);
                     console.log(ch_string + "_" + lv_string + "_" + qst_string + "_ : " + qst5_sum); // 합산 값 로그 체크
-                } catch (error) {
-                    console.log(error);
+                } catch (err) {
+                    console.log(err);
                 }
             }
         }
     }
-}   
+}
 
-trigger_sumTest();
+async function trigger_ox_XsumResult() {
+    var ox_ch_count = 12;  // OX 전체 단원 수
+    var ox_qst_count = 40; // OX 단원 별 문항 수
+    var ox_ans_count = 5;  // OX 풀이 회차
+    var user_lv_count = 5; // 학습 레벨 단계 구분 (Lv1. ~ Lv5.)
+
+    for(var i=1; i<=ox_ch_count; i++){
+        let ch_string = i<10 ? "s_ox_qs_ansr_ch0" + i : "s_ox_qs_ansr_ch" + i; // 집계 테이블(Table ID: s_ox_qs_ansr_ch01~ch12) 단원 선택
+        for(var j=1; j<=ox_qst_count; j++){
+            let qst_string = i<10 ? "ox_ch0" + i + "_q" + j : "ox_ch" + i + "_q" + j; // 문항 선택 (Column : ox_ch01(ch12)_q1~q40)
+            for(var k=1; k<=user_lv_count; k++){
+                var lv_string = "l" + k + "_x_sum"; // Update 학습 레벨 선택 (lv.1~lv.5)
+                var qst5_sum = 0; // 집계 합산 변수 초기화
+                for(var l=1; l<=ox_ans_count; l++){
+                    let table_string = i<10 ? "s_ox_users_s" + l + "_ch0" + i : "s_ox_users_s" + l + "_ch" + i; // 풀이 테이블(Table ID: s_ox_user_s1(s5)_ch01~ch12) 선택
+                // 단원&문항 별 오답수 산출 Query
+                    let sql1 = 'SELECT COUNT(*) AS sumCount FROM ?? '
+                    + 'JOIN s_users_id_info ON s_users_id_info.user_id = ??.user_id '
+                    + 'WHERE ?? = 0 AND s_users_id_info.level = ?';
+                    var params1 = [table_string, table_string, qst_string, k]
+                // Update 오답 수 Query
+                    var sql2 = 'UPDATE ?? SET ??=? WHERE qst_id=?'
+                    var params2 = [ch_string, lv_string, qst5_sum, qst_string]
+
+                    try {
+                        var FeedResult = await dbQueryAsync(sql1, params1);
+                        qst5_sum = qst5_sum + FeedResult[0].sumCount;
+                    } catch (err) {
+                        console.log(err);
+                    }
+                }
+                try {
+                    await dbQueryAsync(sql2, params2);
+                    console.log(ch_string + "_" + lv_string + "_" + qst_string + "_ : " + qst5_sum); // 합산 값 로그 체크
+                } catch (err) {
+                    console.log(err);
+                }
+            }
+        }
+    }
+}
+
+trigger_ox_OsumResult();
+trigger_ox_XsumResult();
 
 /*
 //////////////////////////////////////////////////////////////////////
