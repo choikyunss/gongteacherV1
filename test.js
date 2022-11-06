@@ -1160,7 +1160,7 @@ async function trigger_ox_AvrResult() {
                     QstAvr_Osum = QstAvr_Osum + Qstsum[0].Osum;
                     QstAvr_Xsum = QstAvr_Xsum + Qstsum[0].Xsum;
                     try {
-                        var qstAvr = Qstsum[0].Osum + Qstsum[0].Xsum != 0 ? Qstsum[0].Osum / (Qstsum[0].Osum + Qstsum[0].Xsum) : NULL;
+                        var qstAvr = Qstsum[0].Osum + Qstsum[0].Xsum != 0 ? Qstsum[0].Osum / (Qstsum[0].Osum + Qstsum[0].Xsum) : null;
                         await dbQueryAsync(sql2, params2);
                     } catch (err) {
                         console.log(err);
@@ -1169,7 +1169,7 @@ async function trigger_ox_AvrResult() {
                     console.log(err);
                 }
             }
-            var QstAvr = QstAvr_Osum + QstAvr_Xsum != 0 ? QstAvr_Osum / (QstAvr_Osum + QstAvr_Xsum) : NULL;
+            var QstAvr = QstAvr_Osum + QstAvr_Xsum != 0 ? QstAvr_Osum / (QstAvr_Osum + QstAvr_Xsum) : null;
             var sql3 = 'UPDATE ?? SET o_sum=?, x_sum=?, ox_avr=? WHERE qst_id=?'
             var params3 = [table_string, QstAvr_Osum, QstAvr_Xsum, QstAvr, qst_string]
 
