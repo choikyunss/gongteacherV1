@@ -1149,7 +1149,7 @@ async function trigger_ox_AvrResult() {
                 var lv_string2 = "l" + k + "_x_sum"; // Update 학습 레벨 선택 (lv.1~lv.5)
                 var lv_string3 = "l" + k + "_avr";   // Update 학습 레벨 선택 (lv.1~lv.5)
             // 문항별 정답률 Query
-                let sql1 = 'SELECT ??, ?? AS Osum, Xsum FROM ?? WHERE qst_id = ?';
+                let sql1 = 'SELECT ?? AS Osum, ?? AS Xsum FROM ?? WHERE qst_id = ?';
                 var params1 = [lv_string1, lv_string2, table_string, qst_string]
             // Update 오답 수 Query
                 var sql2 = 'UPDATE ?? SET ??=? WHERE qst_id=?'
