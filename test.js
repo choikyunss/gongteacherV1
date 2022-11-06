@@ -1170,7 +1170,7 @@ async function trigger_ox_AvrResult() {
                 }
             }
             var QstAvr = QstAvr_Osum + QstAvr_Xsum != 0 ? QstAvr_Osum / (QstAvr_Osum + QstAvr_Xsum) : NULL;
-            var sql3 = 'UPDATE ?? SET o_sum=?, x_sum=?, ox_avr WHERE qst_id=?'
+            var sql3 = 'UPDATE ?? SET o_sum=?, x_sum=?, ox_avr=? WHERE qst_id=?'
             var params3 = [table_string, QstAvr_Osum, QstAvr_Xsum, QstAvr, qst_string]
 
             try {
