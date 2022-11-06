@@ -1147,7 +1147,7 @@ async function trigger_ox_AvrResult() {
             for(var k=1; k<=user_lv_count; k++){
                 var lv_string1 = "l" + k + "_o_sum"; // Update 학습 레벨 선택 (lv.1~lv.5)
                 var lv_string2 = "l" + k + "_x_sum"; // Update 학습 레벨 선택 (lv.1~lv.5)
-                var lv_string3 = "l" + k + "_avr";   // Update 학습 레벨 선택 (lv.1~lv.5)
+                var lv_string3 = "l" + k + "_ox_avr";   // Update 학습 레벨 선택 (lv.1~lv.5)
             // 문항별 정답률 Query
                 let sql1 = 'SELECT ?? AS Osum, ?? AS Xsum FROM ?? WHERE qst_id = ?';
                 var params1 = [lv_string1, lv_string2, table_string, qst_string]
