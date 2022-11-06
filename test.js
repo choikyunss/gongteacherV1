@@ -1153,7 +1153,7 @@ async function trigger_ox_AvrResult() {
                 var params1 = [lv_string1, lv_string2, table_string, qst_string]
             // Update 오답 수 Query
                 var sql2 = 'UPDATE ?? SET ??=? WHERE qst_id=?'
-                var params2 = [table_string, lv_string3, qstAvr, qst_string]
+                var params2 = [table_string, lv_string3, qstAvr.toFixed(2), qst_string]
 
                 try {
                     var Qstsum = await dbQueryAsync(sql1, params1);
@@ -1171,7 +1171,7 @@ async function trigger_ox_AvrResult() {
             }
             var QstAvr = QstAvr_Osum + QstAvr_Xsum != 0 ? QstAvr_Osum / (QstAvr_Osum + QstAvr_Xsum) : null;
             var sql3 = 'UPDATE ?? SET o_sum=?, x_sum=?, ox_avr=? WHERE qst_id=?'
-            var params3 = [table_string, QstAvr_Osum, QstAvr_Xsum, QstAvr, qst_string]
+            var params3 = [table_string, QstAvr_Osum, QstAvr_Xsum, QstAvr.toFixed(2), qst_string]
 
             try {
                 await dbQueryAsync(sql3, params3);
