@@ -1139,7 +1139,7 @@ async function trigger_ox_AvrResult() {
     var user_lv_count = 5; // 학습 레벨 단계 구분 (Lv1. ~ Lv5.)
 
     for(var i=1; i<=ox_ch_count; i++){
-        let ch_string = i<10 ? "s_ox_qs_ansr_ch0" + i : "s_ox_qs_ansr_ch" + i; // 집계 테이블(Table ID: s_ox_qs_ansr_ch01~ch12) 단원 선택
+        let table_string = i<10 ? "s_ox_qs_ansr_ch0" + i : "s_ox_qs_ansr_ch" + i; // 집계 테이블(Table ID: s_ox_qs_ansr_ch01~ch12) 단원 선택
         for(var j=1; j<=ox_qst_count; j++){
             let qst_string = i<10 ? "ox_ch0" + i + "_q" + j : "ox_ch" + i + "_q" + j; // 문항 선택 (Column : ox_ch01(ch12)_q1~q40)
             var QstAvr_Osum = 0; // 집계 합산 변수 초기화
