@@ -1190,7 +1190,8 @@ async function TestFunction_UserScore() {
     var type = 11;      // 임의의 사용자 ID 선택 (11번)
 
     var QstString = "ox_ch01_q" + QstNum;
-    var SolveArray = new Array();
+    var SolveArray_bit = new Array();
+    var SolveArray_int = new Array();
     for(i=0; i<3; i++){
         OrderNum = OrderNum >0 ? OrderNum : 5;
         console.log(OrderNum); // 순차정보 Log
@@ -1199,14 +1200,15 @@ async function TestFunction_UserScore() {
         var params1 = [QstString, SolveTableNum, type]
 
         try {
-            SolveArray[i] = await dbQueryAsync(sql1, params1);
-            console.log(SolveArray[i]); // 배점 Array
+            SolveArray_bit[i] = await dbQueryAsync(sql1, params1);
+            SolveArray_int[i] = SolveArray_bit[i].solveResult == '01' ? 1 : 0;
+            console.log(SolveArray_int[i]); // 배점 Array
         } catch (err) {
             console.log(err);
         }
         OrderNum = OrderNum - 1;
     }
-    var ScoreWeight_1 = SolveArray[0].solveResult*4 + SolveArray[1].solveResult*2 + SolveArray[2].solveResult; // 배점 가중치 #1 산출
+    var ScoreWeight_1 = SolveArray_int[0]*4 + SolveArray_int[1]*2 + SolveArray_int[2]; // 배점 가중치 #1 산출
     var ScoreWeight_2 = 0; // 배점 가중치 #2 산출
     switch (ScoreWeight_1) {
         case 7:
