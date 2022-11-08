@@ -1194,7 +1194,7 @@ async function TestFunction_UserScore() {
     for(i=1; i<=3; i++){
         OrderNum = OrderNum >0 ? OrderNum-- : 5;
         console.log(OrderNum); // 순차정보 Log
-        var SolveTableNum = "s_ox_users_s" + OrderNum + "ch01";
+        var SolveTableNum = "s_ox_users_s" + OrderNum + "_ch01";
         var sql1 = 'SELECT ?? FROM ?? WHERE user_id = ?';
         var params1 = [QstString, SolveTableNum, type]
 
