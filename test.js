@@ -1201,7 +1201,7 @@ async function TestFunction_UserScore() {
 
         try {
             SolveArray_bit[i] = await dbQueryAsync(sql1, params1);
-            SolveArray_int[i] = SolveArray_bit[i].solveResult == 0x01 ? 1 : 0;
+            SolveArray_int[i] = SolveArray_bit[i].solveResult == 0x00 ? 1 : 0;
             console.log(SolveArray_int[i]); // 배점 Array
         } catch (err) {
             console.log(err);
