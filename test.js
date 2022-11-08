@@ -1191,8 +1191,8 @@ async function TestFunction_UserScore() {
 
     var QstString = "ox_ch01_q" + QstNum;
     var SolveArray = new Array();
-    for(i=1; i<=3; i++){
-        OrderNum = OrderNum >0 ? OrderNum-- : 5;
+    for(i=0; i<3; i++){
+        OrderNum = OrderNum >0 ? OrderNum - 1 : 5;
         console.log(OrderNum); // 순차정보 Log
         var SolveTableNum = "s_ox_users_s" + OrderNum + "_ch01";
         var sql1 = 'SELECT ?? FROM ?? WHERE user_id = ?';
