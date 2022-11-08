@@ -1184,10 +1184,76 @@ async function trigger_ox_AvrResult() {
     }
 }
 
+async function TestFunction_UserScore() {
+    var QstNum = 1;     // 임의의 문항번호 선택 (1번)
+    var OrderNum = 2;   // 임의의 순차 (2번)
+    var type = 11;      // 임의의 사용자 ID 선택 (11번)
 
+    var QstString = "ox_ch01_q" + QstNum;
+    var SolveArray = new Array();
+    for(i=1; i<=3; i++){
+        OrderNum = OrderNum >0 ? OrderNum-- : 5;
+        console.log(OrderNum); // 순차정보 Log
+        var SolveTableNum = "s_ox_users_s" + OrderNum + "ch01";
+        var sql1 = 'SELECT ?? FROM ?? WHERE user_id = ?';
+        var params1 = [QstString, SolveTableNum, type]
+
+        try {
+            SolveArray[i] = await dbQueryAsync(sql1, params1);
+            console.log(SolveArray[i]); // 배점 Array
+        } catch (err) {
+            console.log(err);
+        }
+    }
+    var ScoreWeight_1 = SolveArray[1]*4 + SolveArray[2]*2 + SolveArray[3]; // 배점 가중치 #1 산출
+    var ScoreWeight_2 = 0; // 배점 가중치 #2 산출
+    switch (ScoreWeight_1) {
+        case 7:
+            ScoreWeight_2 = 2;
+            break;
+        case 6:
+            ScoreWeight_2 = 1.5;
+            break;
+        case 5:
+            ScoreWeight_2 = 1;
+            break;
+        case 4:
+            ScoreWeight_2 = 0.5;
+            break;
+        case 3:
+            ScoreWeight_2 = -0.5;
+            break;
+        case 2:
+            ScoreWeight_2 = -1;
+            break;
+        case 1:
+            ScoreWeight_2 = -1.5;
+            break;
+        case 0:
+            ScoreWeight_2 = -2;
+            break;
+    }
+
+    var sql2 = 'SELECT ox_avr FROM s_ox_qs_ansr_ch01 WHERE qst_id = ?';
+    var params2 = [QstString]
+
+    try {
+        var AnsRate = await dbQueryAsync(sql2, params2);
+        var UnitScore = ScoreWeight_2 >=0 ? ScoreWeight_2 * (1 - AnsRate) : ScoreWeight_2 * AnsRate; // 단위 배점 산출
+        console.log(AnsRate + "_" + UnitScore);
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+TestFunction_UserScore();
+
+/*
 trigger_ox_OsumResult();
 trigger_ox_XsumResult();
 trigger_ox_AvrResult();
+*/
 
 /*
 //////////////////////////////////////////////////////////////////////
