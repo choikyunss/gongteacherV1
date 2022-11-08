@@ -1195,7 +1195,7 @@ async function TestFunction_UserScore() {
         OrderNum = OrderNum >0 ? OrderNum : 5;
         console.log(OrderNum); // 순차정보 Log
         var SolveTableNum = "s_ox_users_s" + OrderNum + "_ch01";
-        var sql1 = 'SELECT ?? FROM ?? WHERE user_id = ?';
+        var sql1 = 'SELECT ?? AS SolveResult FROM ?? WHERE user_id = ?';
         var params1 = [QstString, SolveTableNum, type]
 
         try {
@@ -1206,7 +1206,7 @@ async function TestFunction_UserScore() {
         }
         OrderNum = OrderNum - 1;
     }
-    var ScoreWeight_1 = SolveArray[1]*4 + SolveArray[2]*2 + SolveArray[3]; // 배점 가중치 #1 산출
+    var ScoreWeight_1 = SolveArray[1].SolveResult*4 + SolveArray[2].SolveResult*2 + SolveArray[3].SolveResult; // 배점 가중치 #1 산출
     var ScoreWeight_2 = 0; // 배점 가중치 #2 산출
     switch (ScoreWeight_1) {
         case 7:
