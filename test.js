@@ -1192,7 +1192,7 @@ async function TestFunction_UserScore() {
     var QstString = "ox_ch01_q" + QstNum;
     var SolveArray = new Array();
     for(i=0; i<3; i++){
-        OrderNum = OrderNum >0 ? OrderNum - 1 : 5;
+        OrderNum = OrderNum >0 ? OrderNum : 5;
         console.log(OrderNum); // 순차정보 Log
         var SolveTableNum = "s_ox_users_s" + OrderNum + "_ch01";
         var sql1 = 'SELECT ?? FROM ?? WHERE user_id = ?';
@@ -1204,6 +1204,7 @@ async function TestFunction_UserScore() {
         } catch (err) {
             console.log(err);
         }
+        OrderNum = OrderNum - 1;
     }
     var ScoreWeight_1 = SolveArray[1]*4 + SolveArray[2]*2 + SolveArray[3]; // 배점 가중치 #1 산출
     var ScoreWeight_2 = 0; // 배점 가중치 #2 산출
