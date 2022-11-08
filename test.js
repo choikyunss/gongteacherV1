@@ -1240,8 +1240,8 @@ async function TestFunction_UserScore() {
 
     try {
         var AnsRate = await dbQueryAsync(sql2, params2);
-        var UnitScore = ScoreWeight_2 >=0 ? ScoreWeight_2 * (1 - AnsRate) : ScoreWeight_2 * AnsRate; // 단위 배점 산출
-        console.log(AnsRate + "_" + UnitScore);
+        var UnitScore = ScoreWeight_2 >=0 ? ScoreWeight_2 * (1 - AnsRate[0]) : ScoreWeight_2 * AnsRate[0]; // 단위 배점 산출
+        console.log(AnsRate[0] + "_" + UnitScore);
 
     } catch (err) {
         console.log(err);
