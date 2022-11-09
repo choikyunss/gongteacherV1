@@ -3,8 +3,8 @@ const express = require('express');
 const app = express();
 
 // Mysql2 Module 사용
-var mysql = require('mysql');
-//var mysql = require('mysql2/promise');
+// var mysql = require('mysql');
+var mysql = require('mysql2/promise');
 
 /* ********** Make transaction object ********** */
 /*
@@ -33,7 +33,7 @@ var trconn = transaction({
 });
 */
 
-var conn = mysql.createConnection({
+var conn = await mysql.createConnection({
     host : 'kyunss-db.cjwyxnwnqovj.ap-northeast-2.rds.amazonaws.com',
     user : 'kyunss_admin',
     password : 'Choibjk6014#',
@@ -1183,6 +1183,22 @@ async function trigger_ox_AvrResult() {
         }
     }
 }
+
+/*
+app.put('/api/s_ox_users_us_ch01/update/:type', function(req, res) {
+    conn.beginTransaction((err)=>{
+        
+    });
+});
+
+        let {type} = req.params;
+        var q_num = req.body.q_num; // 문항 번호 (Input value : 1, 2, 3, 4 ... n)
+        var order_t = req.body.order_t; // Order info.에 따른 table ID 선택 (Input value : 1, 2, 3, 4, 5)
+
+        var qst_string = "ox_ch01_q" + q_num; // 문항 번호 String
+        // var t_string = "s_ox_users_s" + order_t + "_ch01"; // Table ID String
+        var SolveArray_int = new Array();
+*/
 
 async function TestFunction_UserScore() {
     var QstNum = 1;     // 임의의 문항번호 선택 (1번)
