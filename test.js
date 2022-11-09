@@ -1200,7 +1200,7 @@ async function TestFunction_UserScore() {
 
         try {
             var SolveArray_bit = await dbQueryAsync(sql1, params1);
-            SolveArray_int[i] = SolveArray_bit[0].solveResult.readInt8();
+            SolveArray_int[i] = SolveArray_bit[0].solveResult != null ? SolveArray_bit[0].solveResult.readInt8() : 0;
             
             //const SolveArrayInt = Buffer.from(SolveArray_bit[i]);
             console.log(SolveArray_int[i]);
