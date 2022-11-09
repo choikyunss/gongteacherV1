@@ -79,7 +79,8 @@ console.log(date);
 // ** URL : http://13.124.19.61:3001/api/s_users_id_info/add
 // ** Body(JSON) : { "login_id": (VARCHAR), "email": (VARCHAR), "join_route": (VARCHAR), "app_version": (INT), "terms_accept": 0/1 (BIT), "ad_accept": 0/1 (BIT)  }
 /// TODO : 동일 이메일 가입 시도 시, 체크하여 중복가입 막기 -> 적용 해야함.//
-app.post('/api/s_users_id_info/add', function(req, res) {
+app.post('/api/s_users_id_info/add', async function(req, res) {
+    const conn = await getConn();
     var req_body = req.body;
     console.log(req_body);
 
@@ -94,7 +95,7 @@ app.post('/api/s_users_id_info/add', function(req, res) {
     
     var sql = 'INSERT INTO s_users_id_info (login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date, terms_accept, ad_accept)'
             + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    conn.query(sql, [login_id, email, join_route, join_date, level, app_version, join_date, join_date, terms_accept, ad_accept], (err, rows, fields) => {
+    await conn.query(sql, [login_id, email, join_route, join_date, level, app_version, join_date, join_date, terms_accept, ad_accept], (err, rows, fields) => {
         if(err) {
             console.log(err);
             res.status(500).send('Internal Server Error');
