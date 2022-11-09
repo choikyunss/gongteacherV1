@@ -45,6 +45,7 @@ var pool = mysql.createPool({
 const getConn = async() => {
     return await pool.getConnection(async (conn) => conn);
 }
+const conn = await getConn();
 
 //conn.connect();
 
