@@ -45,7 +45,6 @@ var pool = mysql.createPool({
 const getConn = async() => {
     return await pool.getConnection(async (conn) => conn);
 }
-const conn = await getConn();
 
 //conn.connect();
 
@@ -367,7 +366,8 @@ read_ox_order()
 // ** Body(JSON) : { "q_num": 1 ~ n (INT), "order_t": 1 ~ 5 (INT), "solve_r": 0/1 (BIT) }
 function update_ox() {
     ///////////// OX Chapter-1 /////////////
-    app.put('/api/s_ox_users_order_ch01/update/:type', function(req, res) {
+    app.put('/api/s_ox_users_order_ch01/update/:type', async function(req, res) {
+        const conn = await getConn();
         conn.beginTransaction((err)=>{
             let {type} = req.params;
             var q_num = req.body.q_num; // 문항 번호 (Input value : 1, 2, 3, 4 ... n)
