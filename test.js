@@ -1200,11 +1200,11 @@ async function TestFunction_UserScore() {
         var params1 = [QstString, SolveTableNum, type]
 
         try {
-            SolveArray_bit[i] = await dbQueryAsync(sql1, params1);
-            SolveArray_int[i] = SolveArray_bit[i].solveResult == 01 ? 1 : 0;
+            SolveArray_bit = await dbQueryAsync(sql1, params1);
+            //SolveArray_int[i] = SolveArray_bit[i].solveResult == 01 ? 1 : 0;
             
-            const SolveArrayInt = SolveArray_bit[i].solveResult;
-            console.log(SolveArrayInt);
+            //const SolveArrayInt = Buffer.from(SolveArray_bit[i]);
+            console.log(SolveArray_bit[0].solveResult);
             //console.log(SolveTableNum + " " + QstString + " " + SolveArrayInt.readInt8()); // 배점 Array
         } catch (err) {
             console.log(err);
