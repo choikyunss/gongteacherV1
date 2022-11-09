@@ -368,7 +368,7 @@ function update_ox() {
     ///////////// OX Chapter-1 /////////////
     app.put('/api/s_ox_users_order_ch01/update/:type', async function(req, res) {
         const conn = await getConn();
-        conn.beginTransaction((err)=>{
+        await conn.beginTransaction(async (err)=>{
             let {type} = req.params;
             var q_num = req.body.q_num; // 문항 번호 (Input value : 1, 2, 3, 4 ... n)
             var order_t = req.body.order_t; // Order info.에 따른 table ID 선택 (Input value : 1, 2, 3, 4, 5)
@@ -383,7 +383,7 @@ function update_ox() {
 
             var sql1 = 'UPDATE s_ox_users_order_ch01 SET ??=??%5+1 WHERE user_id=?';
             var params1 = [qst_string, qst_string, type]
-            conn.query(sql1, params1, function(err1, rows1, fields) {
+            await conn.query(sql1, params1, async function(err1, rows1, fields) {
                 if (err1) {
                     console.log(err1);
                     res.status(500).send('Internal Server Error');
@@ -395,7 +395,7 @@ function update_ox() {
                     'JOIN s_ox_users_s5_ch01 ON s_ox_users_s5_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
                     'SET ??.??=? WHERE s_ox_users_s1_ch01.user_id=?';
                     var params2 = [t_string, qst_string, solve_r, type]
-                    conn.query(sql2, params2, function(err2, rows2, fields) {
+                    await conn.query(sql2, params2, async function(err2, rows2, fields) {
                         if (err2) {
                             console.log(err2);
                             res.status(500).send('Internal Server Error');
@@ -404,7 +404,7 @@ function update_ox() {
                             console.log(rows2);
                             var sql3 = 'UPDATE s_ox_users_vol_ch01 SET ??=??+1 WHERE user_id=?';
                             var params3 = [date_string, date_string, type]
-                            conn.query(sql3, params3, function(err3, rows3, fields) {
+                            await conn.query(sql3, params3, function(err3, rows3, fields) {
                                 if (err3) {
                                     console.log(err3);
                                     res.status(500).send('Internal Server Error');
