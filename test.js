@@ -1191,7 +1191,7 @@ async function TestFunction_UserScore() {
 
     var QstString = "ox_ch01_q" + QstNum;
     var SolveArray_int = new Array();
-    for(i=0; i<3; i++){
+    for(i=0; i<4; i++){
         OrderNum = OrderNum >0 ? OrderNum : 5;
         console.log(OrderNum); // 순차정보 Log
         var SolveTableNum = "s_ox_users_s" + OrderNum + "_ch01";
@@ -1210,43 +1210,78 @@ async function TestFunction_UserScore() {
         }
         OrderNum = OrderNum - 1;
     }
-    var ScoreWeight_1 = SolveArray_int[0]*4 + SolveArray_int[1]*2 + SolveArray_int[2]; // 배점 가중치 #1 산출
-    var ScoreWeight_2 = 0; // 배점 가중치 #2 산출
-    switch (ScoreWeight_1) {
+    var ScoreWeight_A1 = SolveArray_int[0]*4 + SolveArray_int[1]*2 + SolveArray_int[2]; // 배점 가중치 #1 (After) 산출
+    var ScoreWeight_B1 = SolveArray_int[1]*4 + SolveArray_int[2]*2 + SolveArray_int[3]; // 배점 가중치 #1 (Before) 산출
+    var ScoreWeight_A2;
+    var ScoreWeight_B2; 
+    // 배점 가중치 #2 (After) 산출
+    switch (ScoreWeight_A1) {
         case 7:
-            ScoreWeight_2 = 2;
+            ScoreWeight_A2 = 2;
             break;
         case 6:
-            ScoreWeight_2 = 1.5;
+            ScoreWeight_A2 = 1.5;
             break;
         case 5:
-            ScoreWeight_2 = 1;
+            ScoreWeight_A2 = 1;
             break;
         case 4:
-            ScoreWeight_2 = 0.5;
+            ScoreWeight_A2 = 0.5;
             break;
         case 3:
-            ScoreWeight_2 = -0.5;
+            ScoreWeight_A2 = -0.5;
             break;
         case 2:
-            ScoreWeight_2 = -1;
+            ScoreWeight_A2 = -1;
             break;
         case 1:
-            ScoreWeight_2 = -1.5;
+            ScoreWeight_A2 = -1.5;
             break;
         case 0:
-            ScoreWeight_2 = -2;
+            ScoreWeight_A2 = -2;
             break;
     }
+    // 배점 가중치 #2 (Before) 산출
+    switch (ScoreWeight_B1) {
+        case 7:
+            ScoreWeight_B2 = 2;
+            break;
+        case 6:
+            ScoreWeight_B2 = 1.5;
+            break;
+        case 5:
+            ScoreWeight_B2 = 1;
+            break;
+        case 4:
+            ScoreWeight_B2 = 0.5;
+            break;
+        case 3:
+            ScoreWeight_B2 = -0.5;
+            break;
+        case 2:
+            ScoreWeight_B2 = -1;
+            break;
+        case 1:
+            ScoreWeight_B2 = -1.5;
+            break;
+        case 0:
+            ScoreWeight_B2 = -2;
+            break;
+    }
+
 
     var sql2 = 'SELECT ox_avr FROM s_ox_qs_ansr_ch01 WHERE qst_id = ?';
     var params2 = [QstString]
 
     try {
         var AnsRate = await dbQueryAsync(sql2, params2);
-        var UnitScore = ScoreWeight_2 >=0 ? Math.ceil((ScoreWeight_2 * (1 - AnsRate[0].ox_avr))*100)/100 : Math.ceil((ScoreWeight_2 * AnsRate[0].ox_avr)*100)/100; // 단위 배점 산출
+        var UnitScore_A = ScoreWeight_A2 >=0 ? ScoreWeight_A2 * (1 - AnsRate[0].ox_avr) : ScoreWeight_A2 * AnsRate[0].ox_avr; // 단위 배점 (After) 산출
+        var UnitScore_ARound = Math.ceil(UnitScore_A*100)/100; // 단위 배점 (After) RoundUp
+        var UnitScore_B = ScoreWeight_B2 >=0 ? ScoreWeight_B2 * (1 - AnsRate[0].ox_avr) : ScoreWeight_B2 * AnsRate[0].ox_avr; // 단위 배점 (After) 산출
+        var UnitScore_BRound = Math.ceil(UnitScore_B*100)/100; // 단위 배점 (Before) RoundUp
+        var UnitScore = UnitScore_ARound - UnitScore_BRound;   // 단위 배점 (종합) 산출
         
-        console.log(ScoreWeight_1 + "_" + AnsRate[0].ox_avr + "_" + UnitScore);
+        console.log(ScoreWeight_A1 + "_" + AnsRate[0].ox_avr + "_" + UnitScore);
 
     } catch (err) {
         console.log(err);
