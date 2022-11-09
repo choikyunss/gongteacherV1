@@ -96,14 +96,14 @@ app.post('/api/s_users_id_info/add', async function(req, res) {
     var sql = 'INSERT INTO s_users_id_info (login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date, terms_accept, ad_accept)'
             + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
     await conn.query(sql, [login_id, email, join_route, join_date, level, app_version, join_date, join_date, terms_accept, ad_accept], (err, rows, fields) => {
+        conn.release();
         if(err) {
             console.log(err);
             res.status(500).send('Internal Server Error');
         } else {
             console.log(rows);
             res.send(rows);
-        }
-        conn.release();
+        }        
     });
 });
 
