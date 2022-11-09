@@ -103,6 +103,7 @@ app.post('/api/s_users_id_info/add', async function(req, res) {
             console.log(rows);
             res.send(rows);
         }
+        conn.release();
     });
 });
 
