@@ -172,6 +172,7 @@ app.put('/api/s_users_id_info/update2/:type', function(req, res) {
 ///////////// (Table ID : s_system_id_info) 시스템 정보 불러오기 (final_ver, mandatory_update_ver, maint_period) ///////////////////////////
 app.get('/api/s_system_id_info/read/:type', async(req, res) => {
 
+    const conn = await getConn();
     let {type} = req.params;
 
     conn.query('SELECT final_ver, mandatory_update_ver, maint_period FROM s_system_id_info WHERE system_id = ?;', type, function(err, rows, fields) {
