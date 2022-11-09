@@ -33,12 +33,18 @@ var trconn = transaction({
 });
 */
 
-var conn = await mysql.createConnection({
+//var conn = mysql.createConnection({
+var pool = mysql.createPool({
     host : 'kyunss-db.cjwyxnwnqovj.ap-northeast-2.rds.amazonaws.com',
     user : 'kyunss_admin',
     password : 'Choibjk6014#',
     database : 'Gong_Teacher'
 });
+
+// Mysql2 Module 사용
+const getConn = async() => {
+    return await pool.getConnection(async (conn) => conn);
+}
 
 //conn.connect();
 
