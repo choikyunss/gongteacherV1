@@ -1205,7 +1205,7 @@ async function TestFunction_UserScore() {
             
             const SolveArrayInt = SolveArray_bit[i].solveResult;
             console.log(SolveArrayInt);
-            console.log(SolveTableNum + " " + QstString + " " + SolveArrayInt.readInt8()); // 배점 Array
+            //console.log(SolveTableNum + " " + QstString + " " + SolveArrayInt.readInt8()); // 배점 Array
         } catch (err) {
             console.log(err);
         }
