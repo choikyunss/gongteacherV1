@@ -1281,7 +1281,10 @@ async function TestFunction_UserScore() {
         var UnitScore_BRound = Math.ceil(UnitScore_B*100)/100; // 단위 배점 (Before) RoundUp
         var UnitScore = UnitScore_ARound - UnitScore_BRound;   // 단위 배점 (종합) 산출
         
-        console.log(ScoreWeight_A1 + "_" + AnsRate[0].ox_avr + "_" + UnitScore);
+        console.log(ScoreWeight_A1 + "/" + ScoreWeight_B1);
+        console.log(ScoreWeight_A2 + "/" + ScoreWeight_B2);
+        console.log(AnsRate[0].ox_avr);
+        console.log(UnitScore_ARound + "/" + UnitScore_BRound + "_" + UnitScore);
 
     } catch (err) {
         console.log(err);
