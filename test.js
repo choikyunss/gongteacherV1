@@ -1038,7 +1038,7 @@ function update_ox() {
 }
 update_ox()
 
-
+/*
 function dbQueryAsync(query, params) {
     return new Promise((resolve, reject) => {
         conn.query(query, params, (error, result) => {
@@ -1189,6 +1189,7 @@ async function trigger_ox_AvrResult() {
         }
     }
 }
+*/
 
 /*
 app.put('/api/s_ox_users_us_ch01/update/:type', function(req, res) {
@@ -1204,7 +1205,7 @@ app.put('/api/s_ox_users_us_ch01/update/:type', function(req, res) {
         var qst_string = "ox_ch01_q" + q_num; // 문항 번호 String
         // var t_string = "s_ox_users_s" + order_t + "_ch01"; // Table ID String
         var SolveArray_int = new Array();
-*/
+
 
 async function TestFunction_UserScore() {
     var QstNum = 1;     // 임의의 문항번호 선택 (1번)
@@ -1314,7 +1315,7 @@ async function TestFunction_UserScore() {
 }
 
 TestFunction_UserScore();
-
+*/
 /*
 trigger_ox_OsumResult();
 trigger_ox_XsumResult();
