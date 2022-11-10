@@ -3,11 +3,9 @@ const express = require('express');
 const app = express();
 
 // Mysql2 Module
-// var mysql = require('mysql');
 var mysql = require('mysql2/promise');
 
 // Database Pool Object
-//var conn = mysql.createConnection({
 var pool = mysql.createPool({
     host : 'kyunss-db.cjwyxnwnqovj.ap-northeast-2.rds.amazonaws.com',
     user : 'kyunss_admin',
@@ -27,24 +25,6 @@ const server = app.listen(3001, () => {
     console.log('Start Server : 13.124.19.61:3001');
 
 });
-
-// Mysql2 Module 
-const getConn = async() => {
-    try {
-        return await pool.getConnection();
-    } catch (error) {
-        console.error('connection error : ${error.messange}');
-        return null;
-    }
-};
-
-const releaseConnection = async (conn) => {
-    try {
-        await conn.release();
-    } catch (error) {
-        console.error('release error : ${error.message}');
-    }
-};
 
 // Date Object 생성
 function getFormatDate(date){
