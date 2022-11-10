@@ -65,31 +65,29 @@ console.log(date);
 // ** Body(JSON) : { "login_id": (VARCHAR), "email": (VARCHAR), "join_route": (VARCHAR), "app_version": (INT), "terms_accept": 0/1 (BIT), "ad_accept": 0/1 (BIT)  }
 /// TODO : 동일 이메일 가입 시도 시, 체크하여 중복가입 막기 -> 적용 해야함.//
 app.post('/api/s_users_id_info/add', async (req, res) => {
-    const userApp = await pool.getConnection(async conn => conn);
+    const conn = await pool.getConnection(async conn => conn);
     try{
         var req_body = req.body;
         console.log(req_body);
     
-        var login_id = req.body.login_id.toString(); // 로그인 ID (Primary Key) //
-        var email = req.body.email.toString(); // E-Mail 주소 //
-        var join_route = req.body.join_route.toString(); // 가입 경로 (Naver, Kakao Talk, Google)
-        var join_date = date.toString(); // 최초 가입 날짜 //
-        var level = 1; // 신규 가입자의 학습레벨은 무조건 1단계 //
-        var app_version = req.body.app_version; // 앱 버전 //
-        var terms_accept = req.body.terms_accept; // 이용약관 동의 여부 //
-        var ad_accept = req.body.ad_accept; // 광고 수신 동의 여부 //
+        var login_id = req.body.login_id.toString();      // : Log-In ID (Primary Key)
+        var email = req.body.email.toString();            // : E-Mail Address
+        var join_route = req.body.join_route.toString();  // : Join Route (Naver, Kakao Talk, Google)
+        var join_date = date.toString();                  // : Initial Subscription Date
+        var level = 1;                                    // : New member's learning level is ... '1'
+        var app_version = req.body.app_version;           // : App version
+        var terms_accept = req.body.terms_accept;         // : Acceptance of the terms & conditions
+        var ad_accept = req.body.ad_accept;               // : Acceptance of receving advertisements
         
-        var sql = 'INSERT INTO s_users_id_info (login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date, terms_accept, ad_accept)'
+        var sql = 'INSERT INTO s_users_id_info' 
+                + ' (login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date, terms_accept, ad_accept)'
                 + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
         const [rows] = await userApp.query(sql, [login_id, email, join_route, join_date, level, app_version, join_date, join_date, terms_accept, ad_accept]);
-        userApp.release();
-        console.log("finish app!!");
+        conn.release();
         res.json(rows);
-        //return rows;
-        console.log("Success response!!");
 
     } catch (err) {
-        userApp.release();
+        conn.release();
         console.log("failed app!!");
     }
 });
