@@ -84,8 +84,9 @@ app.post('/api/s_users_id_info/add', async (req, res) => {
         const [rows] = await userApp.query(sql, [login_id, email, join_route, join_date, level, app_version, join_date, join_date, terms_accept, ad_accept]);
         userApp.release();
         console.log("finish app!!");
-        return rows;
-        //console.log("End App!!");
+        res.json(rows);
+        //return rows;
+        console.log("Success response!!");
 
     } catch (err) {
         userApp.release();
