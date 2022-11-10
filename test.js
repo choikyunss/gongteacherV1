@@ -1,11 +1,12 @@
+// Express Module
 const express = require('express');
-
 const app = express();
 
-// Mysql2 Module 사용
+// Mysql2 Module
 // var mysql = require('mysql');
 var mysql = require('mysql2/promise');
 
+// Database Pool Object
 //var conn = mysql.createConnection({
 var pool = mysql.createPool({
     host : 'kyunss-db.cjwyxnwnqovj.ap-northeast-2.rds.amazonaws.com',
@@ -67,7 +68,7 @@ console.log(date);
 // ** Body(JSON) : { "login_id": (VARCHAR), "email": (VARCHAR), "join_route": (VARCHAR), "app_version": (INT), "terms_accept": 0/1 (BIT), "ad_accept": 0/1 (BIT)  }
 /// TODO : 동일 이메일 가입 시도 시, 체크하여 중복가입 막기 -> 적용 해야함.//
 app.post('/api/s_users_id_info/add', async (req, res) => {
-    const conn = await getConn();
+    const userApp = await pool.getConnection(async conn => conn);
     var req_body = req.body;
     console.log(req_body);
 
@@ -82,10 +83,10 @@ app.post('/api/s_users_id_info/add', async (req, res) => {
     
     var sql = 'INSERT INTO s_users_id_info (login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date, terms_accept, ad_accept)'
             + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    const [rows, result] = await conn.query(sql, [login_id, email, join_route, join_date, level, app_version, join_date, join_date, terms_accept, ad_accept], (err, rows, fields) => {
-        //res.json(rows);      
+    const [rows, result] = await userApp.query(sql, [login_id, email, join_route, join_date, level, app_version, join_date, join_date, terms_accept, ad_accept], (err, rows, fields) => {
+        res.json(rows);      
     });
-    conn.release(); 
+    userApp.release(); 
 });
 
 ///////////// (Table ID : s_users_id_info) 사용자 정보 불러오기 (join_route, join_date, c_login_date, p_login_date, terms_accept, ad_accept) ///////////////////////////
