@@ -84,6 +84,7 @@ app.post('/api/s_users_id_info/add', async (req, res) => {
     userApp.release(); 
 });
 
+/*
 ///////////// (Table ID : s_users_id_info) 사용자 정보 불러오기 (join_route, join_date, c_login_date, p_login_date, terms_accept, ad_accept) ///////////////////////////
 app.get('/api/s_users_id_info/read/:type', async(req, res) => {
 
