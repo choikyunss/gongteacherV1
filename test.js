@@ -65,7 +65,7 @@ console.log(date);
 // ** Body(JSON) : { "login_id": (VARCHAR), "email": (VARCHAR), "join_route": (VARCHAR), "app_version": (INT), "terms_accept": 0/1 (BIT), "ad_accept": 0/1 (BIT)  }
 /// TODO : 동일 이메일 가입 시도 시, 체크하여 중복가입 막기 -> 적용 해야함.//
 app.post('/api/s_users_id_info/add', async (req, res) => {
-    const connApp = await pool.getConnection(async conn => conn);
+    const conn = await pool.getConnection(async conn => conn);
     try{
         var req_body = req.body;
         console.log(req_body);
@@ -82,12 +82,12 @@ app.post('/api/s_users_id_info/add', async (req, res) => {
         var sql = 'INSERT INTO s_users_id_info' 
                 + ' (login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date, terms_accept, ad_accept)'
                 + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        const [rows] = await userApp.query(sql, [login_id, email, join_route, join_date, level, app_version, join_date, join_date, terms_accept, ad_accept]);
-        connApp.release();
+        const [rows] = await conn.query(sql, [login_id, email, join_route, join_date, level, app_version, join_date, join_date, terms_accept, ad_accept]);
+        conn.release();
         res.json(rows);
 
     } catch (err) {
-        connApp.release();
+        conn.release();
         console.log("failed app!!");
     }
 });
