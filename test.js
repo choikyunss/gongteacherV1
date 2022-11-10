@@ -82,10 +82,10 @@ app.post('/api/s_users_id_info/add', async (req, res) => {
         var sql = 'INSERT INTO s_users_id_info (login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date, terms_accept, ad_accept)'
                 + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
         const [rows] = await userApp.query(sql, [login_id, email, join_route, join_date, level, app_version, join_date, join_date, terms_accept, ad_accept]);
-        userApp.release();
+        conn.release();
         console.log("finish app!!");
-        conn.end();
-        console.log("End App!!");
+        //conn.end();
+        //console.log("End App!!");
 
     } catch (err) {
         userApp.release();
