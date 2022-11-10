@@ -13,7 +13,7 @@ var pool = mysql.createPool({
     user : 'kyunss_admin',
     password : 'Choibjk6014#',
     database : 'Gong_Teacher',
-    connectionLimit : 30
+    connectionLimit : 10000
 });
 
 // body-parser 불러오기
