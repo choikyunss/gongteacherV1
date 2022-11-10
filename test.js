@@ -66,22 +66,28 @@ console.log(date);
 /// TODO : 동일 이메일 가입 시도 시, 체크하여 중복가입 막기 -> 적용 해야함.//
 app.post('/api/s_users_id_info/add', async (req, res) => {
     const userApp = await pool.getConnection(async conn => conn);
-    var req_body = req.body;
-    console.log(req_body);
-
-    var login_id = req.body.login_id.toString(); // 로그인 ID (Primary Key) //
-    var email = req.body.email.toString(); // E-Mail 주소 //
-    var join_route = req.body.join_route.toString(); // 가입 경로 (Naver, Kakao Talk, Google)
-    var join_date = date.toString(); // 최초 가입 날짜 //
-    var level = 1; // 신규 가입자의 학습레벨은 무조건 1단계 //
-    var app_version = req.body.app_version; // 앱 버전 //
-    var terms_accept = req.body.terms_accept; // 이용약관 동의 여부 //
-    var ad_accept = req.body.ad_accept; // 광고 수신 동의 여부 //
+    try{
+        var req_body = req.body;
+        console.log(req_body);
     
-    var sql = 'INSERT INTO s_users_id_info (login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date, terms_accept, ad_accept)'
-            + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    const [rows, result] = await userApp.query(sql, [login_id, email, join_route, join_date, level, app_version, join_date, join_date, terms_accept, ad_accept]);
-    userApp.release(); 
+        var login_id = req.body.login_id.toString(); // 로그인 ID (Primary Key) //
+        var email = req.body.email.toString(); // E-Mail 주소 //
+        var join_route = req.body.join_route.toString(); // 가입 경로 (Naver, Kakao Talk, Google)
+        var join_date = date.toString(); // 최초 가입 날짜 //
+        var level = 1; // 신규 가입자의 학습레벨은 무조건 1단계 //
+        var app_version = req.body.app_version; // 앱 버전 //
+        var terms_accept = req.body.terms_accept; // 이용약관 동의 여부 //
+        var ad_accept = req.body.ad_accept; // 광고 수신 동의 여부 //
+        
+        var sql = 'INSERT INTO s_users_id_info (login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date, terms_accept, ad_accept)'
+                + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        const [rows] = await userApp.query(sql, [login_id, email, join_route, join_date, level, app_version, join_date, join_date, terms_accept, ad_accept]);
+        userApp.release();
+        return rows;
+
+    } catch (err) {
+        userApp.release();
+    }
 });
 
 /*
@@ -1316,4 +1322,3 @@ const j = schedule.scheduleJob('10 * * * * *', function() {
 });
 */
 
-//conn.end();
