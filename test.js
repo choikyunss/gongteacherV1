@@ -11,13 +11,27 @@ var pool = mysql.createPool({
     host : 'kyunss-db.cjwyxnwnqovj.ap-northeast-2.rds.amazonaws.com',
     user : 'kyunss_admin',
     password : 'Choibjk6014#',
-    database : 'Gong_Teacher'
+    database : 'Gong_Teacher',
+    connectionLimit : 30
 });
 
-// Mysql2 Module 사용
+// Mysql2 Module 
 const getConn = async() => {
-    return await pool.getConnection(async (conn) => conn);
-}
+    try {
+        return await pool.getConnection();
+    } catch (error) {
+        console.error('connection error : ${error.messange}');
+        return null;
+    }
+};
+
+const releaseConnection = async (conn) => {
+    try {
+        await conn.release();
+    } catch (error) {
+        console.error('release error : ${error.message}');
+    }
+};
 
 //conn.connect();
 
@@ -52,7 +66,7 @@ console.log(date);
 // ** URL : http://13.124.19.61:3001/api/s_users_id_info/add
 // ** Body(JSON) : { "login_id": (VARCHAR), "email": (VARCHAR), "join_route": (VARCHAR), "app_version": (INT), "terms_accept": 0/1 (BIT), "ad_accept": 0/1 (BIT)  }
 /// TODO : 동일 이메일 가입 시도 시, 체크하여 중복가입 막기 -> 적용 해야함.//
-app.post('/api/s_users_id_info/add', async function(req, res) {
+app.post('/api/s_users_id_info/add', async (req, res) => {
     const conn = await getConn();
     var req_body = req.body;
     console.log(req_body);
@@ -69,7 +83,7 @@ app.post('/api/s_users_id_info/add', async function(req, res) {
     var sql = 'INSERT INTO s_users_id_info (login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date, terms_accept, ad_accept)'
             + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
     const [rows, result] = await conn.query(sql, [login_id, email, join_route, join_date, level, app_version, join_date, join_date, terms_accept, ad_accept], (err, rows, fields) => {
-        conn.release();
+    conn.release();
        
     });
 });
