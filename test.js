@@ -6,33 +6,6 @@ const app = express();
 // var mysql = require('mysql');
 var mysql = require('mysql2/promise');
 
-/* ********** Make transaction object ********** */
-/*
-var transaction = require('node-mysql-transaction');
-var trconn = transaction({
-    // mysql connection config
-    connection: [mysql.createConnection,{
-        host : 'kyunss-db.cjwyxnwnqovj.ap-northeast-2.rds.amazonaws.com',
-        user : 'kyunss_admin',
-        password : 'Choibjk6014#',
-        database : 'Gong_Teacher'
-    }],
-
-    // create temporary connection for increased volume of async work.
-    // if request queue became empty,
-    // start soft removing process of the connection.
-    // recommended for normal usage.
-    dynamicConnection: 32,
-
-    // set dynamicConnection soft removing time.
-    idleConnectionCutoffTime: 1000,
-
-    // auto timeout rollback time in ms
-    // turn off is 0
-    timeout: 600
-});
-*/
-
 //var conn = mysql.createConnection({
 var pool = mysql.createPool({
     host : 'kyunss-db.cjwyxnwnqovj.ap-northeast-2.rds.amazonaws.com',
@@ -95,16 +68,9 @@ app.post('/api/s_users_id_info/add', async function(req, res) {
     
     var sql = 'INSERT INTO s_users_id_info (login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date, terms_accept, ad_accept)'
             + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    await conn.query(sql, [login_id, email, join_route, join_date, level, app_version, join_date, join_date, terms_accept, ad_accept], (err, rows, fields) => {
-        //conn.release();
-        if(err) {
-            console.log(err);
-            res.status(500).send('Internal Server Error');
-        } else {
-            console.log(rows);
-            res.send(rows);
-        }
-        conn.end();        
+    const [rows, result] = await conn.query(sql, [login_id, email, join_route, join_date, level, app_version, join_date, join_date, terms_accept, ad_accept], (err, rows, fields) => {
+        conn.release();
+       
     });
 });
 
