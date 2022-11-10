@@ -16,6 +16,18 @@ var pool = mysql.createPool({
     connectionLimit : 30
 });
 
+// body-parser 불러오기
+var bodyParser = require('body-parser');
+
+// body-parser 가 클라이언트에서 오는 정보를 서버에서 분석 후 가져오게 하는데 1. 인코딩된 url을 가져오는 방법, 2. json 타입으로 된 것을 가져오는 방법 두 가지 모두 가져올 수 있도록 합니다.
+app.use(bodyParser.urlencoded({ extended: true,}));
+app.use(bodyParser.json());
+
+const server = app.listen(3001, () => {
+    console.log('Start Server : 13.124.19.61:3001');
+
+});
+
 // Mysql2 Module 
 const getConn = async() => {
     try {
@@ -33,21 +45,6 @@ const releaseConnection = async (conn) => {
         console.error('release error : ${error.message}');
     }
 };
-
-//conn.connect();
-
-const server = app.listen(3001, () => {
-    console.log('Start Server : 13.124.19.61:3001');
-
-});
-
-
-// body-parser 불러오기
-var bodyParser = require('body-parser');
-
-// body-parser 가 클라이언트에서 오는 정보를 서버에서 분석 후 가져오게 하는데 1. 인코딩된 url을 가져오는 방법, 2. json 타입으로 된 것을 가져오는 방법 두 가지 모두 가져올 수 있도록 합니다.
-app.use(bodyParser.urlencoded({ extended: true,}));
-app.use(bodyParser.json());
 
 // Date Object 생성
 function getFormatDate(date){
@@ -83,9 +80,7 @@ app.post('/api/s_users_id_info/add', async (req, res) => {
     
     var sql = 'INSERT INTO s_users_id_info (login_id, email, join_route, join_date, level, app_version, c_login_date, p_login_date, terms_accept, ad_accept)'
             + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    const [rows, result] = await userApp.query(sql, [login_id, email, join_route, join_date, level, app_version, join_date, join_date, terms_accept, ad_accept], (err, rows, fields) => {
-        res.json(rows);      
-    });
+    const [rows, result] = await userApp.query(sql, [login_id, email, join_route, join_date, level, app_version, join_date, join_date, terms_accept, ad_accept]);
     userApp.release(); 
 });
 
