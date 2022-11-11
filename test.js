@@ -14,7 +14,7 @@ var pool = mysql.createPool({
     connectionLimit : 10000
 });
 
-// body-parser 불러오기
+// body-parser
 var bodyParser = require('body-parser');
 
 // body-parser 가 클라이언트에서 오는 정보를 서버에서 분석 후 가져오게 하는데 1. 인코딩된 url을 가져오는 방법, 2. json 타입으로 된 것을 가져오는 방법 두 가지 모두 가져올 수 있도록 합니다.
@@ -52,9 +52,9 @@ app.post('/api/s_users_id_info/add', async (req, res) => {
     
         var login_id = req.body.login_id.toString();      // : Log-In ID (Primary Key)
         var email = req.body.email.toString();            // : E-Mail Address
-        var join_route = req.body.join_route.toString();  // : Join Route (Naver, Kakao Talk, Google)
+        var join_route = req.body.join_route.toString();  // : Subscription route (Naver, Kakao Talk, Google)
         var join_date = date.toString();                  // : Initial Subscription Date
-        var level = 1;                                    // : New member's learning level is ... '1'
+        var level = 1;                                    // : New user's learning level is ... '1'
         var app_version = req.body.app_version;           // : App version
         var terms_accept = req.body.terms_accept;         // : Acceptance of the terms & conditions
         var ad_accept = req.body.ad_accept;               // : Acceptance of receving advertisements
@@ -67,33 +67,50 @@ app.post('/api/s_users_id_info/add', async (req, res) => {
         res.json(rows);
 
     } catch (err) {
+        res.status(errCode.OK)
+        res.json({
+            errCode: errCode.SERVERERROR,
+            msg: "신규 사용자 등록에 실패하였습니다."
+        });
         conn.release();
-        console.log("failed app!!");
     }
 });
 
-/*
-///////////// (Table ID : s_users_id_info) 사용자 정보 불러오기 (join_route, join_date, c_login_date, p_login_date, terms_accept, ad_accept) ///////////////////////////
+///////////// (Table ID : s_users_id_info) 사용자 정보 불러오기 ///////////////////////////
+// ** URL : http://13.124.19.61:3001/api/s_users_id_info/read/:type
+// ** Contents : join_route, join_date, c_login_date, p_login_date, terms_accept, ad_accept
 app.get('/api/s_users_id_info/read/:type', async(req, res) => {
+    const conn = await pool.getConnection(async conn => conn);
+    try{
+        let {type} = req.params;
+        var sql = 'SELECT user_id, join_route, join_date, c_login_date, p_login_date, terms_accept, ad_accept FROM s_users_id_info WHERE login_id = ?;'
+        const [rows] = await conn.query(sql, type);
+        conn.release();
+        res.json(rows);
 
-    let {type} = req.params;
-
-    conn.query('SELECT user_id, join_route, join_date, c_login_date, p_login_date, terms_accept, ad_accept FROM s_users_id_info WHERE login_id = ?;', type, function(err, rows, fields) {
-        if (err) {
-            res.send(err);
-        } else {
-            res.send(rows);
-        }
-    });
+    } catch (err) {
+        conn.release();
+    }
 });
+
 
 ///////////// (Table ID : s_users_id_info) 사용자 정보 업데이트 (app_version, c_login_date, p_login_date) ///////////////////////////
 // ** URL : http://13.124.19.61:3001/api/s_users_id_info/update1/:type (type : login_id)
 // ** Body(JSON) : { "app_version": (INT) }
-app.put('/api/s_users_id_info/update1/:type', function(req, res) {
-    let {type} = req.params;
-    var app_version = req.body.app_version;
-    var c_login_date = date.toString();
+app.put('/api/s_users_id_info/update1/:type', async(req, res) => {
+    const conn = await pool.getConnection(async conn => conn);
+    try{
+        let {type} = req.params;
+        var app_version = req.body.app_version;
+        var c_login_date = date.toString();
+        
+        var sql1 = 'SELECT c_login_date FROM s_users_id_info WHERE login_id = ?';
+        var sql2 = 'UPDATE s_users_id_info SET app_version=?, c_login_date=?, p_login_date=? WHERE login_id=?';
+
+    } catch (err) {
+        conn.release();
+    }
+
 
     conn.query('SELECT c_login_date FROM s_users_id_info WHERE login_id = ?;', type, function(err1, rows1, fields) {
         if (err1) {
@@ -116,6 +133,7 @@ app.put('/api/s_users_id_info/update1/:type', function(req, res) {
     });
 });
 
+/*
 ///////////// (Table ID : s_users_id_info) 사용자 정보 업데이트 (약관 및 광고수신 동의 여부) ///////////////////////////
 // ** URL : http://13.124.19.61:3001/api/s_users_id_info/update2/:type (type : login_id)
 // ** Body(JSON) : { "terms_accept": 0/1 (BIT), "ad_accept": 0/1 (BIT)  }
