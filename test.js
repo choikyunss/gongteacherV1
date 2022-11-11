@@ -155,6 +155,7 @@ app.put('/api/s_users_id_info/update2/:type', async(req, res) => {
         res.json(rows);
 
     } catch(err) {
+        console.log(err);
         res.status(500).json({message: err.message});
     } finally {
         conn.release(); // Return connection
