@@ -116,7 +116,6 @@ app.put('/api/s_users_id_info/update1/:type', async(req, res) => {
 
         var sqlA = 'SELECT c_login_date FROM s_users_id_info WHERE login_id = ?';
         var sqlB = 'UPDATE s_users_id_info SET app_version=?, c_login_date=?, p_login_date=? WHERE login_id=?';
-        var params = [app_version, c_login_date, p_login_date, type]
 
         await conn.beginTransaction();
         const [rowsA] = await conn.query(sqlA, type);
@@ -124,6 +123,7 @@ app.put('/api/s_users_id_info/update1/:type', async(req, res) => {
         var date1 = getFormatDate(rowsA[0].c_login_date);
         var p_login_date = date1.toString();
         console.log(p_login_date);
+        var params = [app_version, c_login_date, p_login_date, type]
         const [rowsB] = await conn.query(sqlB, params);
         await conn.commit();
         res.json(rowsB);
