@@ -68,6 +68,7 @@ app.post('/api/s_users_id_info/add', async (req, res) => {
 
     } catch (err) {
         res.status(500).json({message: err.message});
+    } finally{
         conn.release();
     }
 });
@@ -76,15 +77,17 @@ app.post('/api/s_users_id_info/add', async (req, res) => {
 // ** URL : http://13.124.19.61:3001/api/s_users_id_info/read/:type
 // ** Contents : join_route, join_date, c_login_date, p_login_date, terms_accept, ad_accept
 app.get('/api/s_users_id_info/read/:type', async(req, res) => {
-    const conn = await pool.getConnection(async conn => conn);
+    const conn = await pool.getConnection(async conn => conn); // Get connection from pool object
     try{
         let {type} = req.params;
         var sql = 'SELECT user_id, join_route, join_date, c_login_date, p_login_date, terms_accept, ad_accept FROM s_users_id_info WHERE login_id = ?;'
         const [rows] = await conn.query(sql, type);
-        conn.release();
+        conn.release(); // Return connection
         res.json(rows);
 
     } catch (err) {
+        res.status(500).json({message: err.message});
+    } finally{
         conn.release();
     }
 });
@@ -100,33 +103,22 @@ app.put('/api/s_users_id_info/update1/:type', async(req, res) => {
         var app_version = req.body.app_version;
         var c_login_date = date.toString();
         
-        var sql1 = 'SELECT c_login_date FROM s_users_id_info WHERE login_id = ?';
-        var sql2 = 'UPDATE s_users_id_info SET app_version=?, c_login_date=?, p_login_date=? WHERE login_id=?';
+        var sqlA = 'SELECT c_login_date FROM s_users_id_info WHERE login_id = ?';
+        var sqlB = 'UPDATE s_users_id_info SET app_version=?, c_login_date=?, p_login_date=? WHERE login_id=?';
+        var params = [app_version, c_login_date, p_login_date, type]
+
+        await conn.beginTransaction();
+        const [rowsA] = await conn.query(sqlA, type);
+        var p_login_date = rowsA[0].c_login_date;
+        const [rowsB] = await conn.query(sqlB, params);
+        await conn.commit();
 
     } catch (err) {
+        await conn.rollback();
+        res.status(500).json({message: err.message});
+    } finally{
         conn.release();
     }
-
-
-    conn.query('SELECT c_login_date FROM s_users_id_info WHERE login_id = ?;', type, function(err1, rows1, fields) {
-        if (err1) {
-            res.send(err1);
-        } else {
-            console.log(rows1.c_login_date);
-            var p_login_date = rows1[0].c_login_date;
-            var sql = 'UPDATE s_users_id_info SET app_version=?, c_login_date=?, p_login_date=? WHERE login_id=?';
-            var params = [app_version, c_login_date, p_login_date, type]
-            conn.query(sql, params, function(err2, rows2, fields) {
-                if (err2) {
-                    console.log(err2);
-                    res.status(500).send('Internal Server Error');
-                } else {
-                    console.log(rows2);
-                    res.send(rows2);
-                }
-            });
-        }
-    });
 });
 
 /*
