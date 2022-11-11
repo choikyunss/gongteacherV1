@@ -122,6 +122,7 @@ app.put('/api/s_users_id_info/update1/:type', async(req, res) => {
         const [rowsA] = await conn.query(sqlA, type);
         console.log(rowsA[0].c_login_date);
         var p_login_date = rowsA[0].c_login_date.toString();
+        console.log(p_login_date);
         const [rowsB] = await conn.query(sqlB, params);
         await conn.commit();
 
