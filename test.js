@@ -72,6 +72,17 @@ app.post('/api/s_users_id_info/add', async (req, res) => {
         conn.release();
     }
 });
+// ** HTTP requst URL/BODY
+/*
+{
+    "login_id": "e",
+    "email": "e@naver.com",
+    "join_route": "naver",
+    "app_version": 1,
+    "terms_accept": 1,
+    "ad_accept": 1
+}
+*/
 
 ///////////// (Table ID : s_users_id_info) 사용자 정보 불러오기 ///////////////////////////
 // ** URL : http://13.124.19.61:3001/api/s_users_id_info/read/:type
@@ -102,6 +113,8 @@ app.put('/api/s_users_id_info/update1/:type', async(req, res) => {
         let {type} = req.params;
         var app_version = req.body.app_version;
         var c_login_date = date.toString();
+
+        console.log(c_login_date);
         
         var sqlA = 'SELECT c_login_date FROM s_users_id_info WHERE login_id = ?';
         var sqlB = 'UPDATE s_users_id_info SET app_version=?, c_login_date=?, p_login_date=? WHERE login_id=?';
