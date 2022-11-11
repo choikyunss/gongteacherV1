@@ -46,7 +46,7 @@ console.log(date);
 /// TODO : 동일 이메일 가입 시도 시, 체크하여 중복가입 막기 -> 적용 해야함.//
 app.post('/api/s_users_id_info/add', async (req, res) => {
     const conn = await pool.getConnection(async conn => conn);
-    try{
+    try {
         var req_body = req.body;
         console.log(req_body);
     
@@ -66,9 +66,9 @@ app.post('/api/s_users_id_info/add', async (req, res) => {
         conn.release();
         res.json(rows);
 
-    } catch (err) {
+    } catch(err) {
         res.status(500).json({message: err.message});
-    } finally{
+    } finally {
         conn.release();
     }
 });
@@ -89,17 +89,16 @@ app.post('/api/s_users_id_info/add', async (req, res) => {
 // ** Contents : join_route, join_date, c_login_date, p_login_date, terms_accept, ad_accept
 app.get('/api/s_users_id_info/read/:type', async(req, res) => {
     const conn = await pool.getConnection(async conn => conn); // Get connection from pool object
-    try{
+    try {
         let {type} = req.params;
         var sql = 'SELECT user_id, join_route, join_date, c_login_date, p_login_date, terms_accept, ad_accept FROM s_users_id_info WHERE login_id = ?;'
         const [rows] = await conn.query(sql, type);
-        conn.release(); // Return connection
         res.json(rows);
 
-    } catch (err) {
+    } catch(err) {
         res.status(500).json({message: err.message});
-    } finally{
-        conn.release();
+    } finally {
+        conn.release(); // Return connection
     }
 });
 
@@ -109,7 +108,7 @@ app.get('/api/s_users_id_info/read/:type', async(req, res) => {
 // ** Body(JSON) : { "app_version": (INT) }
 app.put('/api/s_users_id_info/update1/:type', async(req, res) => {
     const conn = await pool.getConnection(async conn => conn);
-    try{
+    try {
         let {type} = req.params;
         var app_version = req.body.app_version;
         var c_login_date = date.toString();
@@ -125,53 +124,61 @@ app.put('/api/s_users_id_info/update1/:type', async(req, res) => {
         await conn.commit();
         res.json(rowsB);
 
-    } catch (err) {
+    } catch(err) {
         await conn.rollback();
         console.log(err);
         res.status(500).json({message: err.message});
-    } finally{
+    } finally {
         conn.release();
     }
 });
-
+// ** HTTP requst URL/BODY
 /*
+{
+    "app_version": 2
+}
+*/
+
 ///////////// (Table ID : s_users_id_info) 사용자 정보 업데이트 (약관 및 광고수신 동의 여부) ///////////////////////////
 // ** URL : http://13.124.19.61:3001/api/s_users_id_info/update2/:type (type : login_id)
 // ** Body(JSON) : { "terms_accept": 0/1 (BIT), "ad_accept": 0/1 (BIT)  }
-app.put('/api/s_users_id_info/update2/:type', function(req, res) {
-    let {type} = req.params;
-    var terms_accept = req.body.terms_accept;
-    var ad_accept = req.body.ad_accept;
+app.put('/api/s_users_id_info/update2/:type', async(req, res) => {
+    const conn = await pool.getConnection(async conn => conn);
+    try {
+        let {type} = req.params;
+        var terms_accept = req.body.terms_accept;
+        var ad_accept = req.body.ad_accept;
 
-    var sql = 'UPDATE s_users_id_info SET terms_accept=?, ad_accept=? WHERE login_id=?';
-    var params = [terms_accept, ad_accept, type]
-    conn.query(sql, params, function(err, rows, fields) {
-        if (err) {
-            console.log(err);
-            res.status(500).send('Internal Server Error');
-        } else {
-            console.log(rows);
-            res.send(rows);
-        }
-    });
+        var sql = 'UPDATE s_users_id_info SET terms_accept=?, ad_accept=? WHERE login_id=?';
+        var params = [terms_accept, ad_accept, type]
+        const [rows] = await conn.query(sql, params);
+        res.json(rows);
+
+    } catch(err) {
+        res.status(500).json({message: err.message});
+    } finally {
+        conn.release(); // Return connection
+    }
 });
 
 ///////////// (Table ID : s_system_id_info) 시스템 정보 불러오기 (final_ver, mandatory_update_ver, maint_period) ///////////////////////////
 app.get('/api/s_system_id_info/read/:type', async(req, res) => {
+    const conn = await pool.getConnection(async conn => conn);
+    try {
+        let {type} = req.params;
+        var sql = 'SELECT final_ver, mandatory_update_ver, maint_period FROM s_system_id_info WHERE system_id = ?';
+        const [rows] = await conn.query(sql, type);
+        res.json(rows);
 
-    const conn = await getConn();
-    let {type} = req.params;
-
-    conn.query('SELECT final_ver, mandatory_update_ver, maint_period FROM s_system_id_info WHERE system_id = ?;', type, function(err, rows, fields) {
-        if (err) {
-            res.send(err);
-            res.status(500).send('Internal Server Error');
-        } else {
-            res.send(rows);
-        }
-    });
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({message: err.message});
+    } finally {
+        conn.release(); // Return connection
+    }
 });
 
+/*
 ///////////// (Table ID : s_ox_users_order_ch01~12) Read OX order ///////////////////////////
 function read_ox_order() {
     ///////////// OX Chapter-1 /////////////
