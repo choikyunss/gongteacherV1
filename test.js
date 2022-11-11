@@ -126,6 +126,7 @@ app.put('/api/s_users_id_info/update1/:type', async(req, res) => {
         console.log(p_login_date);
         const [rowsB] = await conn.query(sqlB, params);
         await conn.commit();
+        res.json(rowsB);
 
     } catch (err) {
         await conn.rollback();
