@@ -67,11 +67,7 @@ app.post('/api/s_users_id_info/add', async (req, res) => {
         res.json(rows);
 
     } catch (err) {
-        res.status(errCode.OK)
-        res.json({
-            errCode: errCode.SERVERERROR,
-            msg: "신규 사용자 등록에 실패하였습니다."
-        });
+        res.status(500).json({message: err.message});
         conn.release();
     }
 });
