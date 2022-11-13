@@ -72,7 +72,7 @@ app.post('/api/s_users_id_info/add', async (req, res) => {
         conn.release();
     }
 });
-// ** HTTP requst URL/BODY
+// !! HTTP requst URL/BODY
 /*
 {
     "login_id": "e",
@@ -83,6 +83,7 @@ app.post('/api/s_users_id_info/add', async (req, res) => {
     "ad_accept": 1
 }
 */
+
 
 ///////////// (Table ID : s_users_id_info) 사용자 정보 불러오기 ///////////////////////////
 // ** URL : http://13.124.19.61:3001/api/s_users_id_info/read/:type
@@ -132,12 +133,13 @@ app.put('/api/s_users_id_info/update1/:type', async(req, res) => {
         conn.release();
     }
 });
-// ** HTTP requst URL/BODY
+// !! HTTP requst URL/BODY
 /*
 {
     "app_version": 2
 }
 */
+
 
 ///////////// (Table ID : s_users_id_info) 사용자 정보 업데이트 (약관 및 광고수신 동의 여부) ///////////////////////////
 // ** URL : http://13.124.19.61:3001/api/s_users_id_info/update2/:type (type : login_id)
@@ -162,6 +164,7 @@ app.put('/api/s_users_id_info/update2/:type', async(req, res) => {
     }
 });
 
+
 ///////////// (Table ID : s_system_id_info) 시스템 정보 불러오기 (final_ver, mandatory_update_ver, maint_period) ///////////////////////////
 app.get('/api/s_system_id_info/read/:type', async(req, res) => {
     const conn = await pool.getConnection(async conn => conn);
@@ -179,179 +182,216 @@ app.get('/api/s_system_id_info/read/:type', async(req, res) => {
     }
 });
 
-/*
+
 ///////////// (Table ID : s_ox_users_order_ch01~12) Read OX order ///////////////////////////
 function read_ox_order() {
     ///////////// OX Chapter-1 /////////////
     app.get('/api/s_ox_users_order_ch01/read/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var sql = 'SELECT * FROM s_ox_users_order_ch01 WHERE user_id = ?';
+            const [rows] = await conn.query(sql, type);
+            res.json(rows);
 
-        let {type} = req.params;
-
-        conn.query('SELECT * FROM s_ox_users_order_ch01 WHERE user_id = ?;', type, function(err, rows, fields) {
-            if (err) {
-                res.send(err);
-            } else {
-                res.send(rows);
-            }
-        });
+        } catch(err) {
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release(); // Return connection
+        }
     });
 
     ///////////// OX Chapter-2 /////////////
     app.get('/api/s_ox_users_order_ch02/read/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var sql = 'SELECT * FROM s_ox_users_order_ch02 WHERE user_id = ?';
+            const [rows] = await conn.query(sql, type);
+            res.json(rows);
 
-        let {type} = req.params;
-
-        conn.query('SELECT * FROM s_ox_users_order_ch02 WHERE user_id = ?;', type, function(err, rows, fields) {
-            if (err) {
-                res.send(err);
-            } else {
-                res.send(rows);
-            }
-        });
+        } catch(err) {
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release(); // Return connection
+        }
     });
 
     ///////////// OX Chapter-3 /////////////
     app.get('/api/s_ox_users_order_ch03/read/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var sql = 'SELECT * FROM s_ox_users_order_ch03 WHERE user_id = ?';
+            const [rows] = await conn.query(sql, type);
+            res.json(rows);
 
-        let {type} = req.params;
-
-        conn.query('SELECT * FROM s_ox_users_order_ch03 WHERE user_id = ?;', type, function(err, rows, fields) {
-            if (err) {
-                res.send(err);
-            } else {
-                res.send(rows);
-            }
-        });
+        } catch(err) {
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release(); // Return connection
+        }
     });
 
     ///////////// OX Chapter-4 /////////////
     app.get('/api/s_ox_users_order_ch04/read/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var sql = 'SELECT * FROM s_ox_users_order_ch04 WHERE user_id = ?';
+            const [rows] = await conn.query(sql, type);
+            res.json(rows);
 
-        let {type} = req.params;
-
-        conn.query('SELECT * FROM s_ox_users_order_ch04 WHERE user_id = ?;', type, function(err, rows, fields) {
-            if (err) {
-                res.send(err);
-            } else {
-                res.send(rows);
-            }
-        });
+        } catch(err) {
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release(); // Return connection
+        }
     });
 
     ///////////// OX Chapter-5 /////////////
     app.get('/api/s_ox_users_order_ch05/read/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var sql = 'SELECT * FROM s_ox_users_order_ch05 WHERE user_id = ?';
+            const [rows] = await conn.query(sql, type);
+            res.json(rows);
 
-        let {type} = req.params;
-
-        conn.query('SELECT * FROM s_ox_users_order_ch05 WHERE user_id = ?;', type, function(err, rows, fields) {
-            if (err) {
-                res.send(err);
-            } else {
-                res.send(rows);
-            }
-        });
+        } catch(err) {
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release(); // Return connection
+        }
     });
 
     ///////////// OX Chapter-6 /////////////
     app.get('/api/s_ox_users_order_ch06/read/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var sql = 'SELECT * FROM s_ox_users_order_ch06 WHERE user_id = ?';
+            const [rows] = await conn.query(sql, type);
+            res.json(rows);
 
-        let {type} = req.params;
-
-        conn.query('SELECT * FROM s_ox_users_order_ch06 WHERE user_id = ?;', type, function(err, rows, fields) {
-            if (err) {
-                res.send(err);
-            } else {
-                res.send(rows);
-            }
-        });
+        } catch(err) {
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release(); // Return connection
+        }
     });
 
     ///////////// OX Chapter-7 /////////////
     app.get('/api/s_ox_users_order_ch07/read/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var sql = 'SELECT * FROM s_ox_users_order_ch07 WHERE user_id = ?';
+            const [rows] = await conn.query(sql, type);
+            res.json(rows);
 
-        let {type} = req.params;
-
-        conn.query('SELECT * FROM s_ox_users_order_ch07 WHERE user_id = ?;', type, function(err, rows, fields) {
-            if (err) {
-                res.send(err);
-            } else {
-                res.send(rows);
-            }
-        });
+        } catch(err) {
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release(); // Return connection
+        }
     });
 
     ///////////// OX Chapter-8 /////////////
     app.get('/api/s_ox_users_order_ch08/read/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var sql = 'SELECT * FROM s_ox_users_order_ch08 WHERE user_id = ?';
+            const [rows] = await conn.query(sql, type);
+            res.json(rows);
 
-        let {type} = req.params;
-
-        conn.query('SELECT * FROM s_ox_users_order_ch08 WHERE user_id = ?;', type, function(err, rows, fields) {
-            if (err) {
-                res.send(err);
-            } else {
-                res.send(rows);
-            }
-        });
+        } catch(err) {
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release(); // Return connection
+        }
     });
 
     ///////////// OX Chapter-9 /////////////
     app.get('/api/s_ox_users_order_ch09/read/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var sql = 'SELECT * FROM s_ox_users_order_ch09 WHERE user_id = ?';
+            const [rows] = await conn.query(sql, type);
+            res.json(rows);
 
-        let {type} = req.params;
-
-        conn.query('SELECT * FROM s_ox_users_order_ch09 WHERE user_id = ?;', type, function(err, rows, fields) {
-            if (err) {
-                res.send(err);
-            } else {
-                res.send(rows);
-            }
-        });
+        } catch(err) {
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release(); // Return connection
+        }
     });
 
     ///////////// OX Chapter-10 /////////////
-    app.get('/api/s_ox_users_order_ch010/read/:type', async(req, res) => {
+    app.get('/api/s_ox_users_order_ch10/read/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var sql = 'SELECT * FROM s_ox_users_order_ch10 WHERE user_id = ?';
+            const [rows] = await conn.query(sql, type);
+            res.json(rows);
 
-        let {type} = req.params;
-
-        conn.query('SELECT * FROM s_ox_users_order_ch010 WHERE user_id = ?;', type, function(err, rows, fields) {
-            if (err) {
-                res.send(err);
-            } else {
-                res.send(rows);
-            }
-        });
+        } catch(err) {
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release(); // Return connection
+        }
     });
 
     ///////////// OX Chapter-11 /////////////
-    app.get('/api/s_ox_users_order_ch011/read/:type', async(req, res) => {
+    app.get('/api/s_ox_users_order_ch11/read/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var sql = 'SELECT * FROM s_ox_users_order_ch11 WHERE user_id = ?';
+            const [rows] = await conn.query(sql, type);
+            res.json(rows);
 
-        let {type} = req.params;
-
-        conn.query('SELECT * FROM s_ox_users_order_ch011 WHERE user_id = ?;', type, function(err, rows, fields) {
-            if (err) {
-                res.send(err);
-            } else {
-                res.send(rows);
-            }
-        });
+        } catch(err) {
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release(); // Return connection
+        }
     });
 
     ///////////// OX Chapter-12 /////////////
-    app.get('/api/s_ox_users_order_ch012/read/:type', async(req, res) => {
+    app.get('/api/s_ox_users_order_ch12/read/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var sql = 'SELECT * FROM s_ox_users_order_ch12 WHERE user_id = ?';
+            const [rows] = await conn.query(sql, type);
+            res.json(rows);
 
-        let {type} = req.params;
-
-        conn.query('SELECT * FROM s_ox_users_order_ch012 WHERE user_id = ?;', type, function(err, rows, fields) {
-            if (err) {
-                res.send(err);
-            } else {
-                res.send(rows);
-            }
-        });
+        } catch(err) {
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release(); // Return connection
+        }
     });
 }
 read_ox_order()
 
+/*
 ///////////// (Table ID : s_ox_users_order_ch01~12) Update OX ///////////////////////////
 // ** Sequence 
 // 1 Step : update OX order table 0 to 5
