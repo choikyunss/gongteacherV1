@@ -420,20 +420,33 @@ function update_ox() {
             var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
             var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
             var qst_string = "ox_ch01_q" + q_num;               // Question Number String (ox_ch01_q1~q40)
-            var t_string = "s_ox_users_s" + order_t + "_ch01";  // Table ID String (s_ox_users_s1~s5_ch01)
 
-            // Date String (ex. 2022-11-13)
+            // Date String (ex. 2022_11)
             let today = new Date();
-            let year = today.getFullYear();        // 연도
-            let month = today.getMonth() + 1;      // 월
-            var date_string = year + "_" + month;  // Date String
+            let year = today.getFullYear();        // Get the value of 'year'
+            let month = today.getMonth() + 1;      // Get the value of 'month'
+            var date_string = year + "_" + month;  // Get the string of 'date'
 
             await conn.beginTransaction();
 
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch01 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+                console.log('order number : %d', order_t, " order number doesn't match!!");
+            }
+            else {
+                console.log('order number : %d', order_t, " order number does match");
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch01";  // Table ID String (s_ox_users_s1~s5_ch01)
+
             // Update order table
-            var sqlA = 'UPDATE s_ox_users_order_ch01 SET ??=??%5+1 WHERE user_id=?';
+            var sqlA = 'UPDATE s_ox_users_order_ch01 SET ??=??%5+1 WHERE user_id=?'; // order : 1 -> 2 -> 3 -> 4 -> 5 -> 1 ...
             var paramsA = [qst_string, qst_string, type]
-            const [rowsA] = await conn.query(sqlA, paramsA);
+            const [rowsA] = await conn.query(sqlA, paramsA);            
+
             // Update result of answer table
             var sqlB = 'UPDATE s_ox_users_s1_ch01 ' +
             'JOIN s_ox_users_s2_ch01 ON s_ox_users_s2_ch01.user_id = s_ox_users_s1_ch01.user_id ' +
@@ -443,6 +456,7 @@ function update_ox() {
             'SET ??.??=? WHERE s_ox_users_s1_ch01.user_id=?';
             var paramsB = [t_string, qst_string, solve_r, type]
             const [rowsB] = await conn.query(sqlB, paramsB);
+            
             // Update learning volume table
             var sqlC = 'UPDATE s_ox_users_vol_ch01 SET ??=??+1 WHERE user_id=?';
             var paramsC = [date_string, date_string, type]
@@ -461,21 +475,554 @@ function update_ox() {
     });
 
     ///////////// OX Chapter-2 /////////////
+    app.put('/api/s_ox_users_order_ch02/update/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch02_q" + q_num;               // Question Number String (ox_ch02_q1~q40)
+            var t_string = "s_ox_users_s" + order_t + "_ch02";  // Table ID String (s_ox_users_s1~s5_ch02)
+
+            // Date String (ex. 2022-11-13)
+            let today = new Date();
+            let year = today.getFullYear();        // 연도
+            let month = today.getMonth() + 1;      // 월
+            var date_string = year + "_" + month;  // Date String
+
+            await conn.beginTransaction();
+
+            // Update order table
+            var sqlA = 'UPDATE s_ox_users_order_ch02 SET ??=??%5+1 WHERE user_id=?';
+            var paramsA = [qst_string, qst_string, type]
+            const [rowsA] = await conn.query(sqlA, paramsA);
+            // Update result of answer table
+            var sqlB = 'UPDATE s_ox_users_s1_ch02 ' +
+            'JOIN s_ox_users_s2_ch02 ON s_ox_users_s2_ch02.user_id = s_ox_users_s1_ch02.user_id ' +
+            'JOIN s_ox_users_s3_ch02 ON s_ox_users_s3_ch02.user_id = s_ox_users_s1_ch02.user_id ' +
+            'JOIN s_ox_users_s4_ch02 ON s_ox_users_s4_ch02.user_id = s_ox_users_s1_ch02.user_id ' +
+            'JOIN s_ox_users_s5_ch02 ON s_ox_users_s5_ch02.user_id = s_ox_users_s1_ch02.user_id ' +
+            'SET ??.??=? WHERE s_ox_users_s1_ch02.user_id=?';
+            var paramsB = [t_string, qst_string, solve_r, type]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            // Update learning volume table
+            var sqlC = 'UPDATE s_ox_users_vol_ch02 SET ??=??+1 WHERE user_id=?';
+            var paramsC = [date_string, date_string, type]
+            const [rowsC] = await conn.query(sqlC, paramsC);
+
+            await conn.commit();
+            res.json(rowsC);
+
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
+
     ///////////// OX Chapter-3 /////////////
+    app.put('/api/s_ox_users_order_ch03/update/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch03_q" + q_num;               // Question Number String (ox_ch03_q1~q40)
+            var t_string = "s_ox_users_s" + order_t + "_ch03";  // Table ID String (s_ox_users_s1~s5_ch03)
+
+            // Date String (ex. 2022-11-13)
+            let today = new Date();
+            let year = today.getFullYear();        // 연도
+            let month = today.getMonth() + 1;      // 월
+            var date_string = year + "_" + month;  // Date String
+
+            await conn.beginTransaction();
+
+            // Update order table
+            var sqlA = 'UPDATE s_ox_users_order_ch03 SET ??=??%5+1 WHERE user_id=?';
+            var paramsA = [qst_string, qst_string, type]
+            const [rowsA] = await conn.query(sqlA, paramsA);
+            // Update result of answer table
+            var sqlB = 'UPDATE s_ox_users_s1_ch03 ' +
+            'JOIN s_ox_users_s2_ch03 ON s_ox_users_s2_ch03.user_id = s_ox_users_s1_ch03.user_id ' +
+            'JOIN s_ox_users_s3_ch03 ON s_ox_users_s3_ch03.user_id = s_ox_users_s1_ch03.user_id ' +
+            'JOIN s_ox_users_s4_ch03 ON s_ox_users_s4_ch03.user_id = s_ox_users_s1_ch03.user_id ' +
+            'JOIN s_ox_users_s5_ch03 ON s_ox_users_s5_ch03.user_id = s_ox_users_s1_ch03.user_id ' +
+            'SET ??.??=? WHERE s_ox_users_s1_ch03.user_id=?';
+            var paramsB = [t_string, qst_string, solve_r, type]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            // Update learning volume table
+            var sqlC = 'UPDATE s_ox_users_vol_ch03 SET ??=??+1 WHERE user_id=?';
+            var paramsC = [date_string, date_string, type]
+            const [rowsC] = await conn.query(sqlC, paramsC);
+
+            await conn.commit();
+            res.json(rowsC);
+
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
+
     ///////////// OX Chapter-4 /////////////
+    app.put('/api/s_ox_users_order_ch04/update/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch04_q" + q_num;               // Question Number String (ox_ch04_q1~q40)
+            var t_string = "s_ox_users_s" + order_t + "_ch04";  // Table ID String (s_ox_users_s1~s5_ch04)
+
+            // Date String (ex. 2022-11-13)
+            let today = new Date();
+            let year = today.getFullYear();        // 연도
+            let month = today.getMonth() + 1;      // 월
+            var date_string = year + "_" + month;  // Date String
+
+            await conn.beginTransaction();
+
+            // Update order table
+            var sqlA = 'UPDATE s_ox_users_order_ch04 SET ??=??%5+1 WHERE user_id=?';
+            var paramsA = [qst_string, qst_string, type]
+            const [rowsA] = await conn.query(sqlA, paramsA);
+            // Update result of answer table
+            var sqlB = 'UPDATE s_ox_users_s1_ch04 ' +
+            'JOIN s_ox_users_s2_ch04 ON s_ox_users_s2_ch04.user_id = s_ox_users_s1_ch04.user_id ' +
+            'JOIN s_ox_users_s3_ch04 ON s_ox_users_s3_ch04.user_id = s_ox_users_s1_ch04.user_id ' +
+            'JOIN s_ox_users_s4_ch04 ON s_ox_users_s4_ch04.user_id = s_ox_users_s1_ch04.user_id ' +
+            'JOIN s_ox_users_s5_ch04 ON s_ox_users_s5_ch04.user_id = s_ox_users_s1_ch04.user_id ' +
+            'SET ??.??=? WHERE s_ox_users_s1_ch04.user_id=?';
+            var paramsB = [t_string, qst_string, solve_r, type]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            // Update learning volume table
+            var sqlC = 'UPDATE s_ox_users_vol_ch04 SET ??=??+1 WHERE user_id=?';
+            var paramsC = [date_string, date_string, type]
+            const [rowsC] = await conn.query(sqlC, paramsC);
+
+            await conn.commit();
+            res.json(rowsC);
+
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
+
     ///////////// OX Chapter-5 /////////////
+    app.put('/api/s_ox_users_order_ch05/update/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch05_q" + q_num;               // Question Number String (ox_ch05_q1~q40)
+            var t_string = "s_ox_users_s" + order_t + "_ch05";  // Table ID String (s_ox_users_s1~s5_ch05)
+
+            // Date String (ex. 2022-11-13)
+            let today = new Date();
+            let year = today.getFullYear();        // 연도
+            let month = today.getMonth() + 1;      // 월
+            var date_string = year + "_" + month;  // Date String
+
+            await conn.beginTransaction();
+
+            // Update order table
+            var sqlA = 'UPDATE s_ox_users_order_ch05 SET ??=??%5+1 WHERE user_id=?';
+            var paramsA = [qst_string, qst_string, type]
+            const [rowsA] = await conn.query(sqlA, paramsA);
+            // Update result of answer table
+            var sqlB = 'UPDATE s_ox_users_s1_ch05 ' +
+            'JOIN s_ox_users_s2_ch05 ON s_ox_users_s2_ch05.user_id = s_ox_users_s1_ch05.user_id ' +
+            'JOIN s_ox_users_s3_ch05 ON s_ox_users_s3_ch05.user_id = s_ox_users_s1_ch05.user_id ' +
+            'JOIN s_ox_users_s4_ch05 ON s_ox_users_s4_ch05.user_id = s_ox_users_s1_ch05.user_id ' +
+            'JOIN s_ox_users_s5_ch05 ON s_ox_users_s5_ch05.user_id = s_ox_users_s1_ch05.user_id ' +
+            'SET ??.??=? WHERE s_ox_users_s1_ch05.user_id=?';
+            var paramsB = [t_string, qst_string, solve_r, type]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            // Update learning volume table
+            var sqlC = 'UPDATE s_ox_users_vol_ch05 SET ??=??+1 WHERE user_id=?';
+            var paramsC = [date_string, date_string, type]
+            const [rowsC] = await conn.query(sqlC, paramsC);
+
+            await conn.commit();
+            res.json(rowsC);
+
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
+
     ///////////// OX Chapter-6 /////////////
+    app.put('/api/s_ox_users_order_ch06/update/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch06_q" + q_num;               // Question Number String (ox_ch06_q1~q40)
+            var t_string = "s_ox_users_s" + order_t + "_ch06";  // Table ID String (s_ox_users_s1~s5_ch06)
+
+            // Date String (ex. 2022-11-13)
+            let today = new Date();
+            let year = today.getFullYear();        // 연도
+            let month = today.getMonth() + 1;      // 월
+            var date_string = year + "_" + month;  // Date String
+
+            await conn.beginTransaction();
+
+            // Update order table
+            var sqlA = 'UPDATE s_ox_users_order_ch06 SET ??=??%5+1 WHERE user_id=?';
+            var paramsA = [qst_string, qst_string, type]
+            const [rowsA] = await conn.query(sqlA, paramsA);
+            // Update result of answer table
+            var sqlB = 'UPDATE s_ox_users_s1_ch06 ' +
+            'JOIN s_ox_users_s2_ch06 ON s_ox_users_s2_ch06.user_id = s_ox_users_s1_ch06.user_id ' +
+            'JOIN s_ox_users_s3_ch06 ON s_ox_users_s3_ch06.user_id = s_ox_users_s1_ch06.user_id ' +
+            'JOIN s_ox_users_s4_ch06 ON s_ox_users_s4_ch06.user_id = s_ox_users_s1_ch06.user_id ' +
+            'JOIN s_ox_users_s5_ch06 ON s_ox_users_s5_ch06.user_id = s_ox_users_s1_ch06.user_id ' +
+            'SET ??.??=? WHERE s_ox_users_s1_ch06.user_id=?';
+            var paramsB = [t_string, qst_string, solve_r, type]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            // Update learning volume table
+            var sqlC = 'UPDATE s_ox_users_vol_ch06 SET ??=??+1 WHERE user_id=?';
+            var paramsC = [date_string, date_string, type]
+            const [rowsC] = await conn.query(sqlC, paramsC);
+
+            await conn.commit();
+            res.json(rowsC);
+
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
+
     ///////////// OX Chapter-7 /////////////
+    app.put('/api/s_ox_users_order_ch07/update/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch07_q" + q_num;               // Question Number String (ox_ch07_q1~q40)
+            var t_string = "s_ox_users_s" + order_t + "_ch07";  // Table ID String (s_ox_users_s1~s5_ch07)
+
+            // Date String (ex. 2022-11-13)
+            let today = new Date();
+            let year = today.getFullYear();        // 연도
+            let month = today.getMonth() + 1;      // 월
+            var date_string = year + "_" + month;  // Date String
+
+            await conn.beginTransaction();
+
+            // Update order table
+            var sqlA = 'UPDATE s_ox_users_order_ch07 SET ??=??%5+1 WHERE user_id=?';
+            var paramsA = [qst_string, qst_string, type]
+            const [rowsA] = await conn.query(sqlA, paramsA);
+            // Update result of answer table
+            var sqlB = 'UPDATE s_ox_users_s1_ch07 ' +
+            'JOIN s_ox_users_s2_ch07 ON s_ox_users_s2_ch07.user_id = s_ox_users_s1_ch07.user_id ' +
+            'JOIN s_ox_users_s3_ch07 ON s_ox_users_s3_ch07.user_id = s_ox_users_s1_ch07.user_id ' +
+            'JOIN s_ox_users_s4_ch07 ON s_ox_users_s4_ch07.user_id = s_ox_users_s1_ch07.user_id ' +
+            'JOIN s_ox_users_s5_ch07 ON s_ox_users_s5_ch07.user_id = s_ox_users_s1_ch07.user_id ' +
+            'SET ??.??=? WHERE s_ox_users_s1_ch07.user_id=?';
+            var paramsB = [t_string, qst_string, solve_r, type]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            // Update learning volume table
+            var sqlC = 'UPDATE s_ox_users_vol_ch07 SET ??=??+1 WHERE user_id=?';
+            var paramsC = [date_string, date_string, type]
+            const [rowsC] = await conn.query(sqlC, paramsC);
+
+            await conn.commit();
+            res.json(rowsC);
+
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
+
     ///////////// OX Chapter-8 /////////////
+    app.put('/api/s_ox_users_order_ch08/update/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch08_q" + q_num;               // Question Number String (ox_ch08_q1~q40)
+            var t_string = "s_ox_users_s" + order_t + "_ch08";  // Table ID String (s_ox_users_s1~s5_ch08)
+
+            // Date String (ex. 2022-11-13)
+            let today = new Date();
+            let year = today.getFullYear();        // 연도
+            let month = today.getMonth() + 1;      // 월
+            var date_string = year + "_" + month;  // Date String
+
+            await conn.beginTransaction();
+
+            // Update order table
+            var sqlA = 'UPDATE s_ox_users_order_ch08 SET ??=??%5+1 WHERE user_id=?';
+            var paramsA = [qst_string, qst_string, type]
+            const [rowsA] = await conn.query(sqlA, paramsA);
+            // Update result of answer table
+            var sqlB = 'UPDATE s_ox_users_s1_ch08 ' +
+            'JOIN s_ox_users_s2_ch08 ON s_ox_users_s2_ch08.user_id = s_ox_users_s1_ch08.user_id ' +
+            'JOIN s_ox_users_s3_ch08 ON s_ox_users_s3_ch08.user_id = s_ox_users_s1_ch08.user_id ' +
+            'JOIN s_ox_users_s4_ch08 ON s_ox_users_s4_ch08.user_id = s_ox_users_s1_ch08.user_id ' +
+            'JOIN s_ox_users_s5_ch08 ON s_ox_users_s5_ch08.user_id = s_ox_users_s1_ch08.user_id ' +
+            'SET ??.??=? WHERE s_ox_users_s1_ch08.user_id=?';
+            var paramsB = [t_string, qst_string, solve_r, type]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            // Update learning volume table
+            var sqlC = 'UPDATE s_ox_users_vol_ch08 SET ??=??+1 WHERE user_id=?';
+            var paramsC = [date_string, date_string, type]
+            const [rowsC] = await conn.query(sqlC, paramsC);
+
+            await conn.commit();
+            res.json(rowsC);
+
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
+
     ///////////// OX Chapter-9 /////////////
+    app.put('/api/s_ox_users_order_ch09/update/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch09_q" + q_num;               // Question Number String (ox_ch09_q1~q40)
+            var t_string = "s_ox_users_s" + order_t + "_ch09";  // Table ID String (s_ox_users_s1~s5_ch09)
+
+            // Date String (ex. 2022-11-13)
+            let today = new Date();
+            let year = today.getFullYear();        // 연도
+            let month = today.getMonth() + 1;      // 월
+            var date_string = year + "_" + month;  // Date String
+
+            await conn.beginTransaction();
+
+            // Update order table
+            var sqlA = 'UPDATE s_ox_users_order_ch09 SET ??=??%5+1 WHERE user_id=?';
+            var paramsA = [qst_string, qst_string, type]
+            const [rowsA] = await conn.query(sqlA, paramsA);
+            // Update result of answer table
+            var sqlB = 'UPDATE s_ox_users_s1_ch09 ' +
+            'JOIN s_ox_users_s2_ch09 ON s_ox_users_s2_ch09.user_id = s_ox_users_s1_ch09.user_id ' +
+            'JOIN s_ox_users_s3_ch09 ON s_ox_users_s3_ch09.user_id = s_ox_users_s1_ch09.user_id ' +
+            'JOIN s_ox_users_s4_ch09 ON s_ox_users_s4_ch09.user_id = s_ox_users_s1_ch09.user_id ' +
+            'JOIN s_ox_users_s5_ch09 ON s_ox_users_s5_ch09.user_id = s_ox_users_s1_ch09.user_id ' +
+            'SET ??.??=? WHERE s_ox_users_s1_ch09.user_id=?';
+            var paramsB = [t_string, qst_string, solve_r, type]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            // Update learning volume table
+            var sqlC = 'UPDATE s_ox_users_vol_ch09 SET ??=??+1 WHERE user_id=?';
+            var paramsC = [date_string, date_string, type]
+            const [rowsC] = await conn.query(sqlC, paramsC);
+
+            await conn.commit();
+            res.json(rowsC);
+
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
+
     ///////////// OX Chapter-10 /////////////
+    app.put('/api/s_ox_users_order_ch10/update/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch10_q" + q_num;               // Question Number String (ox_ch10_q1~q40)
+            var t_string = "s_ox_users_s" + order_t + "_ch10";  // Table ID String (s_ox_users_s1~s5_ch10)
+
+            // Date String (ex. 2022-11-13)
+            let today = new Date();
+            let year = today.getFullYear();        // 연도
+            let month = today.getMonth() + 1;      // 월
+            var date_string = year + "_" + month;  // Date String
+
+            await conn.beginTransaction();
+
+            // Update order table
+            var sqlA = 'UPDATE s_ox_users_order_ch10 SET ??=??%5+1 WHERE user_id=?';
+            var paramsA = [qst_string, qst_string, type]
+            const [rowsA] = await conn.query(sqlA, paramsA);
+            // Update result of answer table
+            var sqlB = 'UPDATE s_ox_users_s1_ch10 ' +
+            'JOIN s_ox_users_s2_ch10 ON s_ox_users_s2_ch10.user_id = s_ox_users_s1_ch10.user_id ' +
+            'JOIN s_ox_users_s3_ch10 ON s_ox_users_s3_ch10.user_id = s_ox_users_s1_ch10.user_id ' +
+            'JOIN s_ox_users_s4_ch10 ON s_ox_users_s4_ch10.user_id = s_ox_users_s1_ch10.user_id ' +
+            'JOIN s_ox_users_s5_ch10 ON s_ox_users_s5_ch10.user_id = s_ox_users_s1_ch10.user_id ' +
+            'SET ??.??=? WHERE s_ox_users_s1_ch10.user_id=?';
+            var paramsB = [t_string, qst_string, solve_r, type]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            // Update learning volume table
+            var sqlC = 'UPDATE s_ox_users_vol_ch10 SET ??=??+1 WHERE user_id=?';
+            var paramsC = [date_string, date_string, type]
+            const [rowsC] = await conn.query(sqlC, paramsC);
+
+            await conn.commit();
+            res.json(rowsC);
+
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
+
     ///////////// OX Chapter-11 /////////////
+    app.put('/api/s_ox_users_order_ch11/update/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch11_q" + q_num;               // Question Number String (ox_ch11_q1~q40)
+            var t_string = "s_ox_users_s" + order_t + "_ch11";  // Table ID String (s_ox_users_s1~s5_ch11)
+
+            // Date String (ex. 2022-11-13)
+            let today = new Date();
+            let year = today.getFullYear();        // 연도
+            let month = today.getMonth() + 1;      // 월
+            var date_string = year + "_" + month;  // Date String
+
+            await conn.beginTransaction();
+
+            // Update order table
+            var sqlA = 'UPDATE s_ox_users_order_ch11 SET ??=??%5+1 WHERE user_id=?';
+            var paramsA = [qst_string, qst_string, type]
+            const [rowsA] = await conn.query(sqlA, paramsA);
+            // Update result of answer table
+            var sqlB = 'UPDATE s_ox_users_s1_ch11 ' +
+            'JOIN s_ox_users_s2_ch11 ON s_ox_users_s2_ch11.user_id = s_ox_users_s1_ch11.user_id ' +
+            'JOIN s_ox_users_s3_ch11 ON s_ox_users_s3_ch11.user_id = s_ox_users_s1_ch11.user_id ' +
+            'JOIN s_ox_users_s4_ch11 ON s_ox_users_s4_ch11.user_id = s_ox_users_s1_ch11.user_id ' +
+            'JOIN s_ox_users_s5_ch11 ON s_ox_users_s5_ch11.user_id = s_ox_users_s1_ch11.user_id ' +
+            'SET ??.??=? WHERE s_ox_users_s1_ch11.user_id=?';
+            var paramsB = [t_string, qst_string, solve_r, type]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            // Update learning volume table
+            var sqlC = 'UPDATE s_ox_users_vol_ch11 SET ??=??+1 WHERE user_id=?';
+            var paramsC = [date_string, date_string, type]
+            const [rowsC] = await conn.query(sqlC, paramsC);
+
+            await conn.commit();
+            res.json(rowsC);
+
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
+
     ///////////// OX Chapter-12 /////////////
+    app.put('/api/s_ox_users_order_ch12/update/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch12_q" + q_num;               // Question Number String (ox_ch12_q1~q40)
+            var t_string = "s_ox_users_s" + order_t + "_ch12";  // Table ID String (s_ox_users_s1~s5_ch12)
 
+            // Date String (ex. 2022-11-13)
+            let today = new Date();
+            let year = today.getFullYear();        // 연도
+            let month = today.getMonth() + 1;      // 월
+            var date_string = year + "_" + month;  // Date String
 
+            await conn.beginTransaction();
 
+            // Update order table
+            var sqlA = 'UPDATE s_ox_users_order_ch12 SET ??=??%5+1 WHERE user_id=?';
+            var paramsA = [qst_string, qst_string, type]
+            const [rowsA] = await conn.query(sqlA, paramsA);
+            // Update result of answer table
+            var sqlB = 'UPDATE s_ox_users_s1_ch12 ' +
+            'JOIN s_ox_users_s2_ch12 ON s_ox_users_s2_ch12.user_id = s_ox_users_s1_ch12.user_id ' +
+            'JOIN s_ox_users_s3_ch12 ON s_ox_users_s3_ch12.user_id = s_ox_users_s1_ch12.user_id ' +
+            'JOIN s_ox_users_s4_ch12 ON s_ox_users_s4_ch12.user_id = s_ox_users_s1_ch12.user_id ' +
+            'JOIN s_ox_users_s5_ch12 ON s_ox_users_s5_ch12.user_id = s_ox_users_s1_ch12.user_id ' +
+            'SET ??.??=? WHERE s_ox_users_s1_ch12.user_id=?';
+            var paramsB = [t_string, qst_string, solve_r, type]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            // Update learning volume table
+            var sqlC = 'UPDATE s_ox_users_vol_ch12 SET ??=??+1 WHERE user_id=?';
+            var paramsC = [date_string, date_string, type]
+            const [rowsC] = await conn.query(sqlC, paramsC);
+
+            await conn.commit();
+            res.json(rowsC);
+
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
 }
 update_ox()
+// !! HTTP requst URL/BODY
+/*
+{
+    "q_num": 1,
+    "order_t": 1,
+    "solve_r": 1
+}
+*/
+
 
 /*
 function dbQueryAsync(query, params) {
