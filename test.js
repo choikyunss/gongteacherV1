@@ -420,6 +420,7 @@ function update_ox() {
             var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
             var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
             var qst_string = "ox_ch01_q" + q_num;               // Question Number String (ox_ch01_q1~q40)
+            var t_string = "s_ox_users_s" + order_t + "_ch01";  // Table ID String (s_ox_users_s1~s5_ch01)
 
             // Date String (ex. 2022_11)
             let today = new Date();
@@ -429,6 +430,11 @@ function update_ox() {
 
             await conn.beginTransaction();
 
+            // Update order table
+            var sqlA = 'UPDATE s_ox_users_order_ch01 SET ??=??%5+1 WHERE user_id=?'; // order : 1 -> 2 -> 3 -> 4 -> 5 -> 1 ...
+            var paramsA = [qst_string, qst_string, type]
+            const [rowsA] = await conn.query(sqlA, paramsA);
+            
             // Read order info. and match (To verify that the value of client matches the server)
             var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch01 WHERE user_id = ?';
             var params = [qst_string, type]
@@ -441,11 +447,6 @@ function update_ox() {
                 console.log('order number : %d', order_t, " order number does match");
             }  // The order number is only from server DB!!
             var t_string = "s_ox_users_s" + order_t + "_ch01";  // Table ID String (s_ox_users_s1~s5_ch01)
-
-            // Update order table
-            var sqlA = 'UPDATE s_ox_users_order_ch01 SET ??=??%5+1 WHERE user_id=?'; // order : 1 -> 2 -> 3 -> 4 -> 5 -> 1 ...
-            var paramsA = [qst_string, qst_string, type]
-            const [rowsA] = await conn.query(sqlA, paramsA);            
 
             // Update result of answer table
             var sqlB = 'UPDATE s_ox_users_s1_ch01 ' +
