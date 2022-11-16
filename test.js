@@ -2220,7 +2220,6 @@ async function trigger_ox_OsumResult() {
                     var sqlB = 'UPDATE ?? SET ??=? WHERE qst_id=?'
                     var paramsB = [ch_string, lv_string, qst5_sum, qst_string]
                     const [rowsB] = await conn.query(sqlB, paramsB);
-                    res.json(rowsB);
                     // console.log(ch_string + "_" + lv_string + "_" + qst_string + "_ : " + qst5_sum); // log ()
                 }
             }
@@ -2231,7 +2230,6 @@ async function trigger_ox_OsumResult() {
     } catch(err) {
         await conn.rollback();
         console.log(err);
-        res.status(500).json({message: err.message});
     } finally {
         conn.release();
     }
@@ -2272,7 +2270,6 @@ async function trigger_ox_XsumResult() {
                     var sqlB = 'UPDATE ?? SET ??=? WHERE qst_id=?'
                     var paramsB = [ch_string, lv_string, qst5_sum, qst_string]
                     const [rowsB] = await conn.query(sqlB, paramsB);
-                    res.json(rowsB);
                     // console.log(ch_string + "_" + lv_string + "_" + qst_string + "_ : " + qst5_sum); // log ()
                 }
             }
@@ -2283,7 +2280,6 @@ async function trigger_ox_XsumResult() {
     } catch(err) {
         await conn.rollback();
         console.log(err);
-        res.status(500).json({message: err.message});
     } finally {
         conn.release();
     }
@@ -2329,7 +2325,6 @@ async function trigger_ox_AvrResult() {
                 var sqlC = 'UPDATE ?? SET o_sum=?, x_sum=?, ox_avr=? WHERE qst_id=?'
                 var paramsC = [table_string, avrOsum, avrXsum, QAvr_prec, qst_string]
                 const [rowsC] = await conn.query(sqlC, paramsC);
-                res.json(rowsC);
             }
         }
         await conn.commit();
@@ -2338,7 +2333,6 @@ async function trigger_ox_AvrResult() {
     } catch(err) {
         await conn.rollback();
         console.log(err);
-        res.status(500).json({message: err.message});
     } finally {
         conn.release();
     }
