@@ -2335,53 +2335,7 @@ async function trigger_ox_AvrResult() {
         console.log(err);
     } finally {
         conn.release();
-    }
-
-
-    for(var i=1; i<=ox_ch_count; i++){
-        let table_string = i<10 ? "s_ox_qs_ansr_ch0" + i : "s_ox_qs_ansr_ch" + i; // 집계 테이블(Table ID: s_ox_qs_ansr_ch01~ch12) 단원 선택
-        for(var j=1; j<=ox_qst_count; j++){
-            let qst_string = i<10 ? "ox_ch0" + i + "_q" + j : "ox_ch" + i + "_q" + j; // 문항 선택 (Column : ox_ch01(ch12)_q1~q40)
-            var QstAvr_Osum = 0; // 집계 합산 변수 초기화
-            var QstAvr_Xsum = 0; // 집계 합산 변수 초기화
-            for(var k=1; k<=user_lv_count; k++){
-                var lv_string1 = "l" + k + "_o_sum"; // Update 학습 레벨 선택 (lv.1~lv.5)
-                var lv_string2 = "l" + k + "_x_sum"; // Update 학습 레벨 선택 (lv.1~lv.5)
-                var lv_string3 = "l" + k + "_ox_avr";   // Update 학습 레벨 선택 (lv.1~lv.5)
-            // 문항별 정답률 Query
-                let sql1 = 'SELECT ?? AS Osum, ?? AS Xsum FROM ?? WHERE qst_id = ?';
-                var params1 = [lv_string1, lv_string2, table_string, qst_string]
-            // Update 오답 수 Query
-                var sql2 = 'UPDATE ?? SET ??=? WHERE qst_id=?'
-                var params2 = [table_string, lv_string3, qstAvr_prec, qst_string]
-
-                try {
-                    var Qstsum = await dbQueryAsync(sql1, params1);
-                    QstAvr_Osum = QstAvr_Osum + Qstsum[0].Osum;
-                    QstAvr_Xsum = QstAvr_Xsum + Qstsum[0].Xsum;
-                    try {
-                        var qstAvr = Qstsum[0].Osum + Qstsum[0].Xsum != 0 ? Qstsum[0].Osum / (Qstsum[0].Osum + Qstsum[0].Xsum) : null;
-                        var qstAvr_prec = qstAvr != null ? Math.ceil(qstAvr*100)/100 : null;
-                        await dbQueryAsync(sql2, params2);
-                    } catch (err) {
-                        console.log(err);
-                    }
-                } catch (err) {
-                    console.log(err);
-                }
-            }
-            var QstAvr = QstAvr_Osum + QstAvr_Xsum != 0 ? QstAvr_Osum / (QstAvr_Osum + QstAvr_Xsum) : null;
-            var QstAvr_prec = QstAvr != null ? Math.ceil(QstAvr*100)/100 : null;
-            var sql3 = 'UPDATE ?? SET o_sum=?, x_sum=?, ox_avr=? WHERE qst_id=?'
-            var params3 = [table_string, QstAvr_Osum, QstAvr_Xsum, QstAvr_prec, qst_string]
-
-            try {
-                await dbQueryAsync(sql3, params3);
-            } catch (err) {
-                console.log(err);
-            }
-        }
-    }
+    }         
 }
 
 trigger_ox_OsumResult();
