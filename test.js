@@ -1217,10 +1217,8 @@ function update_ox2() {
             const [rows] = await conn.query(sql, params);
             if(order_t != rows[0].s_order_t) {
                 order_t = rows[0].s_order_t;
-                console.log('order number : %d', order_t, " order number doesn't match!!");
             }
             else {
-                console.log('order number : %d', order_t, " order number does match");
             }  // The order number is only from server DB!!
             var t_string = "s_ox_users_s" + order_t + "_ch01";  // Table ID String (s_ox_users_s1~s5_ch01)
 
@@ -1263,6 +1261,7 @@ function update_ox2() {
             var sqlC = 'SELECT ch01 FROM s_stat_users_ch_score WHERE user_id = ?';
             const [rowsC] = await conn.query(sqlC, type);
             var score = rowsC[0].ch01;
+            console.log(score, " ", Unitscore);
             score = score + Unitscore; // Calculate a score
             var sqlD = 'UPDATE s_stat_users_ch_score SET ch01=? WHERE user_id=?';
             var paramsD = [score, type]
