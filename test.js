@@ -1261,7 +1261,7 @@ function update_ox2() {
             var sqlC = 'SELECT ch01 FROM s_stat_users_ch_score WHERE user_id = ?';
             const [rowsC] = await conn.query(sqlC, type);
             var score = rowsC[0].ch01;
-            console.log(score, " ", Unitscore);
+            console.log(score, " ", afterUnitscore, " ", beforeUnitscore, " ", Unitscore);
             score = score + Unitscore; // Calculate a score
             var sqlD = 'UPDATE s_stat_users_ch_score SET ch01=? WHERE user_id=?';
             var paramsD = [score, type]
