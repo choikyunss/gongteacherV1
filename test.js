@@ -403,14 +403,13 @@ function read_ox_order() {
 read_ox_order()
 
 
-///////////// (Table ID : s_ox_users_order_ch01~12) Update OX ///////////////////////////
+///////////// (Table ID : s_ox_users_order_ch01~12) Update OX (1) ///////////////////////////
 // ** Sequence 
 // 1 Step : update OX order table 0 to 5
 // 2 Step : update OX result of answer table 0 or 1 (1 is collect answer, 0 is wrong answer) 
 // 3 Step : update OX learning volume table by counting the number of times learned
 // ** URL : http://13.124.19.61:3001/api/s_ox_users_order_ch01/update/:type (type : user_id )
-// ** Body(JSON) : { "q_num": 1 ~ n (INT), "order_t": 1 ~ 5 (INT), "solve_r": 0/1 (BIT) }
-function update_ox() {
+function update_ox1() {
     ///////////// OX Chapter-1 /////////////
     app.put('/api/s_ox_users_order_ch01/update/:type', async(req, res) => {
         const conn = await pool.getConnection(async conn => conn);
@@ -486,18 +485,32 @@ function update_ox() {
             var qst_string = "ox_ch02_q" + q_num;               // Question Number String (ox_ch02_q1~q40)
             var t_string = "s_ox_users_s" + order_t + "_ch02";  // Table ID String (s_ox_users_s1~s5_ch02)
 
-            // Date String (ex. 2022-11-13)
+            // Date String (ex. 2022_11)
             let today = new Date();
-            let year = today.getFullYear();        // 연도
-            let month = today.getMonth() + 1;      // 월
-            var date_string = year + "_" + month;  // Date String
+            let year = today.getFullYear();        // Get the value of 'year'
+            let month = today.getMonth() + 1;      // Get the value of 'month'
+            var date_string = year + "_" + month;  // Get the string of 'date'
 
             await conn.beginTransaction();
 
             // Update order table
-            var sqlA = 'UPDATE s_ox_users_order_ch02 SET ??=??%5+1 WHERE user_id=?';
+            var sqlA = 'UPDATE s_ox_users_order_ch02 SET ??=??%5+1 WHERE user_id=?'; // order : 1 -> 2 -> 3 -> 4 -> 5 -> 1 ...
             var paramsA = [qst_string, qst_string, type]
             const [rowsA] = await conn.query(sqlA, paramsA);
+            
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch02 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+                console.log('order number : %d', order_t, " order number doesn't match!!");
+            }
+            else {
+                console.log('order number : %d', order_t, " order number does match");
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch02";  // Table ID String (s_ox_users_s1~s5_ch02)
+
             // Update result of answer table
             var sqlB = 'UPDATE s_ox_users_s1_ch02 ' +
             'JOIN s_ox_users_s2_ch02 ON s_ox_users_s2_ch02.user_id = s_ox_users_s1_ch02.user_id ' +
@@ -507,6 +520,7 @@ function update_ox() {
             'SET ??.??=? WHERE s_ox_users_s1_ch02.user_id=?';
             var paramsB = [t_string, qst_string, solve_r, type]
             const [rowsB] = await conn.query(sqlB, paramsB);
+            
             // Update learning volume table
             var sqlC = 'UPDATE s_ox_users_vol_ch02 SET ??=??+1 WHERE user_id=?';
             var paramsC = [date_string, date_string, type]
@@ -535,18 +549,32 @@ function update_ox() {
             var qst_string = "ox_ch03_q" + q_num;               // Question Number String (ox_ch03_q1~q40)
             var t_string = "s_ox_users_s" + order_t + "_ch03";  // Table ID String (s_ox_users_s1~s5_ch03)
 
-            // Date String (ex. 2022-11-13)
+            // Date String (ex. 2022_11)
             let today = new Date();
-            let year = today.getFullYear();        // 연도
-            let month = today.getMonth() + 1;      // 월
-            var date_string = year + "_" + month;  // Date String
+            let year = today.getFullYear();        // Get the value of 'year'
+            let month = today.getMonth() + 1;      // Get the value of 'month'
+            var date_string = year + "_" + month;  // Get the string of 'date'
 
             await conn.beginTransaction();
 
             // Update order table
-            var sqlA = 'UPDATE s_ox_users_order_ch03 SET ??=??%5+1 WHERE user_id=?';
+            var sqlA = 'UPDATE s_ox_users_order_ch03 SET ??=??%5+1 WHERE user_id=?'; // order : 1 -> 2 -> 3 -> 4 -> 5 -> 1 ...
             var paramsA = [qst_string, qst_string, type]
             const [rowsA] = await conn.query(sqlA, paramsA);
+            
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch03 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+                console.log('order number : %d', order_t, " order number doesn't match!!");
+            }
+            else {
+                console.log('order number : %d', order_t, " order number does match");
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch03";  // Table ID String (s_ox_users_s1~s5_ch03)
+
             // Update result of answer table
             var sqlB = 'UPDATE s_ox_users_s1_ch03 ' +
             'JOIN s_ox_users_s2_ch03 ON s_ox_users_s2_ch03.user_id = s_ox_users_s1_ch03.user_id ' +
@@ -556,6 +584,7 @@ function update_ox() {
             'SET ??.??=? WHERE s_ox_users_s1_ch03.user_id=?';
             var paramsB = [t_string, qst_string, solve_r, type]
             const [rowsB] = await conn.query(sqlB, paramsB);
+            
             // Update learning volume table
             var sqlC = 'UPDATE s_ox_users_vol_ch03 SET ??=??+1 WHERE user_id=?';
             var paramsC = [date_string, date_string, type]
@@ -584,18 +613,32 @@ function update_ox() {
             var qst_string = "ox_ch04_q" + q_num;               // Question Number String (ox_ch04_q1~q40)
             var t_string = "s_ox_users_s" + order_t + "_ch04";  // Table ID String (s_ox_users_s1~s5_ch04)
 
-            // Date String (ex. 2022-11-13)
+            // Date String (ex. 2022_11)
             let today = new Date();
-            let year = today.getFullYear();        // 연도
-            let month = today.getMonth() + 1;      // 월
-            var date_string = year + "_" + month;  // Date String
+            let year = today.getFullYear();        // Get the value of 'year'
+            let month = today.getMonth() + 1;      // Get the value of 'month'
+            var date_string = year + "_" + month;  // Get the string of 'date'
 
             await conn.beginTransaction();
 
             // Update order table
-            var sqlA = 'UPDATE s_ox_users_order_ch04 SET ??=??%5+1 WHERE user_id=?';
+            var sqlA = 'UPDATE s_ox_users_order_ch04 SET ??=??%5+1 WHERE user_id=?'; // order : 1 -> 2 -> 3 -> 4 -> 5 -> 1 ...
             var paramsA = [qst_string, qst_string, type]
             const [rowsA] = await conn.query(sqlA, paramsA);
+            
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch04 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+                console.log('order number : %d', order_t, " order number doesn't match!!");
+            }
+            else {
+                console.log('order number : %d', order_t, " order number does match");
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch04";  // Table ID String (s_ox_users_s1~s5_ch04)
+
             // Update result of answer table
             var sqlB = 'UPDATE s_ox_users_s1_ch04 ' +
             'JOIN s_ox_users_s2_ch04 ON s_ox_users_s2_ch04.user_id = s_ox_users_s1_ch04.user_id ' +
@@ -605,6 +648,7 @@ function update_ox() {
             'SET ??.??=? WHERE s_ox_users_s1_ch04.user_id=?';
             var paramsB = [t_string, qst_string, solve_r, type]
             const [rowsB] = await conn.query(sqlB, paramsB);
+            
             // Update learning volume table
             var sqlC = 'UPDATE s_ox_users_vol_ch04 SET ??=??+1 WHERE user_id=?';
             var paramsC = [date_string, date_string, type]
@@ -633,18 +677,32 @@ function update_ox() {
             var qst_string = "ox_ch05_q" + q_num;               // Question Number String (ox_ch05_q1~q40)
             var t_string = "s_ox_users_s" + order_t + "_ch05";  // Table ID String (s_ox_users_s1~s5_ch05)
 
-            // Date String (ex. 2022-11-13)
+            // Date String (ex. 2022_11)
             let today = new Date();
-            let year = today.getFullYear();        // 연도
-            let month = today.getMonth() + 1;      // 월
-            var date_string = year + "_" + month;  // Date String
+            let year = today.getFullYear();        // Get the value of 'year'
+            let month = today.getMonth() + 1;      // Get the value of 'month'
+            var date_string = year + "_" + month;  // Get the string of 'date'
 
             await conn.beginTransaction();
 
             // Update order table
-            var sqlA = 'UPDATE s_ox_users_order_ch05 SET ??=??%5+1 WHERE user_id=?';
+            var sqlA = 'UPDATE s_ox_users_order_ch05 SET ??=??%5+1 WHERE user_id=?'; // order : 1 -> 2 -> 3 -> 4 -> 5 -> 1 ...
             var paramsA = [qst_string, qst_string, type]
             const [rowsA] = await conn.query(sqlA, paramsA);
+            
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch05 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+                console.log('order number : %d', order_t, " order number doesn't match!!");
+            }
+            else {
+                console.log('order number : %d', order_t, " order number does match");
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch05";  // Table ID String (s_ox_users_s1~s5_ch05)
+
             // Update result of answer table
             var sqlB = 'UPDATE s_ox_users_s1_ch05 ' +
             'JOIN s_ox_users_s2_ch05 ON s_ox_users_s2_ch05.user_id = s_ox_users_s1_ch05.user_id ' +
@@ -654,6 +712,7 @@ function update_ox() {
             'SET ??.??=? WHERE s_ox_users_s1_ch05.user_id=?';
             var paramsB = [t_string, qst_string, solve_r, type]
             const [rowsB] = await conn.query(sqlB, paramsB);
+            
             // Update learning volume table
             var sqlC = 'UPDATE s_ox_users_vol_ch05 SET ??=??+1 WHERE user_id=?';
             var paramsC = [date_string, date_string, type]
@@ -682,18 +741,32 @@ function update_ox() {
             var qst_string = "ox_ch06_q" + q_num;               // Question Number String (ox_ch06_q1~q40)
             var t_string = "s_ox_users_s" + order_t + "_ch06";  // Table ID String (s_ox_users_s1~s5_ch06)
 
-            // Date String (ex. 2022-11-13)
+            // Date String (ex. 2022_11)
             let today = new Date();
-            let year = today.getFullYear();        // 연도
-            let month = today.getMonth() + 1;      // 월
-            var date_string = year + "_" + month;  // Date String
+            let year = today.getFullYear();        // Get the value of 'year'
+            let month = today.getMonth() + 1;      // Get the value of 'month'
+            var date_string = year + "_" + month;  // Get the string of 'date'
 
             await conn.beginTransaction();
 
             // Update order table
-            var sqlA = 'UPDATE s_ox_users_order_ch06 SET ??=??%5+1 WHERE user_id=?';
+            var sqlA = 'UPDATE s_ox_users_order_ch06 SET ??=??%5+1 WHERE user_id=?'; // order : 1 -> 2 -> 3 -> 4 -> 5 -> 1 ...
             var paramsA = [qst_string, qst_string, type]
             const [rowsA] = await conn.query(sqlA, paramsA);
+            
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch06 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+                console.log('order number : %d', order_t, " order number doesn't match!!");
+            }
+            else {
+                console.log('order number : %d', order_t, " order number does match");
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch06";  // Table ID String (s_ox_users_s1~s5_ch06)
+
             // Update result of answer table
             var sqlB = 'UPDATE s_ox_users_s1_ch06 ' +
             'JOIN s_ox_users_s2_ch06 ON s_ox_users_s2_ch06.user_id = s_ox_users_s1_ch06.user_id ' +
@@ -703,6 +776,7 @@ function update_ox() {
             'SET ??.??=? WHERE s_ox_users_s1_ch06.user_id=?';
             var paramsB = [t_string, qst_string, solve_r, type]
             const [rowsB] = await conn.query(sqlB, paramsB);
+            
             // Update learning volume table
             var sqlC = 'UPDATE s_ox_users_vol_ch06 SET ??=??+1 WHERE user_id=?';
             var paramsC = [date_string, date_string, type]
@@ -719,7 +793,7 @@ function update_ox() {
             conn.release();
         }
     });
-
+    
     ///////////// OX Chapter-7 /////////////
     app.put('/api/s_ox_users_order_ch07/update/:type', async(req, res) => {
         const conn = await pool.getConnection(async conn => conn);
@@ -731,18 +805,32 @@ function update_ox() {
             var qst_string = "ox_ch07_q" + q_num;               // Question Number String (ox_ch07_q1~q40)
             var t_string = "s_ox_users_s" + order_t + "_ch07";  // Table ID String (s_ox_users_s1~s5_ch07)
 
-            // Date String (ex. 2022-11-13)
+            // Date String (ex. 2022_11)
             let today = new Date();
-            let year = today.getFullYear();        // 연도
-            let month = today.getMonth() + 1;      // 월
-            var date_string = year + "_" + month;  // Date String
+            let year = today.getFullYear();        // Get the value of 'year'
+            let month = today.getMonth() + 1;      // Get the value of 'month'
+            var date_string = year + "_" + month;  // Get the string of 'date'
 
             await conn.beginTransaction();
 
             // Update order table
-            var sqlA = 'UPDATE s_ox_users_order_ch07 SET ??=??%5+1 WHERE user_id=?';
+            var sqlA = 'UPDATE s_ox_users_order_ch07 SET ??=??%5+1 WHERE user_id=?'; // order : 1 -> 2 -> 3 -> 4 -> 5 -> 1 ...
             var paramsA = [qst_string, qst_string, type]
             const [rowsA] = await conn.query(sqlA, paramsA);
+            
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch07 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+                console.log('order number : %d', order_t, " order number doesn't match!!");
+            }
+            else {
+                console.log('order number : %d', order_t, " order number does match");
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch07";  // Table ID String (s_ox_users_s1~s5_ch07)
+
             // Update result of answer table
             var sqlB = 'UPDATE s_ox_users_s1_ch07 ' +
             'JOIN s_ox_users_s2_ch07 ON s_ox_users_s2_ch07.user_id = s_ox_users_s1_ch07.user_id ' +
@@ -752,6 +840,7 @@ function update_ox() {
             'SET ??.??=? WHERE s_ox_users_s1_ch07.user_id=?';
             var paramsB = [t_string, qst_string, solve_r, type]
             const [rowsB] = await conn.query(sqlB, paramsB);
+            
             // Update learning volume table
             var sqlC = 'UPDATE s_ox_users_vol_ch07 SET ??=??+1 WHERE user_id=?';
             var paramsC = [date_string, date_string, type]
@@ -780,18 +869,32 @@ function update_ox() {
             var qst_string = "ox_ch08_q" + q_num;               // Question Number String (ox_ch08_q1~q40)
             var t_string = "s_ox_users_s" + order_t + "_ch08";  // Table ID String (s_ox_users_s1~s5_ch08)
 
-            // Date String (ex. 2022-11-13)
+            // Date String (ex. 2022_11)
             let today = new Date();
-            let year = today.getFullYear();        // 연도
-            let month = today.getMonth() + 1;      // 월
-            var date_string = year + "_" + month;  // Date String
+            let year = today.getFullYear();        // Get the value of 'year'
+            let month = today.getMonth() + 1;      // Get the value of 'month'
+            var date_string = year + "_" + month;  // Get the string of 'date'
 
             await conn.beginTransaction();
 
             // Update order table
-            var sqlA = 'UPDATE s_ox_users_order_ch08 SET ??=??%5+1 WHERE user_id=?';
+            var sqlA = 'UPDATE s_ox_users_order_ch08 SET ??=??%5+1 WHERE user_id=?'; // order : 1 -> 2 -> 3 -> 4 -> 5 -> 1 ...
             var paramsA = [qst_string, qst_string, type]
             const [rowsA] = await conn.query(sqlA, paramsA);
+            
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch08 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+                console.log('order number : %d', order_t, " order number doesn't match!!");
+            }
+            else {
+                console.log('order number : %d', order_t, " order number does match");
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch08";  // Table ID String (s_ox_users_s1~s5_ch08)
+
             // Update result of answer table
             var sqlB = 'UPDATE s_ox_users_s1_ch08 ' +
             'JOIN s_ox_users_s2_ch08 ON s_ox_users_s2_ch08.user_id = s_ox_users_s1_ch08.user_id ' +
@@ -801,6 +904,7 @@ function update_ox() {
             'SET ??.??=? WHERE s_ox_users_s1_ch08.user_id=?';
             var paramsB = [t_string, qst_string, solve_r, type]
             const [rowsB] = await conn.query(sqlB, paramsB);
+            
             // Update learning volume table
             var sqlC = 'UPDATE s_ox_users_vol_ch08 SET ??=??+1 WHERE user_id=?';
             var paramsC = [date_string, date_string, type]
@@ -829,18 +933,32 @@ function update_ox() {
             var qst_string = "ox_ch09_q" + q_num;               // Question Number String (ox_ch09_q1~q40)
             var t_string = "s_ox_users_s" + order_t + "_ch09";  // Table ID String (s_ox_users_s1~s5_ch09)
 
-            // Date String (ex. 2022-11-13)
+            // Date String (ex. 2022_11)
             let today = new Date();
-            let year = today.getFullYear();        // 연도
-            let month = today.getMonth() + 1;      // 월
-            var date_string = year + "_" + month;  // Date String
+            let year = today.getFullYear();        // Get the value of 'year'
+            let month = today.getMonth() + 1;      // Get the value of 'month'
+            var date_string = year + "_" + month;  // Get the string of 'date'
 
             await conn.beginTransaction();
 
             // Update order table
-            var sqlA = 'UPDATE s_ox_users_order_ch09 SET ??=??%5+1 WHERE user_id=?';
+            var sqlA = 'UPDATE s_ox_users_order_ch09 SET ??=??%5+1 WHERE user_id=?'; // order : 1 -> 2 -> 3 -> 4 -> 5 -> 1 ...
             var paramsA = [qst_string, qst_string, type]
             const [rowsA] = await conn.query(sqlA, paramsA);
+            
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch09 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+                console.log('order number : %d', order_t, " order number doesn't match!!");
+            }
+            else {
+                console.log('order number : %d', order_t, " order number does match");
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch09";  // Table ID String (s_ox_users_s1~s5_ch09)
+
             // Update result of answer table
             var sqlB = 'UPDATE s_ox_users_s1_ch09 ' +
             'JOIN s_ox_users_s2_ch09 ON s_ox_users_s2_ch09.user_id = s_ox_users_s1_ch09.user_id ' +
@@ -850,6 +968,7 @@ function update_ox() {
             'SET ??.??=? WHERE s_ox_users_s1_ch09.user_id=?';
             var paramsB = [t_string, qst_string, solve_r, type]
             const [rowsB] = await conn.query(sqlB, paramsB);
+            
             // Update learning volume table
             var sqlC = 'UPDATE s_ox_users_vol_ch09 SET ??=??+1 WHERE user_id=?';
             var paramsC = [date_string, date_string, type]
@@ -878,18 +997,32 @@ function update_ox() {
             var qst_string = "ox_ch10_q" + q_num;               // Question Number String (ox_ch10_q1~q40)
             var t_string = "s_ox_users_s" + order_t + "_ch10";  // Table ID String (s_ox_users_s1~s5_ch10)
 
-            // Date String (ex. 2022-11-13)
+            // Date String (ex. 2022_11)
             let today = new Date();
-            let year = today.getFullYear();        // 연도
-            let month = today.getMonth() + 1;      // 월
-            var date_string = year + "_" + month;  // Date String
+            let year = today.getFullYear();        // Get the value of 'year'
+            let month = today.getMonth() + 1;      // Get the value of 'month'
+            var date_string = year + "_" + month;  // Get the string of 'date'
 
             await conn.beginTransaction();
 
             // Update order table
-            var sqlA = 'UPDATE s_ox_users_order_ch10 SET ??=??%5+1 WHERE user_id=?';
+            var sqlA = 'UPDATE s_ox_users_order_ch10 SET ??=??%5+1 WHERE user_id=?'; // order : 1 -> 2 -> 3 -> 4 -> 5 -> 1 ...
             var paramsA = [qst_string, qst_string, type]
             const [rowsA] = await conn.query(sqlA, paramsA);
+            
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch10 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+                console.log('order number : %d', order_t, " order number doesn't match!!");
+            }
+            else {
+                console.log('order number : %d', order_t, " order number does match");
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch10";  // Table ID String (s_ox_users_s1~s5_ch10)
+
             // Update result of answer table
             var sqlB = 'UPDATE s_ox_users_s1_ch10 ' +
             'JOIN s_ox_users_s2_ch10 ON s_ox_users_s2_ch10.user_id = s_ox_users_s1_ch10.user_id ' +
@@ -899,6 +1032,7 @@ function update_ox() {
             'SET ??.??=? WHERE s_ox_users_s1_ch10.user_id=?';
             var paramsB = [t_string, qst_string, solve_r, type]
             const [rowsB] = await conn.query(sqlB, paramsB);
+            
             // Update learning volume table
             var sqlC = 'UPDATE s_ox_users_vol_ch10 SET ??=??+1 WHERE user_id=?';
             var paramsC = [date_string, date_string, type]
@@ -927,18 +1061,32 @@ function update_ox() {
             var qst_string = "ox_ch11_q" + q_num;               // Question Number String (ox_ch11_q1~q40)
             var t_string = "s_ox_users_s" + order_t + "_ch11";  // Table ID String (s_ox_users_s1~s5_ch11)
 
-            // Date String (ex. 2022-11-13)
+            // Date String (ex. 2022_11)
             let today = new Date();
-            let year = today.getFullYear();        // 연도
-            let month = today.getMonth() + 1;      // 월
-            var date_string = year + "_" + month;  // Date String
+            let year = today.getFullYear();        // Get the value of 'year'
+            let month = today.getMonth() + 1;      // Get the value of 'month'
+            var date_string = year + "_" + month;  // Get the string of 'date'
 
             await conn.beginTransaction();
 
             // Update order table
-            var sqlA = 'UPDATE s_ox_users_order_ch11 SET ??=??%5+1 WHERE user_id=?';
+            var sqlA = 'UPDATE s_ox_users_order_ch11 SET ??=??%5+1 WHERE user_id=?'; // order : 1 -> 2 -> 3 -> 4 -> 5 -> 1 ...
             var paramsA = [qst_string, qst_string, type]
             const [rowsA] = await conn.query(sqlA, paramsA);
+            
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch11 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+                console.log('order number : %d', order_t, " order number doesn't match!!");
+            }
+            else {
+                console.log('order number : %d', order_t, " order number does match");
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch11";  // Table ID String (s_ox_users_s1~s5_ch11)
+
             // Update result of answer table
             var sqlB = 'UPDATE s_ox_users_s1_ch11 ' +
             'JOIN s_ox_users_s2_ch11 ON s_ox_users_s2_ch11.user_id = s_ox_users_s1_ch11.user_id ' +
@@ -948,6 +1096,7 @@ function update_ox() {
             'SET ??.??=? WHERE s_ox_users_s1_ch11.user_id=?';
             var paramsB = [t_string, qst_string, solve_r, type]
             const [rowsB] = await conn.query(sqlB, paramsB);
+            
             // Update learning volume table
             var sqlC = 'UPDATE s_ox_users_vol_ch11 SET ??=??+1 WHERE user_id=?';
             var paramsC = [date_string, date_string, type]
@@ -976,18 +1125,32 @@ function update_ox() {
             var qst_string = "ox_ch12_q" + q_num;               // Question Number String (ox_ch12_q1~q40)
             var t_string = "s_ox_users_s" + order_t + "_ch12";  // Table ID String (s_ox_users_s1~s5_ch12)
 
-            // Date String (ex. 2022-11-13)
+            // Date String (ex. 2022_11)
             let today = new Date();
-            let year = today.getFullYear();        // 연도
-            let month = today.getMonth() + 1;      // 월
-            var date_string = year + "_" + month;  // Date String
+            let year = today.getFullYear();        // Get the value of 'year'
+            let month = today.getMonth() + 1;      // Get the value of 'month'
+            var date_string = year + "_" + month;  // Get the string of 'date'
 
             await conn.beginTransaction();
 
             // Update order table
-            var sqlA = 'UPDATE s_ox_users_order_ch12 SET ??=??%5+1 WHERE user_id=?';
+            var sqlA = 'UPDATE s_ox_users_order_ch12 SET ??=??%5+1 WHERE user_id=?'; // order : 1 -> 2 -> 3 -> 4 -> 5 -> 1 ...
             var paramsA = [qst_string, qst_string, type]
             const [rowsA] = await conn.query(sqlA, paramsA);
+            
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch12 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+                console.log('order number : %d', order_t, " order number doesn't match!!");
+            }
+            else {
+                console.log('order number : %d', order_t, " order number does match");
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch12";  // Table ID String (s_ox_users_s1~s5_ch12)
+
             // Update result of answer table
             var sqlB = 'UPDATE s_ox_users_s1_ch12 ' +
             'JOIN s_ox_users_s2_ch12 ON s_ox_users_s2_ch12.user_id = s_ox_users_s1_ch12.user_id ' +
@@ -997,6 +1160,7 @@ function update_ox() {
             'SET ??.??=? WHERE s_ox_users_s1_ch12.user_id=?';
             var paramsB = [t_string, qst_string, solve_r, type]
             const [rowsB] = await conn.query(sqlB, paramsB);
+            
             // Update learning volume table
             var sqlC = 'UPDATE s_ox_users_vol_ch12 SET ??=??+1 WHERE user_id=?';
             var paramsC = [date_string, date_string, type]
@@ -1014,7 +1178,7 @@ function update_ox() {
         }
     });
 }
-update_ox()
+update_ox1()
 // !! HTTP requst URL/BODY
 /*
 {
@@ -1023,6 +1187,110 @@ update_ox()
     "solve_r": 1
 }
 */
+
+
+///////////// (Table ID : s_ox_users_order_ch01~12) Update OX (2) ///////////////////////////
+// ** Sequence
+// 1 Step : read OX result of answer 1st ~ 4nd
+// 2 Step : calculate the weight
+// 3 Step : read OX correct answer rate
+// 4 Step : calculate the unit score
+// 5 Step : calculate and update the score
+// ** URL : http://13.124.19.61:3001/api/s_ox_users_order_ch01/update2/:type (type : user_id )
+function update_ox2() {
+    ///////////// OX Chapter-1 /////////////
+    app.put('/api/s_ox_users_order_ch01/update2/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch01_q" + q_num;               // Question Number String (ox_ch01_q1~q40)
+            var answerArray_int = new Array();                  // Array for temporary save of the result of answer.
+
+            await conn.beginTransaction();
+
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch01 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+                console.log('order number : %d', order_t, " order number doesn't match!!");
+            }
+            else {
+                console.log('order number : %d', order_t, " order number does match");
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch01";  // Table ID String (s_ox_users_s1~s5_ch01)
+
+            // Calculation of the weight
+            // ** weight = answer result(1st) x 4 + answer result(2nd) x 2 + answer result(3nd)
+            //   (A range of weight is from 0 to 7)
+            //   (1st -> 2nd -> 3nd > 4nd is ... in the order of most recently entered values)
+            // ** Alpha value : Calibration value of unit score (0 ~0.7)
+            // ** unit score = weight x [Alphavalue + (1 - answer rate) x (1 - Alphavalue)]
+            //   (A range of [] value is from Alphavalue(min.) to 1.0)
+            // ** score = score - unit Score(#Before) + unit Score(#After)
+            for(i=0; i<4; i++) {
+                var order_t = order_t >0 ? order_t : 5;
+                var answerTableNum = "s_ox_users_s" + order_t + "_ch01";
+                var sqlA = 'SELECT ?? AS answerResult FROM ?? WHERE user_id = ?';
+                var paramsA = [qst_string, answerTableNum, type]
+                const [rowsA] = await conn.query(sqlA, paramsA);
+
+                answerArray_int[i] = rowsA[0].answerResult != null ? rowsA[0].answerResult.readInt8() : 0; // byte -> integer
+                order_t = order_t - 1;
+            }
+
+            // Weight
+            var afterWeight = SolveArray_int[0]*4 + SolveArray_int[1]*2 + SolveArray_int[2];  // Calculate a current value
+            var beforeWeight = SolveArray_int[1]*4 + SolveArray_int[2]*2 + SolveArray_int[3]; // Calculate a previous value
+
+            // Read correct answer rate
+            var sqlB = 'SELECT ox_avr FROM s_ox_qs_ansr_ch01 WHERE qst_id = ?';
+            var paramsB = [qst_string]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            var Alphavalue = 0.6;          // Alpha value
+            var AnsRate = rowsB[0].ox_avr != null ? rowsB[0].ox_avr : 0; // Answer rate
+
+            // Unit score
+            var afterUnitscore = afterWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue));   // Calculate a current value
+            var beforeUnitscore = beforeWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue)); // Calculate a previous value
+            var Unitscore = afterUnitscore - beforeUnitscore;                                     // Calculate a total value
+
+            // Update score
+            var sqlC = 'SELECT ch01 FROM s_stat_users_ch_score WHERE user_id = ?';
+            const [rowsC] = await conn.query(sqlC, type);
+            var score = rowsC[0].ch01;
+            score = score + Unitscore; // Calculate a score
+            var sqlD = 'UPDATE s_stat_users_ch_score SET ch01=? WHERE user_id=?';
+            var paramsD = [score, type]
+            const [rowsD] = await conn.query(sqlD, paramsD);
+
+            await conn.commit();
+            res.json(rowsD);
+
+
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
+}
+update_ox2()
+// !! HTTP requst URL/BODY
+/*
+{
+    "q_num": 1,
+    "order_t": 1,
+    "solve_r": 1
+}
+*/
+
 
 
 /*
