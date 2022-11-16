@@ -403,7 +403,7 @@ function read_ox_order() {
 read_ox_order()
 
 
-///////////// (Table ID : s_ox_users_order_ch01~12) Update OX (1) ///////////////////////////
+///////////// (Table ID : s_ox_users_order_ch01~12) Update OX ///////////////////////////
 // ** Sequence 
 // 1 Step : update OX order table 0 to 5
 // 2 Step : update OX result of answer table 0 or 1 (1 is collect answer, 0 is wrong answer) 
@@ -1189,7 +1189,7 @@ update_ox1()
 */
 
 
-///////////// (Table ID : s_ox_users_order_ch01~12) Update OX (2) ///////////////////////////
+///////////// (Table ID : s_ox_users_order_ch01~12) Update OX (Statistics) ///////////////////////////
 // ** Sequence
 // 1 Step : read OX result of answer 1st ~ 4nd
 // 2 Step : calculate the weight
@@ -1270,6 +1270,896 @@ function update_ox2() {
             await conn.commit();
             res.json(rowsD);
 
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
+
+    ///////////// OX Chapter-2 /////////////
+    app.put('/api/s_ox_users_order_ch02/update2/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch02_q" + q_num;               // Question Number String (ox_ch02_q1~q40)
+            var answerArray_int = new Array();                  // Array for temporary save of the result of answer.
+
+            await conn.beginTransaction();
+
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch02 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+            }
+            else {
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch02";  // Table ID String (s_ox_users_s1~s5_ch02)
+
+            // Calculation of the weight
+            // ** weight = answer result(1st) x 4 + answer result(2nd) x 2 + answer result(3nd)
+            //   (A range of weight is from 0 to 7)
+            //   (1st -> 2nd -> 3nd > 4nd is ... in the order of most recently entered values)
+            // ** Alpha value : Calibration value of unit score (0 ~0.7)
+            // ** unit score = weight x [Alphavalue + (1 - answer rate) x (1 - Alphavalue)]
+            //   (A range of [] value is from Alphavalue(min.) to 1.0)
+            // ** score = score - unit Score(#Before) + unit Score(#After)
+            for(i=0; i<4; i++) {
+                var order_t = order_t >0 ? order_t : 5;
+                var answerTableNum = "s_ox_users_s" + order_t + "_ch02";
+                var sqlA = 'SELECT ?? AS answerResult FROM ?? WHERE user_id = ?';
+                var paramsA = [qst_string, answerTableNum, type]
+                const [rowsA] = await conn.query(sqlA, paramsA);
+
+                answerArray_int[i] = rowsA[0].answerResult != null ? rowsA[0].answerResult.readInt8() : 0; // byte -> integer
+                order_t = order_t - 1;
+            }
+
+            // Weight
+            var afterWeight = answerArray_int[0]*4 + answerArray_int[1]*2 + answerArray_int[2];  // Calculate a current value
+            var beforeWeight = answerArray_int[1]*4 + answerArray_int[2]*2 + answerArray_int[3]; // Calculate a previous value
+
+            // Read correct answer rate
+            var sqlB = 'SELECT ox_avr FROM s_ox_qs_ansr_ch02 WHERE qst_id = ?';
+            var paramsB = [qst_string]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            var Alphavalue = 0.6;          // Alpha value
+            var AnsRate = rowsB[0].ox_avr != null ? rowsB[0].ox_avr : 0; // Answer rate
+
+            // Unit score
+            var afterUnitscore = afterWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue));   // Calculate a current value
+            var beforeUnitscore = beforeWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue)); // Calculate a previous value
+            var Unitscore = afterUnitscore - beforeUnitscore;                                     // Calculate a total value
+
+            // Update score
+            var sqlC = 'SELECT ch02 FROM s_stat_users_ch_score WHERE user_id = ?';
+            const [rowsC] = await conn.query(sqlC, type);
+            var score = rowsC[0].ch02;
+            console.log(score, " ", afterUnitscore, " ", beforeUnitscore, " ", Unitscore);
+            score = score + Unitscore; // Calculate a score
+            var sqlD = 'UPDATE s_stat_users_ch_score SET ch02=? WHERE user_id=?';
+            var paramsD = [score, type]
+            const [rowsD] = await conn.query(sqlD, paramsD);
+
+            await conn.commit();
+            res.json(rowsD);
+
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
+
+    ///////////// OX Chapter-3 /////////////
+    app.put('/api/s_ox_users_order_ch03/update2/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch03_q" + q_num;               // Question Number String (ox_ch03_q1~q40)
+            var answerArray_int = new Array();                  // Array for temporary save of the result of answer.
+
+            await conn.beginTransaction();
+
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch03 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+            }
+            else {
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch03";  // Table ID String (s_ox_users_s1~s5_ch03)
+
+            // Calculation of the weight
+            // ** weight = answer result(1st) x 4 + answer result(2nd) x 2 + answer result(3nd)
+            //   (A range of weight is from 0 to 7)
+            //   (1st -> 2nd -> 3nd > 4nd is ... in the order of most recently entered values)
+            // ** Alpha value : Calibration value of unit score (0 ~0.7)
+            // ** unit score = weight x [Alphavalue + (1 - answer rate) x (1 - Alphavalue)]
+            //   (A range of [] value is from Alphavalue(min.) to 1.0)
+            // ** score = score - unit Score(#Before) + unit Score(#After)
+            for(i=0; i<4; i++) {
+                var order_t = order_t >0 ? order_t : 5;
+                var answerTableNum = "s_ox_users_s" + order_t + "_ch03";
+                var sqlA = 'SELECT ?? AS answerResult FROM ?? WHERE user_id = ?';
+                var paramsA = [qst_string, answerTableNum, type]
+                const [rowsA] = await conn.query(sqlA, paramsA);
+
+                answerArray_int[i] = rowsA[0].answerResult != null ? rowsA[0].answerResult.readInt8() : 0; // byte -> integer
+                order_t = order_t - 1;
+            }
+
+            // Weight
+            var afterWeight = answerArray_int[0]*4 + answerArray_int[1]*2 + answerArray_int[2];  // Calculate a current value
+            var beforeWeight = answerArray_int[1]*4 + answerArray_int[2]*2 + answerArray_int[3]; // Calculate a previous value
+
+            // Read correct answer rate
+            var sqlB = 'SELECT ox_avr FROM s_ox_qs_ansr_ch03 WHERE qst_id = ?';
+            var paramsB = [qst_string]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            var Alphavalue = 0.6;          // Alpha value
+            var AnsRate = rowsB[0].ox_avr != null ? rowsB[0].ox_avr : 0; // Answer rate
+
+            // Unit score
+            var afterUnitscore = afterWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue));   // Calculate a current value
+            var beforeUnitscore = beforeWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue)); // Calculate a previous value
+            var Unitscore = afterUnitscore - beforeUnitscore;                                     // Calculate a total value
+
+            // Update score
+            var sqlC = 'SELECT ch03 FROM s_stat_users_ch_score WHERE user_id = ?';
+            const [rowsC] = await conn.query(sqlC, type);
+            var score = rowsC[0].ch03;
+            console.log(score, " ", afterUnitscore, " ", beforeUnitscore, " ", Unitscore);
+            score = score + Unitscore; // Calculate a score
+            var sqlD = 'UPDATE s_stat_users_ch_score SET ch03=? WHERE user_id=?';
+            var paramsD = [score, type]
+            const [rowsD] = await conn.query(sqlD, paramsD);
+
+            await conn.commit();
+            res.json(rowsD);
+
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
+
+    ///////////// OX Chapter-4 /////////////
+    app.put('/api/s_ox_users_order_ch04/update2/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch04_q" + q_num;               // Question Number String (ox_ch04_q1~q40)
+            var answerArray_int = new Array();                  // Array for temporary save of the result of answer.
+
+            await conn.beginTransaction();
+
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch04 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+            }
+            else {
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch04";  // Table ID String (s_ox_users_s1~s5_ch04)
+
+            // Calculation of the weight
+            // ** weight = answer result(1st) x 4 + answer result(2nd) x 2 + answer result(3nd)
+            //   (A range of weight is from 0 to 7)
+            //   (1st -> 2nd -> 3nd > 4nd is ... in the order of most recently entered values)
+            // ** Alpha value : Calibration value of unit score (0 ~0.7)
+            // ** unit score = weight x [Alphavalue + (1 - answer rate) x (1 - Alphavalue)]
+            //   (A range of [] value is from Alphavalue(min.) to 1.0)
+            // ** score = score - unit Score(#Before) + unit Score(#After)
+            for(i=0; i<4; i++) {
+                var order_t = order_t >0 ? order_t : 5;
+                var answerTableNum = "s_ox_users_s" + order_t + "_ch04";
+                var sqlA = 'SELECT ?? AS answerResult FROM ?? WHERE user_id = ?';
+                var paramsA = [qst_string, answerTableNum, type]
+                const [rowsA] = await conn.query(sqlA, paramsA);
+
+                answerArray_int[i] = rowsA[0].answerResult != null ? rowsA[0].answerResult.readInt8() : 0; // byte -> integer
+                order_t = order_t - 1;
+            }
+
+            // Weight
+            var afterWeight = answerArray_int[0]*4 + answerArray_int[1]*2 + answerArray_int[2];  // Calculate a current value
+            var beforeWeight = answerArray_int[1]*4 + answerArray_int[2]*2 + answerArray_int[3]; // Calculate a previous value
+
+            // Read correct answer rate
+            var sqlB = 'SELECT ox_avr FROM s_ox_qs_ansr_ch04 WHERE qst_id = ?';
+            var paramsB = [qst_string]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            var Alphavalue = 0.6;          // Alpha value
+            var AnsRate = rowsB[0].ox_avr != null ? rowsB[0].ox_avr : 0; // Answer rate
+
+            // Unit score
+            var afterUnitscore = afterWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue));   // Calculate a current value
+            var beforeUnitscore = beforeWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue)); // Calculate a previous value
+            var Unitscore = afterUnitscore - beforeUnitscore;                                     // Calculate a total value
+
+            // Update score
+            var sqlC = 'SELECT ch04 FROM s_stat_users_ch_score WHERE user_id = ?';
+            const [rowsC] = await conn.query(sqlC, type);
+            var score = rowsC[0].ch04;
+            console.log(score, " ", afterUnitscore, " ", beforeUnitscore, " ", Unitscore);
+            score = score + Unitscore; // Calculate a score
+            var sqlD = 'UPDATE s_stat_users_ch_score SET ch04=? WHERE user_id=?';
+            var paramsD = [score, type]
+            const [rowsD] = await conn.query(sqlD, paramsD);
+
+            await conn.commit();
+            res.json(rowsD);
+
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
+
+    ///////////// OX Chapter-5 /////////////
+    app.put('/api/s_ox_users_order_ch05/update2/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch05_q" + q_num;               // Question Number String (ox_ch05_q1~q40)
+            var answerArray_int = new Array();                  // Array for temporary save of the result of answer.
+
+            await conn.beginTransaction();
+
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch05 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+            }
+            else {
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch05";  // Table ID String (s_ox_users_s1~s5_ch05)
+
+            // Calculation of the weight
+            // ** weight = answer result(1st) x 4 + answer result(2nd) x 2 + answer result(3nd)
+            //   (A range of weight is from 0 to 7)
+            //   (1st -> 2nd -> 3nd > 4nd is ... in the order of most recently entered values)
+            // ** Alpha value : Calibration value of unit score (0 ~0.7)
+            // ** unit score = weight x [Alphavalue + (1 - answer rate) x (1 - Alphavalue)]
+            //   (A range of [] value is from Alphavalue(min.) to 1.0)
+            // ** score = score - unit Score(#Before) + unit Score(#After)
+            for(i=0; i<4; i++) {
+                var order_t = order_t >0 ? order_t : 5;
+                var answerTableNum = "s_ox_users_s" + order_t + "_ch05";
+                var sqlA = 'SELECT ?? AS answerResult FROM ?? WHERE user_id = ?';
+                var paramsA = [qst_string, answerTableNum, type]
+                const [rowsA] = await conn.query(sqlA, paramsA);
+
+                answerArray_int[i] = rowsA[0].answerResult != null ? rowsA[0].answerResult.readInt8() : 0; // byte -> integer
+                order_t = order_t - 1;
+            }
+
+            // Weight
+            var afterWeight = answerArray_int[0]*4 + answerArray_int[1]*2 + answerArray_int[2];  // Calculate a current value
+            var beforeWeight = answerArray_int[1]*4 + answerArray_int[2]*2 + answerArray_int[3]; // Calculate a previous value
+
+            // Read correct answer rate
+            var sqlB = 'SELECT ox_avr FROM s_ox_qs_ansr_ch05 WHERE qst_id = ?';
+            var paramsB = [qst_string]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            var Alphavalue = 0.6;          // Alpha value
+            var AnsRate = rowsB[0].ox_avr != null ? rowsB[0].ox_avr : 0; // Answer rate
+
+            // Unit score
+            var afterUnitscore = afterWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue));   // Calculate a current value
+            var beforeUnitscore = beforeWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue)); // Calculate a previous value
+            var Unitscore = afterUnitscore - beforeUnitscore;                                     // Calculate a total value
+
+            // Update score
+            var sqlC = 'SELECT ch05 FROM s_stat_users_ch_score WHERE user_id = ?';
+            const [rowsC] = await conn.query(sqlC, type);
+            var score = rowsC[0].ch05;
+            console.log(score, " ", afterUnitscore, " ", beforeUnitscore, " ", Unitscore);
+            score = score + Unitscore; // Calculate a score
+            var sqlD = 'UPDATE s_stat_users_ch_score SET ch05=? WHERE user_id=?';
+            var paramsD = [score, type]
+            const [rowsD] = await conn.query(sqlD, paramsD);
+
+            await conn.commit();
+            res.json(rowsD);
+
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
+
+    ///////////// OX Chapter-6 /////////////
+    app.put('/api/s_ox_users_order_ch06/update2/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch06_q" + q_num;               // Question Number String (ox_ch06_q1~q40)
+            var answerArray_int = new Array();                  // Array for temporary save of the result of answer.
+
+            await conn.beginTransaction();
+
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch06 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+            }
+            else {
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch06";  // Table ID String (s_ox_users_s1~s5_ch06)
+
+            // Calculation of the weight
+            // ** weight = answer result(1st) x 4 + answer result(2nd) x 2 + answer result(3nd)
+            //   (A range of weight is from 0 to 7)
+            //   (1st -> 2nd -> 3nd > 4nd is ... in the order of most recently entered values)
+            // ** Alpha value : Calibration value of unit score (0 ~0.7)
+            // ** unit score = weight x [Alphavalue + (1 - answer rate) x (1 - Alphavalue)]
+            //   (A range of [] value is from Alphavalue(min.) to 1.0)
+            // ** score = score - unit Score(#Before) + unit Score(#After)
+            for(i=0; i<4; i++) {
+                var order_t = order_t >0 ? order_t : 5;
+                var answerTableNum = "s_ox_users_s" + order_t + "_ch06";
+                var sqlA = 'SELECT ?? AS answerResult FROM ?? WHERE user_id = ?';
+                var paramsA = [qst_string, answerTableNum, type]
+                const [rowsA] = await conn.query(sqlA, paramsA);
+
+                answerArray_int[i] = rowsA[0].answerResult != null ? rowsA[0].answerResult.readInt8() : 0; // byte -> integer
+                order_t = order_t - 1;
+            }
+
+            // Weight
+            var afterWeight = answerArray_int[0]*4 + answerArray_int[1]*2 + answerArray_int[2];  // Calculate a current value
+            var beforeWeight = answerArray_int[1]*4 + answerArray_int[2]*2 + answerArray_int[3]; // Calculate a previous value
+
+            // Read correct answer rate
+            var sqlB = 'SELECT ox_avr FROM s_ox_qs_ansr_ch06 WHERE qst_id = ?';
+            var paramsB = [qst_string]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            var Alphavalue = 0.6;          // Alpha value
+            var AnsRate = rowsB[0].ox_avr != null ? rowsB[0].ox_avr : 0; // Answer rate
+
+            // Unit score
+            var afterUnitscore = afterWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue));   // Calculate a current value
+            var beforeUnitscore = beforeWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue)); // Calculate a previous value
+            var Unitscore = afterUnitscore - beforeUnitscore;                                     // Calculate a total value
+
+            // Update score
+            var sqlC = 'SELECT ch06 FROM s_stat_users_ch_score WHERE user_id = ?';
+            const [rowsC] = await conn.query(sqlC, type);
+            var score = rowsC[0].ch06;
+            console.log(score, " ", afterUnitscore, " ", beforeUnitscore, " ", Unitscore);
+            score = score + Unitscore; // Calculate a score
+            var sqlD = 'UPDATE s_stat_users_ch_score SET ch06=? WHERE user_id=?';
+            var paramsD = [score, type]
+            const [rowsD] = await conn.query(sqlD, paramsD);
+
+            await conn.commit();
+            res.json(rowsD);
+
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
+
+    ///////////// OX Chapter-7 /////////////
+    app.put('/api/s_ox_users_order_ch07/update2/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch07_q" + q_num;               // Question Number String (ox_ch07_q1~q40)
+            var answerArray_int = new Array();                  // Array for temporary save of the result of answer.
+
+            await conn.beginTransaction();
+
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch07 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+            }
+            else {
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch07";  // Table ID String (s_ox_users_s1~s5_ch07)
+
+            // Calculation of the weight
+            // ** weight = answer result(1st) x 4 + answer result(2nd) x 2 + answer result(3nd)
+            //   (A range of weight is from 0 to 7)
+            //   (1st -> 2nd -> 3nd > 4nd is ... in the order of most recently entered values)
+            // ** Alpha value : Calibration value of unit score (0 ~0.7)
+            // ** unit score = weight x [Alphavalue + (1 - answer rate) x (1 - Alphavalue)]
+            //   (A range of [] value is from Alphavalue(min.) to 1.0)
+            // ** score = score - unit Score(#Before) + unit Score(#After)
+            for(i=0; i<4; i++) {
+                var order_t = order_t >0 ? order_t : 5;
+                var answerTableNum = "s_ox_users_s" + order_t + "_ch07";
+                var sqlA = 'SELECT ?? AS answerResult FROM ?? WHERE user_id = ?';
+                var paramsA = [qst_string, answerTableNum, type]
+                const [rowsA] = await conn.query(sqlA, paramsA);
+
+                answerArray_int[i] = rowsA[0].answerResult != null ? rowsA[0].answerResult.readInt8() : 0; // byte -> integer
+                order_t = order_t - 1;
+            }
+
+            // Weight
+            var afterWeight = answerArray_int[0]*4 + answerArray_int[1]*2 + answerArray_int[2];  // Calculate a current value
+            var beforeWeight = answerArray_int[1]*4 + answerArray_int[2]*2 + answerArray_int[3]; // Calculate a previous value
+
+            // Read correct answer rate
+            var sqlB = 'SELECT ox_avr FROM s_ox_qs_ansr_ch07 WHERE qst_id = ?';
+            var paramsB = [qst_string]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            var Alphavalue = 0.6;          // Alpha value
+            var AnsRate = rowsB[0].ox_avr != null ? rowsB[0].ox_avr : 0; // Answer rate
+
+            // Unit score
+            var afterUnitscore = afterWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue));   // Calculate a current value
+            var beforeUnitscore = beforeWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue)); // Calculate a previous value
+            var Unitscore = afterUnitscore - beforeUnitscore;                                     // Calculate a total value
+
+            // Update score
+            var sqlC = 'SELECT ch07 FROM s_stat_users_ch_score WHERE user_id = ?';
+            const [rowsC] = await conn.query(sqlC, type);
+            var score = rowsC[0].ch07;
+            console.log(score, " ", afterUnitscore, " ", beforeUnitscore, " ", Unitscore);
+            score = score + Unitscore; // Calculate a score
+            var sqlD = 'UPDATE s_stat_users_ch_score SET ch07=? WHERE user_id=?';
+            var paramsD = [score, type]
+            const [rowsD] = await conn.query(sqlD, paramsD);
+
+            await conn.commit();
+            res.json(rowsD);
+
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
+
+    ///////////// OX Chapter-8 /////////////
+    app.put('/api/s_ox_users_order_ch08/update2/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch08_q" + q_num;               // Question Number String (ox_ch08_q1~q40)
+            var answerArray_int = new Array();                  // Array for temporary save of the result of answer.
+
+            await conn.beginTransaction();
+
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch08 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+            }
+            else {
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch08";  // Table ID String (s_ox_users_s1~s5_ch08)
+
+            // Calculation of the weight
+            // ** weight = answer result(1st) x 4 + answer result(2nd) x 2 + answer result(3nd)
+            //   (A range of weight is from 0 to 7)
+            //   (1st -> 2nd -> 3nd > 4nd is ... in the order of most recently entered values)
+            // ** Alpha value : Calibration value of unit score (0 ~0.7)
+            // ** unit score = weight x [Alphavalue + (1 - answer rate) x (1 - Alphavalue)]
+            //   (A range of [] value is from Alphavalue(min.) to 1.0)
+            // ** score = score - unit Score(#Before) + unit Score(#After)
+            for(i=0; i<4; i++) {
+                var order_t = order_t >0 ? order_t : 5;
+                var answerTableNum = "s_ox_users_s" + order_t + "_ch08";
+                var sqlA = 'SELECT ?? AS answerResult FROM ?? WHERE user_id = ?';
+                var paramsA = [qst_string, answerTableNum, type]
+                const [rowsA] = await conn.query(sqlA, paramsA);
+
+                answerArray_int[i] = rowsA[0].answerResult != null ? rowsA[0].answerResult.readInt8() : 0; // byte -> integer
+                order_t = order_t - 1;
+            }
+
+            // Weight
+            var afterWeight = answerArray_int[0]*4 + answerArray_int[1]*2 + answerArray_int[2];  // Calculate a current value
+            var beforeWeight = answerArray_int[1]*4 + answerArray_int[2]*2 + answerArray_int[3]; // Calculate a previous value
+
+            // Read correct answer rate
+            var sqlB = 'SELECT ox_avr FROM s_ox_qs_ansr_ch08 WHERE qst_id = ?';
+            var paramsB = [qst_string]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            var Alphavalue = 0.6;          // Alpha value
+            var AnsRate = rowsB[0].ox_avr != null ? rowsB[0].ox_avr : 0; // Answer rate
+
+            // Unit score
+            var afterUnitscore = afterWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue));   // Calculate a current value
+            var beforeUnitscore = beforeWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue)); // Calculate a previous value
+            var Unitscore = afterUnitscore - beforeUnitscore;                                     // Calculate a total value
+
+            // Update score
+            var sqlC = 'SELECT ch08 FROM s_stat_users_ch_score WHERE user_id = ?';
+            const [rowsC] = await conn.query(sqlC, type);
+            var score = rowsC[0].ch08;
+            console.log(score, " ", afterUnitscore, " ", beforeUnitscore, " ", Unitscore);
+            score = score + Unitscore; // Calculate a score
+            var sqlD = 'UPDATE s_stat_users_ch_score SET ch08=? WHERE user_id=?';
+            var paramsD = [score, type]
+            const [rowsD] = await conn.query(sqlD, paramsD);
+
+            await conn.commit();
+            res.json(rowsD);
+
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
+
+    ///////////// OX Chapter-9 /////////////
+    app.put('/api/s_ox_users_order_ch09/update2/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch09_q" + q_num;               // Question Number String (ox_ch09_q1~q40)
+            var answerArray_int = new Array();                  // Array for temporary save of the result of answer.
+
+            await conn.beginTransaction();
+
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch09 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+            }
+            else {
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch09";  // Table ID String (s_ox_users_s1~s5_ch09)
+
+            // Calculation of the weight
+            // ** weight = answer result(1st) x 4 + answer result(2nd) x 2 + answer result(3nd)
+            //   (A range of weight is from 0 to 7)
+            //   (1st -> 2nd -> 3nd > 4nd is ... in the order of most recently entered values)
+            // ** Alpha value : Calibration value of unit score (0 ~0.7)
+            // ** unit score = weight x [Alphavalue + (1 - answer rate) x (1 - Alphavalue)]
+            //   (A range of [] value is from Alphavalue(min.) to 1.0)
+            // ** score = score - unit Score(#Before) + unit Score(#After)
+            for(i=0; i<4; i++) {
+                var order_t = order_t >0 ? order_t : 5;
+                var answerTableNum = "s_ox_users_s" + order_t + "_ch09";
+                var sqlA = 'SELECT ?? AS answerResult FROM ?? WHERE user_id = ?';
+                var paramsA = [qst_string, answerTableNum, type]
+                const [rowsA] = await conn.query(sqlA, paramsA);
+
+                answerArray_int[i] = rowsA[0].answerResult != null ? rowsA[0].answerResult.readInt8() : 0; // byte -> integer
+                order_t = order_t - 1;
+            }
+
+            // Weight
+            var afterWeight = answerArray_int[0]*4 + answerArray_int[1]*2 + answerArray_int[2];  // Calculate a current value
+            var beforeWeight = answerArray_int[1]*4 + answerArray_int[2]*2 + answerArray_int[3]; // Calculate a previous value
+
+            // Read correct answer rate
+            var sqlB = 'SELECT ox_avr FROM s_ox_qs_ansr_ch09 WHERE qst_id = ?';
+            var paramsB = [qst_string]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            var Alphavalue = 0.6;          // Alpha value
+            var AnsRate = rowsB[0].ox_avr != null ? rowsB[0].ox_avr : 0; // Answer rate
+
+            // Unit score
+            var afterUnitscore = afterWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue));   // Calculate a current value
+            var beforeUnitscore = beforeWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue)); // Calculate a previous value
+            var Unitscore = afterUnitscore - beforeUnitscore;                                     // Calculate a total value
+
+            // Update score
+            var sqlC = 'SELECT ch09 FROM s_stat_users_ch_score WHERE user_id = ?';
+            const [rowsC] = await conn.query(sqlC, type);
+            var score = rowsC[0].ch09;
+            console.log(score, " ", afterUnitscore, " ", beforeUnitscore, " ", Unitscore);
+            score = score + Unitscore; // Calculate a score
+            var sqlD = 'UPDATE s_stat_users_ch_score SET ch09=? WHERE user_id=?';
+            var paramsD = [score, type]
+            const [rowsD] = await conn.query(sqlD, paramsD);
+
+            await conn.commit();
+            res.json(rowsD);
+
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
+
+    ///////////// OX Chapter-10 /////////////
+    app.put('/api/s_ox_users_order_ch10/update2/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch10_q" + q_num;               // Question Number String (ox_ch10_q1~q40)
+            var answerArray_int = new Array();                  // Array for temporary save of the result of answer.
+
+            await conn.beginTransaction();
+
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch10 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+            }
+            else {
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch10";  // Table ID String (s_ox_users_s1~s5_ch10)
+
+            // Calculation of the weight
+            // ** weight = answer result(1st) x 4 + answer result(2nd) x 2 + answer result(3nd)
+            //   (A range of weight is from 0 to 7)
+            //   (1st -> 2nd -> 3nd > 4nd is ... in the order of most recently entered values)
+            // ** Alpha value : Calibration value of unit score (0 ~0.7)
+            // ** unit score = weight x [Alphavalue + (1 - answer rate) x (1 - Alphavalue)]
+            //   (A range of [] value is from Alphavalue(min.) to 1.0)
+            // ** score = score - unit Score(#Before) + unit Score(#After)
+            for(i=0; i<4; i++) {
+                var order_t = order_t >0 ? order_t : 5;
+                var answerTableNum = "s_ox_users_s" + order_t + "_ch10";
+                var sqlA = 'SELECT ?? AS answerResult FROM ?? WHERE user_id = ?';
+                var paramsA = [qst_string, answerTableNum, type]
+                const [rowsA] = await conn.query(sqlA, paramsA);
+
+                answerArray_int[i] = rowsA[0].answerResult != null ? rowsA[0].answerResult.readInt8() : 0; // byte -> integer
+                order_t = order_t - 1;
+            }
+
+            // Weight
+            var afterWeight = answerArray_int[0]*4 + answerArray_int[1]*2 + answerArray_int[2];  // Calculate a current value
+            var beforeWeight = answerArray_int[1]*4 + answerArray_int[2]*2 + answerArray_int[3]; // Calculate a previous value
+
+            // Read correct answer rate
+            var sqlB = 'SELECT ox_avr FROM s_ox_qs_ansr_ch10 WHERE qst_id = ?';
+            var paramsB = [qst_string]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            var Alphavalue = 0.6;          // Alpha value
+            var AnsRate = rowsB[0].ox_avr != null ? rowsB[0].ox_avr : 0; // Answer rate
+
+            // Unit score
+            var afterUnitscore = afterWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue));   // Calculate a current value
+            var beforeUnitscore = beforeWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue)); // Calculate a previous value
+            var Unitscore = afterUnitscore - beforeUnitscore;                                     // Calculate a total value
+
+            // Update score
+            var sqlC = 'SELECT ch10 FROM s_stat_users_ch_score WHERE user_id = ?';
+            const [rowsC] = await conn.query(sqlC, type);
+            var score = rowsC[0].ch10;
+            console.log(score, " ", afterUnitscore, " ", beforeUnitscore, " ", Unitscore);
+            score = score + Unitscore; // Calculate a score
+            var sqlD = 'UPDATE s_stat_users_ch_score SET ch10=? WHERE user_id=?';
+            var paramsD = [score, type]
+            const [rowsD] = await conn.query(sqlD, paramsD);
+
+            await conn.commit();
+            res.json(rowsD);
+
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
+
+    ///////////// OX Chapter-11 /////////////
+    app.put('/api/s_ox_users_order_ch11/update2/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch11_q" + q_num;               // Question Number String (ox_ch11_q1~q40)
+            var answerArray_int = new Array();                  // Array for temporary save of the result of answer.
+
+            await conn.beginTransaction();
+
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch11 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+            }
+            else {
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch11";  // Table ID String (s_ox_users_s1~s5_ch11)
+
+            // Calculation of the weight
+            // ** weight = answer result(1st) x 4 + answer result(2nd) x 2 + answer result(3nd)
+            //   (A range of weight is from 0 to 7)
+            //   (1st -> 2nd -> 3nd > 4nd is ... in the order of most recently entered values)
+            // ** Alpha value : Calibration value of unit score (0 ~0.7)
+            // ** unit score = weight x [Alphavalue + (1 - answer rate) x (1 - Alphavalue)]
+            //   (A range of [] value is from Alphavalue(min.) to 1.0)
+            // ** score = score - unit Score(#Before) + unit Score(#After)
+            for(i=0; i<4; i++) {
+                var order_t = order_t >0 ? order_t : 5;
+                var answerTableNum = "s_ox_users_s" + order_t + "_ch11";
+                var sqlA = 'SELECT ?? AS answerResult FROM ?? WHERE user_id = ?';
+                var paramsA = [qst_string, answerTableNum, type]
+                const [rowsA] = await conn.query(sqlA, paramsA);
+
+                answerArray_int[i] = rowsA[0].answerResult != null ? rowsA[0].answerResult.readInt8() : 0; // byte -> integer
+                order_t = order_t - 1;
+            }
+
+            // Weight
+            var afterWeight = answerArray_int[0]*4 + answerArray_int[1]*2 + answerArray_int[2];  // Calculate a current value
+            var beforeWeight = answerArray_int[1]*4 + answerArray_int[2]*2 + answerArray_int[3]; // Calculate a previous value
+
+            // Read correct answer rate
+            var sqlB = 'SELECT ox_avr FROM s_ox_qs_ansr_ch11 WHERE qst_id = ?';
+            var paramsB = [qst_string]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            var Alphavalue = 0.6;          // Alpha value
+            var AnsRate = rowsB[0].ox_avr != null ? rowsB[0].ox_avr : 0; // Answer rate
+
+            // Unit score
+            var afterUnitscore = afterWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue));   // Calculate a current value
+            var beforeUnitscore = beforeWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue)); // Calculate a previous value
+            var Unitscore = afterUnitscore - beforeUnitscore;                                     // Calculate a total value
+
+            // Update score
+            var sqlC = 'SELECT ch11 FROM s_stat_users_ch_score WHERE user_id = ?';
+            const [rowsC] = await conn.query(sqlC, type);
+            var score = rowsC[0].ch11;
+            console.log(score, " ", afterUnitscore, " ", beforeUnitscore, " ", Unitscore);
+            score = score + Unitscore; // Calculate a score
+            var sqlD = 'UPDATE s_stat_users_ch_score SET ch11=? WHERE user_id=?';
+            var paramsD = [score, type]
+            const [rowsD] = await conn.query(sqlD, paramsD);
+
+            await conn.commit();
+            res.json(rowsD);
+
+        } catch(err) {
+            await conn.rollback();
+            console.log(err);
+            res.status(500).json({message: err.message});
+        } finally {
+            conn.release();
+        }
+    });
+
+    ///////////// OX Chapter-12 /////////////
+    app.put('/api/s_ox_users_order_ch12/update2/:type', async(req, res) => {
+        const conn = await pool.getConnection(async conn => conn);
+        try {
+            let {type} = req.params;
+            var q_num = req.body.q_num;                         // Question Number (value : 1, 2, 3, 4 ... n)
+            var order_t = req.body.order_t;                     // Order Number (value : 1, 2, 3, 4, 5)
+            var solve_r = req.body.solve_r;                     // Result of Answer (value : 1 / 0)
+            var qst_string = "ox_ch12_q" + q_num;               // Question Number String (ox_ch12_q1~q40)
+            var answerArray_int = new Array();                  // Array for temporary save of the result of answer.
+
+            await conn.beginTransaction();
+
+            // Read order info. and match (To verify that the value of client matches the server)
+            var sql = 'SELECT ?? AS s_order_t FROM s_ox_users_order_ch12 WHERE user_id = ?';
+            var params = [qst_string, type]
+            const [rows] = await conn.query(sql, params);
+            if(order_t != rows[0].s_order_t) {
+                order_t = rows[0].s_order_t;
+            }
+            else {
+            }  // The order number is only from server DB!!
+            var t_string = "s_ox_users_s" + order_t + "_ch12";  // Table ID String (s_ox_users_s1~s5_ch12)
+
+            // Calculation of the weight
+            // ** weight = answer result(1st) x 4 + answer result(2nd) x 2 + answer result(3nd)
+            //   (A range of weight is from 0 to 7)
+            //   (1st -> 2nd -> 3nd > 4nd is ... in the order of most recently entered values)
+            // ** Alpha value : Calibration value of unit score (0 ~0.7)
+            // ** unit score = weight x [Alphavalue + (1 - answer rate) x (1 - Alphavalue)]
+            //   (A range of [] value is from Alphavalue(min.) to 1.0)
+            // ** score = score - unit Score(#Before) + unit Score(#After)
+            for(i=0; i<4; i++) {
+                var order_t = order_t >0 ? order_t : 5;
+                var answerTableNum = "s_ox_users_s" + order_t + "_ch12";
+                var sqlA = 'SELECT ?? AS answerResult FROM ?? WHERE user_id = ?';
+                var paramsA = [qst_string, answerTableNum, type]
+                const [rowsA] = await conn.query(sqlA, paramsA);
+
+                answerArray_int[i] = rowsA[0].answerResult != null ? rowsA[0].answerResult.readInt8() : 0; // byte -> integer
+                order_t = order_t - 1;
+            }
+
+            // Weight
+            var afterWeight = answerArray_int[0]*4 + answerArray_int[1]*2 + answerArray_int[2];  // Calculate a current value
+            var beforeWeight = answerArray_int[1]*4 + answerArray_int[2]*2 + answerArray_int[3]; // Calculate a previous value
+
+            // Read correct answer rate
+            var sqlB = 'SELECT ox_avr FROM s_ox_qs_ansr_ch12 WHERE qst_id = ?';
+            var paramsB = [qst_string]
+            const [rowsB] = await conn.query(sqlB, paramsB);
+            var Alphavalue = 0.6;          // Alpha value
+            var AnsRate = rowsB[0].ox_avr != null ? rowsB[0].ox_avr : 0; // Answer rate
+
+            // Unit score
+            var afterUnitscore = afterWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue));   // Calculate a current value
+            var beforeUnitscore = beforeWeight * (Alphavalue + (1 - AnsRate) * (1 - Alphavalue)); // Calculate a previous value
+            var Unitscore = afterUnitscore - beforeUnitscore;                                     // Calculate a total value
+
+            // Update score
+            var sqlC = 'SELECT ch12 FROM s_stat_users_ch_score WHERE user_id = ?';
+            const [rowsC] = await conn.query(sqlC, type);
+            var score = rowsC[0].ch12;
+            console.log(score, " ", afterUnitscore, " ", beforeUnitscore, " ", Unitscore);
+            score = score + Unitscore; // Calculate a score
+            var sqlD = 'UPDATE s_stat_users_ch_score SET ch12=? WHERE user_id=?';
+            var paramsD = [score, type]
+            const [rowsD] = await conn.query(sqlD, paramsD);
+
+            await conn.commit();
+            res.json(rowsD);
 
         } catch(err) {
             await conn.rollback();
@@ -1291,112 +2181,168 @@ update_ox2()
 */
 
 
-
-/*
-function dbQueryAsync(query, params) {
-    return new Promise((resolve, reject) => {
-        conn.query(query, params, (error, result) => {
-            if (error) {
-                reject(error);
-            }
-            resolve(result);                
-        });
-    });
-}
-
-///////////// (Table ID : s_ox_qs_ansr_ch01~12) Update OX 집계(풀이 합산) ///////////////////////////
+///////////// (Table ID : s_ox_qs_ansr_ch01~12) Update OX Statistics (Add up the number of correct/wrong answers) ///////////////////////////
 // ** Sequence
 // 1 Step : Read the ratio of correct/wrong answer -> Calculation 
 // 2 Step : update OX solving result (sum of correct/wrong answer)
 // function name : trigger_ox_OsumResult
 async function trigger_ox_OsumResult() {
-    var ox_ch_count = 12;  // OX 전체 단원 수
-    var ox_qst_count = 40; // OX 단원 별 문항 수
-    var ox_ans_count = 5;  // OX 풀이 회차
-    var user_lv_count = 5; // 학습 레벨 단계 구분 (Lv1. ~ Lv5.)
+    const conn = await pool.getConnection(async conn => conn);
+    try {
+        var ox_ch_count = 12;   // OX total number of chapters
+        var ox_qst_count = 40;  // OX number of question per chapter
+        var ox_ans_count = 5;   // OX order of answers
+        var user_lv_count = 5;  // Learing level (Lv1. ~ Lv5.)
 
-    for(var i=1; i<=ox_ch_count; i++){
-        let ch_string = i<10 ? "s_ox_qs_ansr_ch0" + i : "s_ox_qs_ansr_ch" + i; // 집계 테이블(Table ID: s_ox_qs_ansr_ch01~ch12) 단원 선택
-        for(var j=1; j<=ox_qst_count; j++){
-            let qst_string = i<10 ? "ox_ch0" + i + "_q" + j : "ox_ch" + i + "_q" + j; // 문항 선택 (Column : ox_ch01(ch12)_q1~q40)
-            for(var k=1; k<=user_lv_count; k++){
-                var lv_string = "l" + k + "_o_sum"; // Update 학습 레벨 선택 (lv.1~lv.5)
-                var qst5_sum = 0; // 집계 합산 변수 초기화
-                for(var l=1; l<=ox_ans_count; l++){
-                    let table_string = i<10 ? "s_ox_users_s" + l + "_ch0" + i : "s_ox_users_s" + l + "_ch" + i; // 풀이 테이블(Table ID: s_ox_user_s1(s5)_ch01~ch12) 선택
-                // 단원&문항 별 정답수 산출 Query
-                    let sql1 = 'SELECT COUNT(*) AS sumCount FROM ?? '
-                    + 'JOIN s_users_id_info ON s_users_id_info.user_id = ??.user_id '
-                    + 'WHERE ?? = 1 AND s_users_id_info.level = ?';
-                    var params1 = [table_string, table_string, qst_string, k]
-                // Update 정답 수 Query
-                    var sql2 = 'UPDATE ?? SET ??=? WHERE qst_id=?'
-                    var params2 = [ch_string, lv_string, qst5_sum, qst_string]
+        await conn.beginTransaction();
 
-                    try {
-                        var FeedResult = await dbQueryAsync(sql1, params1);
-                        qst5_sum = qst5_sum + FeedResult[0].sumCount;
-                    } catch (err) {
-                        console.log(err);
+        // number of chapter (12) x number of question (40) x number of order (5) x number of learning level (5) = 12,000
+        for(var i=1; i<=ox_ch_count; i++){
+            let ch_string = i<10 ? "s_ox_qs_ansr_ch0" + i : "s_ox_qs_ansr_ch" + i;          // to select a chapter from DB table (Table ID: s_ox_qs_ansr_ch01~ch12)
+            for(var j=1; j<=ox_qst_count; j++){
+                let qst_string = i<10 ? "ox_ch0" + i + "_q" + j : "ox_ch" + i + "_q" + j;   // to select a question from table column (Column : ox_ch01(ch12)_q1~q40)
+                for(var k=1; k<=user_lv_count; k++){
+                    var lv_string = "l" + k + "_o_sum";                                     // to select a learing level (lv.1~lv.5)
+                    var qst5_sum = 0;                                                       // Initialize a variable
+                    for(var l=1; l<=ox_ans_count; l++){
+                        var table_string = i<10 ? "s_ox_users_s" + l + "_ch0" + i : "s_ox_users_s" + l + "_ch" + i; // to select answer result (Table ID: s_ox_user_s1(s5)_ch01~ch12)
+
+                        // calculate the number of correct answers
+                        var sqlA = 'SELECT COUNT(*) AS sumCount FROM ?? '
+                        + 'JOIN s_users_id_info ON s_users_id_info.user_id = ??.user_id '
+                        + 'WHERE ?? = 1 AND s_users_id_info.level = ?';
+                        var paramsA = [table_string, table_string, qst_string, k]
+                        const [rowsA] = await conn.query(sqlA, paramsA);
+                        qst5_sum = qst5_sum + rowsA[0].sumCount;
                     }
-                }
-                try {
-                    await dbQueryAsync(sql2, params2);
-                    console.log(ch_string + "_" + lv_string + "_" + qst_string + "_ : " + qst5_sum); // 합산 값 로그 체크
-                } catch (err) {
-                    console.log(err);
+                    
+                    // Update the number of correct answers
+                    var sqlB = 'UPDATE ?? SET ??=? WHERE qst_id=?'
+                    var paramsB = [ch_string, lv_string, qst5_sum, qst_string]
+                    const [rowsB] = await conn.query(sqlB, paramsB);
+                    res.json(rowsB);
+                    // console.log(ch_string + "_" + lv_string + "_" + qst_string + "_ : " + qst5_sum); // log ()
                 }
             }
         }
+        await conn.commit();
+        console.log("trigger_ox_OsumResult is end");
+
+    } catch(err) {
+        await conn.rollback();
+        console.log(err);
+        res.status(500).json({message: err.message});
+    } finally {
+        conn.release();
     }
 }
 
+// function name : trigger_ox_XsumResult
 async function trigger_ox_XsumResult() {
-    var ox_ch_count = 12;  // OX 전체 단원 수
-    var ox_qst_count = 40; // OX 단원 별 문항 수
-    var ox_ans_count = 5;  // OX 풀이 회차
-    var user_lv_count = 5; // 학습 레벨 단계 구분 (Lv1. ~ Lv5.)
+    const conn = await pool.getConnection(async conn => conn);
+    try {
+        var ox_ch_count = 12;   // OX total number of chapters
+        var ox_qst_count = 40;  // OX number of question per chapter
+        var ox_ans_count = 5;   // OX order of answers
+        var user_lv_count = 5;  // Learing level (Lv1. ~ Lv5.)
 
-    for(var i=1; i<=ox_ch_count; i++){
-        let ch_string = i<10 ? "s_ox_qs_ansr_ch0" + i : "s_ox_qs_ansr_ch" + i; // 집계 테이블(Table ID: s_ox_qs_ansr_ch01~ch12) 단원 선택
-        for(var j=1; j<=ox_qst_count; j++){
-            let qst_string = i<10 ? "ox_ch0" + i + "_q" + j : "ox_ch" + i + "_q" + j; // 문항 선택 (Column : ox_ch01(ch12)_q1~q40)
-            for(var k=1; k<=user_lv_count; k++){
-                var lv_string = "l" + k + "_x_sum"; // Update 학습 레벨 선택 (lv.1~lv.5)
-                var qst5_sum = 0; // 집계 합산 변수 초기화
-                for(var l=1; l<=ox_ans_count; l++){
-                    let table_string = i<10 ? "s_ox_users_s" + l + "_ch0" + i : "s_ox_users_s" + l + "_ch" + i; // 풀이 테이블(Table ID: s_ox_user_s1(s5)_ch01~ch12) 선택
-                // 단원&문항 별 오답수 산출 Query
-                    let sql1 = 'SELECT COUNT(*) AS sumCount FROM ?? '
-                    + 'JOIN s_users_id_info ON s_users_id_info.user_id = ??.user_id '
-                    + 'WHERE ?? = 0 AND s_users_id_info.level = ?';
-                    var params1 = [table_string, table_string, qst_string, k]
-                // Update 오답 수 Query
-                    var sql2 = 'UPDATE ?? SET ??=? WHERE qst_id=?'
-                    var params2 = [ch_string, lv_string, qst5_sum, qst_string]
+        await conn.beginTransaction();
 
-                    try {
-                        var FeedResult = await dbQueryAsync(sql1, params1);
-                        qst5_sum = qst5_sum + FeedResult[0].sumCount;
-                    } catch (err) {
-                        console.log(err);
+        // number of chapter (12) x number of question (40) x number of order (5) x number of learning level (5) = 12,000
+        for(var i=1; i<=ox_ch_count; i++){
+            let ch_string = i<10 ? "s_ox_qs_ansr_ch0" + i : "s_ox_qs_ansr_ch" + i;          // to select a chapter from DB table (Table ID: s_ox_qs_ansr_ch01~ch12)
+            for(var j=1; j<=ox_qst_count; j++){
+                let qst_string = i<10 ? "ox_ch0" + i + "_q" + j : "ox_ch" + i + "_q" + j;   // to select a question from table column (Column : ox_ch01(ch12)_q1~q40)
+                for(var k=1; k<=user_lv_count; k++){
+                    var lv_string = "l" + k + "_x_sum";                                     // to select a learing level (lv.1~lv.5)
+                    var qst5_sum = 0;                                                       // Initialize a variable
+                    for(var l=1; l<=ox_ans_count; l++){
+                        var table_string = i<10 ? "s_ox_users_s" + l + "_ch0" + i : "s_ox_users_s" + l + "_ch" + i; // to select answer result (Table ID: s_ox_user_s1(s5)_ch01~ch12)
+
+                    // calculate the number of correct answers 
+                        var sqlA = 'SELECT COUNT(*) AS sumCount FROM ?? '
+                        + 'JOIN s_users_id_info ON s_users_id_info.user_id = ??.user_id '
+                        + 'WHERE ?? = 0 AND s_users_id_info.level = ?';
+                        var paramsA = [table_string, table_string, qst_string, k]
+                        const [rowsA] = await conn.query(sqlA, paramsA);
+                        qst5_sum = qst5_sum + rowsA[0].sumCount;
                     }
-                }
-                try {
-                    await dbQueryAsync(sql2, params2);
-                    console.log(ch_string + "_" + lv_string + "_" + qst_string + "_ : " + qst5_sum); // 합산 값 로그 체크
-                } catch (err) {
-                    console.log(err);
+                    
+                    // Update the number of correct answers
+                    var sqlB = 'UPDATE ?? SET ??=? WHERE qst_id=?'
+                    var paramsB = [ch_string, lv_string, qst5_sum, qst_string]
+                    const [rowsB] = await conn.query(sqlB, paramsB);
+                    res.json(rowsB);
+                    // console.log(ch_string + "_" + lv_string + "_" + qst_string + "_ : " + qst5_sum); // log ()
                 }
             }
         }
+        await conn.commit();
+        console.log("trigger_ox_XsumResult is end");
+
+    } catch(err) {
+        await conn.rollback();
+        console.log(err);
+        res.status(500).json({message: err.message});
+    } finally {
+        conn.release();
     }
 }
+
 
 async function trigger_ox_AvrResult() {
-    var ox_ch_count = 12;  // OX 전체 단원 수
-    var ox_qst_count = 40; // OX 단원 별 문항 수
-    var user_lv_count = 5; // 학습 레벨 단계 구분 (Lv1. ~ Lv5.)
+    const conn = await pool.getConnection(async conn => conn);
+    try {
+        var ox_ch_count = 12;   // OX total number of chapters
+        var ox_qst_count = 40;  // OX number of question per chapter
+        var user_lv_count = 5;  // Learing level (Lv1. ~ Lv5.)
+
+        for(var i=1; i<=ox_ch_count; i++){
+            let table_string = i<10 ? "s_ox_qs_ansr_ch0" + i : "s_ox_qs_ansr_ch" + i;      // to select a chapter from DB table (Table ID: s_ox_qs_ansr_ch01~ch12)
+            for(var j=1; j<=ox_qst_count; j++){
+                let qst_string = i<10 ? "ox_ch0" + i + "_q" + j : "ox_ch" + i + "_q" + j;  // to select a question from table column (Column : ox_ch01(ch12)_q1~q40)
+                var avrOsum = 0;                                                       // Initialize a variable
+                var avrXsum = 0;                                                       // Initialize a variable
+                for(var k=1; k<=user_lv_count; k++){
+                    var lvOsum_string = "l" + k + "_o_sum";                                   // to select a learing level (lv.1~lv.5)
+                    var lvXsum_string = "l" + k + "_x_sum";                                   // to select a learing level (lv.1~lv.5)
+                    var lvSum_string = "l" + k + "_ox_avr";                                  // to select a learing level (lv.1~lv.5)
+                    
+                    // Read the number of correct/wrong answers 
+                    var sqlA = 'SELECT ?? AS Osum, ?? AS Xsum FROM ?? WHERE qst_id = ?';
+                    var paramsA = [lvOsum_string, lvXsum_string, table_string, qst_string]
+                    const [rowsA] = await conn.query(sqlA, paramsA);
+                    avrOsum = avrOsum + rowsA[0].Osum;
+                    avrXsum = avrXsum + rowsA[0].Xsum;
+
+                    var qAvr = rowsA[0].Osum + rowsA[0].Xsum != 0 ? rowsA[0].Osum / (rowsA[0].Osum +rowsA[0].Xsum) : null;
+                    var qAvr_prec = qAvr != null ? Math.ceil(qAvr*100)/100 : null;
+
+                    // Update the correct answer rate
+                    var sqlB = 'UPDATE ?? SET ??=? WHERE qst_id=?'
+                    var paramsB = [table_string, lvSum_string, qAvr_prec, qst_string]
+                    const [rowsB] = await conn.query(sqlB, paramsB);
+                }
+                // Update the number of correct/wrong answers, correct answer rate (total)
+                var QAvr = avrOsum + avrXsum != 0 ? avrOsum / (avrOsum + avrXsum) : null;
+                var QAvr_prec = QAvr != null ? Math.ceil(QAvr*100)/100 : null;
+                var sqlC = 'UPDATE ?? SET o_sum=?, x_sum=?, ox_avr=? WHERE qst_id=?'
+                var paramsC = [table_string, avrOsum, avrXsum, QAvr_prec, qst_string]
+                const [rowsC] = await conn.query(sqlC, paramsC);
+                res.json(rowsC);
+            }
+        }
+        await conn.commit();
+        console.log("trigger_ox_AvrResult is end");
+
+    } catch(err) {
+        await conn.rollback();
+        console.log(err);
+        res.status(500).json({message: err.message});
+    } finally {
+        conn.release();
+    }
+
 
     for(var i=1; i<=ox_ch_count; i++){
         let table_string = i<10 ? "s_ox_qs_ansr_ch0" + i : "s_ox_qs_ansr_ch" + i; // 집계 테이블(Table ID: s_ox_qs_ansr_ch01~ch12) 단원 선택
@@ -1443,138 +2389,11 @@ async function trigger_ox_AvrResult() {
         }
     }
 }
-*/
 
-/*
-app.put('/api/s_ox_users_us_ch01/update/:type', function(req, res) {
-    conn.beginTransaction((err)=>{
-        
-    });
-});
-
-        let {type} = req.params;
-        var q_num = req.body.q_num; // 문항 번호 (Input value : 1, 2, 3, 4 ... n)
-        var order_t = req.body.order_t; // Order info.에 따른 table ID 선택 (Input value : 1, 2, 3, 4, 5)
-
-        var qst_string = "ox_ch01_q" + q_num; // 문항 번호 String
-        // var t_string = "s_ox_users_s" + order_t + "_ch01"; // Table ID String
-        var SolveArray_int = new Array();
-
-
-async function TestFunction_UserScore() {
-    var QstNum = 1;     // 임의의 문항번호 선택 (1번)
-    var OrderNum = 2;   // 임의의 순차 (2번)
-    var type = 11;      // 임의의 사용자 ID 선택 (11번)
-
-    var QstString = "ox_ch01_q" + QstNum;
-    var SolveArray_int = new Array();
-    for(i=0; i<4; i++){
-        OrderNum = OrderNum >0 ? OrderNum : 5;
-        console.log(OrderNum); // 순차정보 Log
-        var SolveTableNum = "s_ox_users_s" + OrderNum + "_ch01";
-        var sql1 = 'SELECT ?? AS solveResult FROM ?? WHERE user_id = ?';
-        var params1 = [QstString, SolveTableNum, type]
-
-        try {
-            var SolveArray_bit = await dbQueryAsync(sql1, params1);
-            SolveArray_int[i] = SolveArray_bit[0].solveResult != null ? SolveArray_bit[0].solveResult.readInt8() : 0;
-            
-            //const SolveArrayInt = Buffer.from(SolveArray_bit[i]);
-            console.log(SolveArray_int[i]);
-            //console.log(SolveTableNum + " " + QstString + " " + SolveArrayInt.readInt8()); // 배점 Array
-        } catch (err) {
-            console.log(err);
-        }
-        OrderNum = OrderNum - 1;
-    }
-    var ScoreWeight_A1 = SolveArray_int[0]*4 + SolveArray_int[1]*2 + SolveArray_int[2]; // 배점 가중치 #1 (After) 산출
-    var ScoreWeight_B1 = SolveArray_int[1]*4 + SolveArray_int[2]*2 + SolveArray_int[3]; // 배점 가중치 #1 (Before) 산출
-    var ScoreWeight_A2;
-    var ScoreWeight_B2; 
-    // 배점 가중치 #2 (After) 산출
-    switch (ScoreWeight_A1) {
-        case 7:
-            ScoreWeight_A2 = 2;
-            break;
-        case 6:
-            ScoreWeight_A2 = 1.5;
-            break;
-        case 5:
-            ScoreWeight_A2 = 1;
-            break;
-        case 4:
-            ScoreWeight_A2 = 0.5;
-            break;
-        case 3:
-            ScoreWeight_A2 = -0.5;
-            break;
-        case 2:
-            ScoreWeight_A2 = -1;
-            break;
-        case 1:
-            ScoreWeight_A2 = -1.5;
-            break;
-        case 0:
-            ScoreWeight_A2 = -2;
-            break;
-    }
-    // 배점 가중치 #2 (Before) 산출
-    switch (ScoreWeight_B1) {
-        case 7:
-            ScoreWeight_B2 = 2;
-            break;
-        case 6:
-            ScoreWeight_B2 = 1.5;
-            break;
-        case 5:
-            ScoreWeight_B2 = 1;
-            break;
-        case 4:
-            ScoreWeight_B2 = 0.5;
-            break;
-        case 3:
-            ScoreWeight_B2 = -0.5;
-            break;
-        case 2:
-            ScoreWeight_B2 = -1;
-            break;
-        case 1:
-            ScoreWeight_B2 = -1.5;
-            break;
-        case 0:
-            ScoreWeight_B2 = -2;
-            break;
-    }
-
-
-    var sql2 = 'SELECT ox_avr FROM s_ox_qs_ansr_ch01 WHERE qst_id = ?';
-    var params2 = [QstString]
-
-    try {
-        var AnsRate = await dbQueryAsync(sql2, params2);
-        var UnitScore_A = ScoreWeight_A2 >=0 ? ScoreWeight_A2 * (1 - AnsRate[0].ox_avr) : ScoreWeight_A2 * AnsRate[0].ox_avr; // 단위 배점 (After) 산출
-        var UnitScore_ARound = Math.ceil(UnitScore_A*100)/100; // 단위 배점 (After) RoundUp
-        var UnitScore_B = ScoreWeight_B2 >=0 ? ScoreWeight_B2 * (1 - AnsRate[0].ox_avr) : ScoreWeight_B2 * AnsRate[0].ox_avr; // 단위 배점 (After) 산출
-        var UnitScore_BRound = Math.ceil(UnitScore_B*100)/100; // 단위 배점 (Before) RoundUp
-        var UnitScore = UnitScore_ARound - UnitScore_BRound;   // 단위 배점 (종합) 산출
-        
-        console.log(ScoreWeight_A1 + "/" + ScoreWeight_B1);
-        console.log(ScoreWeight_A2 + "/" + ScoreWeight_B2);
-        console.log(AnsRate[0].ox_avr);
-        console.log(UnitScore_ARound + "/" + UnitScore_BRound + "_" + UnitScore);
-
-    } catch (err) {
-        console.log(err);
-    }
-}
-
-TestFunction_UserScore();
-*/
-/*
 trigger_ox_OsumResult();
 trigger_ox_XsumResult();
 trigger_ox_AvrResult();
-*/
+
 
 /*
 //////////////////////////////////////////////////////////////////////
