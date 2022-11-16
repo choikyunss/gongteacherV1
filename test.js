@@ -1244,8 +1244,8 @@ function update_ox2() {
             }
 
             // Weight
-            var afterWeight = SolveArray_int[0]*4 + SolveArray_int[1]*2 + SolveArray_int[2];  // Calculate a current value
-            var beforeWeight = SolveArray_int[1]*4 + SolveArray_int[2]*2 + SolveArray_int[3]; // Calculate a previous value
+            var afterWeight = answerArray_int[0]*4 + answerArray_int[1]*2 + answerArray_int[2];  // Calculate a current value
+            var beforeWeight = answerArray_int[1]*4 + answerArray_int[2]*2 + answerArray_int[3]; // Calculate a previous value
 
             // Read correct answer rate
             var sqlB = 'SELECT ox_avr FROM s_ox_qs_ansr_ch01 WHERE qst_id = ?';
